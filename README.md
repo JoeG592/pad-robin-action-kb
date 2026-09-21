@@ -82,4 +82,4 @@ PAD updates add and change actions. The KB carries the PAD build it was validate
 
 The data files are released under Creative Commons Attribution 4.0 (CC BY 4.0). Use them for anything, including commercially, with attribution.
 
-Built by Joe Green, an AI flow generator for Power Automate.
+Built by Joe Green while automating Power Automate Desktop for real-world use.
