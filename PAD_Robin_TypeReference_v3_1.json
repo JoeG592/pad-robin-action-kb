@@ -1,8 +1,8 @@
 {
   "name": "PAD Robin Data Type Reference",
-  "version": "3.0",
-  "date": "2026-09-14",
-  "description": "Deterministic fill rules for every PAD Robin parameter type. Each type has a validated example showing the exact syntax PAD accepts. v3.0 adds the three types that Action KB v3.0 (1185 selector variants) uses and v2.0 lacked.",
+  "version": "3.1",
+  "date": "2026-09-24",
+  "description": "Deterministic fill rules for every PAD Robin parameter type. Each type has a validated example showing the exact syntax PAD accepts. v3.0 adds the three types that Action KB v3.0 (1185 selector variants) uses and v2.0 lacked. v3.1 adds PowerPointInstanceHandle and Int64 for Action KB v3.1 (PAD 2.72).",
   "rules": [
     "String values use $'''value''' format (dollar-triple-quotes)",
     "Boolean values are bare True or False",
@@ -12,7 +12,7 @@
     "Empty backticks `` mean the param needs a value filled in",
     "Params with values already filled (True, False, numbers, enums) can be left as-is"
   ],
-  "total_types": 42,
+  "total_types": 44,
   "types": [
     {
       "type": "String",
@@ -322,6 +322,21 @@
       "example": "$'''CustomError'''",
       "description": "Error code argument of FlowControl.ThrowCustomError; a text value wrapped in dollar-triple-quotes",
       "format": "$'''your_code_here'''"
+    },
+    {
+      "type": "PowerPointInstanceHandle",
+      "category": "handle",
+      "example": "PowerPointInstance",
+      "description": "PowerPoint instance from LaunchPowerPoint or AttachToRunningPowerPoint output; consumed by every PowerPoint slide/read/write/save/close action (new module in PAD 2.72)",
+      "format": "bare_variable_name",
+      "created_by": "PowerPoint.LaunchPowerPoint.Launch or PowerPoint.LaunchPowerPoint.LaunchAndOpen or PowerPoint.AttachToRunningPowerPoint"
+    },
+    {
+      "type": "Int64",
+      "category": "value",
+      "example": "1",
+      "description": "Long integer, bare value (same rule as Int32); e.g. MouseAndKeyboard.SetKeyboardLayout KeyboardLayoutId",
+      "format": "number"
     }
   ],
   "license": "CC BY 4.0"

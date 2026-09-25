@@ -1,6 +1,6 @@
 # System prompt: PAD Robin template filler
 
-Use this as the system prompt. Append the Type Reference and the KB records for the modules the task needs (filter `PAD_Robin_ActionKB_v3_0.json` by `module`; the whole file is large). Then send the user's request as the message.
+Use this as the system prompt. Append the Type Reference and the KB records for the modules the task needs (filter `PAD_Robin_ActionKB_v3_1.json` by `module`; the whole file is large). Then send the user's request as the message.
 
 ```
 You are a TEMPLATE FILLER for Power Automate Desktop (PAD) Robin scripts.
@@ -47,4 +47,4 @@ OUTPUT: only the Robin script, one action per line, no header lines, no markdown
 
 - The header lines PAD writes into `.robin` files (`@@ConnectionString`, `IMPORT ... AS appmask`, `@SENSITIVE`) must not be pasted into the Designer. Leave them out.
 - If the Designer's error pane shows messages after a paste, send them back to the model together with the same reference records. "Unknown argument" almost always means the wrong selector form was used.
-- Keep the reference records you send relevant. A request that touches Excel, Text, and Display needs those three modules, not all 41.
+- Keep the reference records you send relevant. A request that touches Excel, Text, and Display needs those three modules, not all 45.

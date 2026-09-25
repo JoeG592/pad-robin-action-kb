@@ -1,8 +1,8 @@
 {
   "name": "PAD Robin Action Knowledge Base",
-  "version": "3.0",
-  "date": "2026-09-14",
-  "pad_build": "2.67.00143.26090",
+  "version": "3.1",
+  "date": "2026-09-24",
+  "pad_build": "2.72.00183.26250",
   "license": "CC BY 4.0",
   "description": "Paste-validated reference of Power Automate Desktop (PAD) Robin actions: every record is a Robin action id with a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters, and the sibling selector forms of the same action. Built for use with AI assistants (Claude, Copilot, ChatGPT): give the model the golden example and the Type Reference, have it change values only.",
   "fields": {
@@ -16,20 +16,20 @@
     "constraints": "properties fixed by this selector and therefore absent from Robin (e.g. DelimiterType=Standard)",
     "sibling_selectors": "other Robin ids of the same action; each exposes a different argument subset",
     "needs_ui_selector": "an input is a recorded UI/web element or image; the example uses a placeholder and cannot run as-is",
-    "validation": "how the golden example was validated"
+    "validation": "how the golden example was validated, and on which PAD build"
   },
   "counts": {
-    "total": 953,
-    "modules": 41,
+    "total": 988,
+    "modules": 45,
     "by_kind": {
-      "Action": 870,
+      "Action": 903,
       "Condition": 42,
       "Wait": 39,
-      "While": 2
+      "While": 4
     },
     "needs_ui_selector": 17
   },
-  "not_included": "231 further selector variants exist in PAD 2.67 but are not in this release: 198 require a recorded UI element or image, 25 require a live mail or work-queue context to validate, 8 are deprecated or unknown to the Designer. They may be added in a later release.",
+  "not_included": "236 further selector variants exist in PAD 2.72 but are not in this release: 200 require a recorded UI element or image, 25 require a live mail or work-queue context to validate, 11 are deprecated, removed, or unknown to the Designer. They may be added in a later release.",
   "modules": [
     "AWS",
     "Access",
@@ -53,18 +53,22 @@
     "File",
     "FlowControl",
     "Folder",
-    "GenerativeAI",
+    "LLM",
     "Logging",
     "MouseAndKeyboard",
     "OCR",
     "Outlook",
     "PDF",
+    "PGP",
+    "PowerAutomateEnvironment",
+    "PowerPoint",
     "SAP",
     "Services",
     "System",
     "TerminalEmulation",
     "Testing",
     "Text",
+    "Triggers",
     "UIAutomation",
     "Variables",
     "Web",
@@ -6119,14 +6123,9 @@
       "module": "Cyberark",
       "kind": "Action",
       "selector": "GetPassword",
-      "template": "Cyberark.GetPassword.GetPassword ServerAddress: `` Safe: `` Object: `` Timeout: 30 ApplicationId: `` AcceptUntrustedCertificates: False Folder: `` ExtraData: `` Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
-      "golden_example": "Cyberark.GetPassword.GetPassword ServerAddress: $'''example''' Safe: $'''example''' Object: $'''example''' Timeout: 30 ApplicationId: $'''example''' AcceptUntrustedCertificates: False Folder: $'''example''' ExtraData: $'''example''' Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
+      "template": "Cyberark.GetPassword.GetPassword Safe: `` Object: `` ServerAddress: `` Timeout: 30 AuthApp: `` ApplicationId: `` AcceptUntrustedCertificates: False Folder: `` ExtraData: `` Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
+      "golden_example": "Cyberark.GetPassword.GetPassword Safe: $'''example''' Object: $'''example''' ServerAddress: $'''example''' Timeout: 30 AuthApp: $'''example''' ApplicationId: $'''example''' AcceptUntrustedCertificates: False Folder: $'''example''' ExtraData: $'''example''' Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
       "input_params": [
-        {
-          "name": "ServerAddress",
-          "type": "String",
-          "required": true
-        },
         {
           "name": "Safe",
           "type": "String",
@@ -6138,10 +6137,21 @@
           "required": true
         },
         {
+          "name": "ServerAddress",
+          "type": "String",
+          "required": true
+        },
+        {
           "name": "Timeout",
           "type": "Int32",
           "required": true,
           "default": "30"
+        },
+        {
+          "name": "AuthApp",
+          "type": "String",
+          "required": true,
+          "default": "AIMWebService"
         },
         {
           "name": "ApplicationId",
@@ -6184,10 +6194,11 @@
         }
       ],
       "required_params": [
-        "ServerAddress",
         "Safe",
         "Object",
+        "ServerAddress",
         "Timeout",
+        "AuthApp",
         "ApplicationId",
         "AcceptUntrustedCertificates",
         "Folder"
@@ -6200,21 +6211,16 @@
         "Cyberark.GetPassword.GetPasswordWithStoreCertificate"
       ],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "Cyberark.GetPassword.GetPasswordWithFileCertificate",
       "module": "Cyberark",
       "kind": "Action",
       "selector": "GetPasswordWithFileCertificate",
-      "template": "Cyberark.GetPassword.GetPasswordWithFileCertificate ServerAddress: `` Safe: `` Object: `` Timeout: 30 CertificateFilePassword: `` ApplicationId: `` AcceptUntrustedCertificates: False Folder: `` ExtraData: `` CertificateFilePath: `` Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
-      "golden_example": "Cyberark.GetPassword.GetPasswordWithFileCertificate ServerAddress: $'''example''' Safe: $'''example''' Object: $'''example''' Timeout: 30 CertificateFilePassword: $'''password''' ApplicationId: $'''example''' AcceptUntrustedCertificates: False Folder: $'''example''' ExtraData: $'''example''' CertificateFilePath: $'''C:\\temp\\test.xlsx''' Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
+      "template": "Cyberark.GetPassword.GetPasswordWithFileCertificate Safe: `` Object: `` ServerAddress: `` Timeout: 30 AuthApp: `` ApplicationId: `` AcceptUntrustedCertificates: False CertificateFilePassword: `` Folder: `` ExtraData: `` CertificateFilePath: `` Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
+      "golden_example": "Cyberark.GetPassword.GetPasswordWithFileCertificate Safe: $'''example''' Object: $'''example''' ServerAddress: $'''example''' Timeout: 30 AuthApp: $'''example''' ApplicationId: $'''example''' AcceptUntrustedCertificates: False CertificateFilePassword: $'''password''' Folder: $'''example''' ExtraData: $'''example''' CertificateFilePath: $'''C:\\temp\\test.xlsx''' Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
       "input_params": [
-        {
-          "name": "ServerAddress",
-          "type": "String",
-          "required": true
-        },
         {
           "name": "Safe",
           "type": "String",
@@ -6226,15 +6232,21 @@
           "required": true
         },
         {
+          "name": "ServerAddress",
+          "type": "String",
+          "required": true
+        },
+        {
           "name": "Timeout",
           "type": "Int32",
           "required": true,
           "default": "30"
         },
         {
-          "name": "CertificateFilePassword",
-          "type": "EncryptableObject",
-          "required": true
+          "name": "AuthApp",
+          "type": "String",
+          "required": true,
+          "default": "AIMWebService"
         },
         {
           "name": "ApplicationId",
@@ -6246,6 +6258,11 @@
           "type": "Boolean",
           "required": true,
           "default": "False"
+        },
+        {
+          "name": "CertificateFilePassword",
+          "type": "EncryptableObject",
+          "required": true
         },
         {
           "name": "Folder",
@@ -6282,13 +6299,14 @@
         }
       ],
       "required_params": [
-        "ServerAddress",
         "Safe",
         "Object",
+        "ServerAddress",
         "Timeout",
-        "CertificateFilePassword",
+        "AuthApp",
         "ApplicationId",
         "AcceptUntrustedCertificates",
+        "CertificateFilePassword",
         "Folder",
         "CertificateFilePath"
       ],
@@ -6300,21 +6318,16 @@
         "Cyberark.GetPassword.GetPasswordWithStoreCertificate"
       ],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "Cyberark.GetPassword.GetPasswordWithStoreCertificate",
       "module": "Cyberark",
       "kind": "Action",
       "selector": "GetPasswordWithStoreCertificate",
-      "template": "Cyberark.GetPassword.GetPasswordWithStoreCertificate ServerAddress: `` Safe: `` Object: `` UseOnlyValidCertificate: False Timeout: 30 StoreCertificatesPaths: `` ApplicationId: `` AcceptUntrustedCertificates: False Folder: `` ExtraData: `` Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
-      "golden_example": "Cyberark.GetPassword.GetPasswordWithStoreCertificate ServerAddress: $'''example''' Safe: $'''example''' Object: $'''example''' UseOnlyValidCertificate: False Timeout: 30 StoreCertificatesPaths: $'''example''' ApplicationId: $'''example''' AcceptUntrustedCertificates: False Folder: $'''example''' ExtraData: $'''example''' Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
+      "template": "Cyberark.GetPassword.GetPasswordWithStoreCertificate Safe: `` Object: `` ServerAddress: `` UseOnlyValidCertificate: False Timeout: 30 StoreCertificatesPaths: `` AuthApp: `` ApplicationId: `` AcceptUntrustedCertificates: False Folder: `` ExtraData: `` Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
+      "golden_example": "Cyberark.GetPassword.GetPasswordWithStoreCertificate Safe: $'''example''' Object: $'''example''' ServerAddress: $'''example''' UseOnlyValidCertificate: False Timeout: 30 StoreCertificatesPaths: $'''example''' AuthApp: $'''example''' ApplicationId: $'''example''' AcceptUntrustedCertificates: False Folder: $'''example''' ExtraData: $'''example''' Response=> JSONResponse PlainTextPassword=> CyberArkPassword Password=> CyberArkPassword",
       "input_params": [
-        {
-          "name": "ServerAddress",
-          "type": "String",
-          "required": true
-        },
         {
           "name": "Safe",
           "type": "String",
@@ -6322,6 +6335,11 @@
         },
         {
           "name": "Object",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "ServerAddress",
           "type": "String",
           "required": true
         },
@@ -6341,6 +6359,12 @@
           "name": "StoreCertificatesPaths",
           "type": "String",
           "required": true
+        },
+        {
+          "name": "AuthApp",
+          "type": "String",
+          "required": true,
+          "default": "AIMWebService"
         },
         {
           "name": "ApplicationId",
@@ -6383,12 +6407,13 @@
         }
       ],
       "required_params": [
-        "ServerAddress",
         "Safe",
         "Object",
+        "ServerAddress",
         "UseOnlyValidCertificate",
         "Timeout",
         "StoreCertificatesPaths",
+        "AuthApp",
         "ApplicationId",
         "AcceptUntrustedCertificates",
         "Folder"
@@ -6401,7 +6426,7 @@
         "Cyberark.GetPassword.GetPassword"
       ],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "Database.Close",
@@ -6427,32 +6452,76 @@
       "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
     },
     {
-      "actionId": "Database.Connect",
+      "actionId": "Database.Connect.Connect",
       "module": "Database",
       "kind": "Action",
-      "selector": null,
-      "template": "Database.Connect ConnectionString: `` Connection=> SQLConnection",
-      "golden_example": "Database.Connect ConnectionString: $'''example''' Connection=> SQLConnection",
+      "selector": "Connect",
+      "template": "Database.Connect.Connect ConnectionString: `` Connection=> SQLConnection",
+      "golden_example": "Database.Connect.Connect ConnectionString: $'''example''' Connection=> SQLConnection",
       "input_params": [
         {
           "name": "ConnectionString",
           "type": "String",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [
         {
           "name": "Connection",
-          "type": "SqlConnectionHandle"
+          "type": "SqlConnectionHandle",
+          "defaultVariable": "SQLConnection"
         }
       ],
       "required_params": [
-        "Connection string"
+        "ConnectionString"
       ],
-      "constraints": {},
-      "sibling_selectors": [],
+      "constraints": {
+        "DatabaseType": "Other"
+      },
+      "sibling_selectors": [
+        "Database.Connect.ConnectOracle"
+      ],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "Database.Connect.ConnectOracle",
+      "module": "Database",
+      "kind": "Action",
+      "selector": "ConnectOracle",
+      "template": "Database.Connect.ConnectOracle ProviderLibraryPath: `` ConnectionString: `` Connection=> SQLConnection",
+      "golden_example": "Database.Connect.ConnectOracle ProviderLibraryPath: $'''C:\\temp\\test.xlsx''' ConnectionString: $'''example''' Connection=> SQLConnection",
+      "input_params": [
+        {
+          "name": "ProviderLibraryPath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "ConnectionString",
+          "type": "String",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "Connection",
+          "type": "SqlConnectionHandle",
+          "defaultVariable": "SQLConnection"
+        }
+      ],
+      "required_params": [
+        "ProviderLibraryPath",
+        "ConnectionString"
+      ],
+      "constraints": {
+        "DatabaseType": "Oracle"
+      },
+      "sibling_selectors": [
+        "Database.Connect.Connect"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "Database.ExecuteSqlStatement.ConnectAndExecute",
@@ -6492,13 +6561,69 @@
         "ConnectionString"
       ],
       "constraints": {
-        "GetConnection": "ConnectionString"
+        "GetConnection": "ConnectionString",
+        "DatabaseType": "Other"
       },
       "sibling_selectors": [
+        "Database.ExecuteSqlStatement.ConnectAndExecuteOracle",
         "Database.ExecuteSqlStatement.Execute"
       ],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "Database.ExecuteSqlStatement.ConnectAndExecuteOracle",
+      "module": "Database",
+      "kind": "Action",
+      "selector": "ConnectAndExecuteOracle",
+      "template": "Database.ExecuteSqlStatement.ConnectAndExecuteOracle Statement: `` Timeout: 30 ProviderLibraryPath: `` ConnectionString: `` Result=> QueryResult",
+      "golden_example": "Database.ExecuteSqlStatement.ConnectAndExecuteOracle Statement: $'''example''' Timeout: 30 ProviderLibraryPath: $'''C:\\temp\\test.xlsx''' ConnectionString: $'''example''' Result=> QueryResult",
+      "input_params": [
+        {
+          "name": "Statement",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "Timeout",
+          "type": "Int32",
+          "required": true,
+          "default": "30"
+        },
+        {
+          "name": "ProviderLibraryPath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "ConnectionString",
+          "type": "String",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "Result",
+          "type": "DataTable",
+          "defaultVariable": "QueryResult"
+        }
+      ],
+      "required_params": [
+        "Statement",
+        "Timeout",
+        "ProviderLibraryPath",
+        "ConnectionString"
+      ],
+      "constraints": {
+        "GetConnection": "ConnectionString",
+        "DatabaseType": "Oracle"
+      },
+      "sibling_selectors": [
+        "Database.ExecuteSqlStatement.ConnectAndExecute",
+        "Database.ExecuteSqlStatement.Execute"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "Database.ExecuteSqlStatement.Execute",
@@ -6538,7 +6663,8 @@
         "GetConnection": "SQLConnectionVariable"
       },
       "sibling_selectors": [
-        "Database.ExecuteSqlStatement.ConnectAndExecute"
+        "Database.ExecuteSqlStatement.ConnectAndExecute",
+        "Database.ExecuteSqlStatement.ConnectAndExecuteOracle"
       ],
       "needs_ui_selector": false,
       "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
@@ -17334,68 +17460,6 @@
       "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
     },
     {
-      "actionId": "GenerativeAI.RunCUAPrompt",
-      "module": "GenerativeAI",
-      "kind": "Action",
-      "selector": null,
-      "template": "GenerativeAI.RunCUAPrompt FailOnTimeout: False SystemPrompt: `` Timeout: 300 Prompt: `` Model: GenerativeAI.CUAModels.Model1 Response=> Response",
-      "golden_example": "GenerativeAI.RunCUAPrompt FailOnTimeout: False SystemPrompt: $'''example''' Timeout: 300 Prompt: $'''example''' Model: GenerativeAI.CUAModels.Model1 Response=> Response",
-      "input_params": [
-        {
-          "name": "FailOnTimeout",
-          "type": "Boolean",
-          "required": true,
-          "default": "False"
-        },
-        {
-          "name": "SystemPrompt",
-          "type": "String",
-          "required": true,
-          "default": "<SYSTEM_CAPABILITY>\n* You are utilising a windows machine with internet access.\n* To launch applications on the desktop, double click on the icon. Note, firefox-esr is what is installed on your system.\n* When using your computer function calls, they take a while to run and send back to you.  Do not try to chain multiple of these calls all into one function calls request, only include on tool request per response.\n </SYSTEM_CAPABILITY>\n\n<IMPORTANT>\n* When using Firefox, if a startup wizard appears, IGNORE IT.  Do not even click \"skip this step\".  Instead, click on the address bar where it says \"Search or enter address\", and enter the appropriate search term or URL there.\n* If the item you are looking at is a pdf, if after taking a single screenshot of the pdf it seems that you want to read the entire document instead of trying to continue to read the pdf from your screenshots + navigation, determine the URL\n. Explain what steps you will take \n. Never ask for confirmation to perform actions.\n </IMPORTANT>"
-        },
-        {
-          "name": "Timeout",
-          "type": "Int32",
-          "required": true,
-          "default": "300"
-        },
-        {
-          "name": "Prompt",
-          "type": "String",
-          "required": true
-        },
-        {
-          "name": "Model",
-          "type": "CUAModels",
-          "required": true,
-          "default": "Model1",
-          "enumValues": [
-            "Model1",
-            "Model2",
-            "Model3"
-          ]
-        }
-      ],
-      "output_params": [
-        {
-          "name": "Response",
-          "type": "String",
-          "defaultVariable": "Response"
-        }
-      ],
-      "required_params": [
-        "FailOnTimeout",
-        "SystemPrompt",
-        "Timeout",
-        "Prompt",
-        "Model"
-      ],
-      "constraints": {},
-      "sibling_selectors": [],
-      "needs_ui_selector": false,
-      "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
-    },
-    {
       "actionId": "GoogleCognitive.AnalyzeEntitiesGoogle.AnalyzeEntitiesFromFile",
       "module": "Cognitive - Google",
       "kind": "Action",
@@ -19170,6 +19234,110 @@
       "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
+      "actionId": "LLM.InvokeLLM",
+      "module": "LLM",
+      "kind": "Action",
+      "selector": null,
+      "template": "LLM.InvokeLLM MaxTokens: 2048 Temperature: 0.8 ResponseFormat: LLM.ResponseFormatType.Text ApiKey: `` Timeout: 300 ModelConfiguration: `` EndpointUrl: `` SystemPrompt: `` AttachFiles: `` UserPrompt: `` CompletionTokens=> CompletionTokens PromptTokens=> PromptTokens Response=> Response",
+      "golden_example": "LLM.InvokeLLM MaxTokens: 2048 Temperature: 0.8 ResponseFormat: LLM.ResponseFormatType.Text ApiKey: $'''password''' Timeout: 300 ModelConfiguration: $'''example''' EndpointUrl: $'''example''' SystemPrompt: $'''example''' AttachFiles: SelectedFiles UserPrompt: $'''example''' CompletionTokens=> CompletionTokens PromptTokens=> PromptTokens Response=> Response",
+      "input_params": [
+        {
+          "name": "MaxTokens",
+          "type": "Int32",
+          "required": true,
+          "default": "2048"
+        },
+        {
+          "name": "Temperature",
+          "type": "Double",
+          "required": true,
+          "default": "0.8"
+        },
+        {
+          "name": "ResponseFormat",
+          "type": "ResponseFormatType",
+          "required": true,
+          "default": "Text",
+          "enumValues": [
+            "Text",
+            "Json"
+          ]
+        },
+        {
+          "name": "ApiKey",
+          "type": "EncryptableObject",
+          "required": false,
+          "default": ""
+        },
+        {
+          "name": "Timeout",
+          "type": "Int32",
+          "required": true,
+          "default": "300"
+        },
+        {
+          "name": "ModelConfiguration",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "EndpointUrl",
+          "type": "String",
+          "required": true,
+          "default": "http://localhost:11434/v1"
+        },
+        {
+          "name": "SystemPrompt",
+          "type": "String",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "AttachFiles",
+          "type": "List`1<FileObject>",
+          "required": true,
+          "default": ""
+        },
+        {
+          "name": "UserPrompt",
+          "type": "String",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "CompletionTokens",
+          "type": "Int32",
+          "defaultVariable": "CompletionTokens"
+        },
+        {
+          "name": "PromptTokens",
+          "type": "Int32",
+          "defaultVariable": "PromptTokens"
+        },
+        {
+          "name": "Response",
+          "type": "String",
+          "defaultVariable": "Response"
+        }
+      ],
+      "required_params": [
+        "MaxTokens",
+        "Temperature",
+        "ResponseFormat",
+        "Timeout",
+        "ModelConfiguration",
+        "EndpointUrl",
+        "SystemPrompt",
+        "AttachFiles",
+        "UserPrompt"
+      ],
+      "constraints": {},
+      "sibling_selectors": [],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
       "actionId": "Logging.LogMessage",
       "module": "Logging",
       "kind": "Action",
@@ -20431,6 +20599,29 @@
       ],
       "needs_ui_selector": false,
       "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "MouseAndKeyboard.SetKeyboardLayout",
+      "module": "MouseAndKeyboard",
+      "kind": "Action",
+      "selector": null,
+      "template": "MouseAndKeyboard.SetKeyboardLayout KeyboardLayoutId: ``",
+      "golden_example": "MouseAndKeyboard.SetKeyboardLayout KeyboardLayoutId: 1",
+      "input_params": [
+        {
+          "name": "KeyboardLayoutId",
+          "type": "Int64",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "KeyboardLayoutId"
+      ],
+      "constraints": {},
+      "sibling_selectors": [],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "MouseAndKeyboard.SetKeyState",
@@ -28309,6 +28500,1070 @@
       "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
     },
     {
+      "actionId": "PGP.PgpDecryptFile.PgpDecryptFile",
+      "module": "PGP",
+      "kind": "Action",
+      "selector": "PgpDecryptFile",
+      "template": "PGP.PgpDecryptFile.PgpDecryptFile PrivateKeyFilePath: `` Passphrase: `` InputFilePath: `` OutputFilePath: ``",
+      "golden_example": "PGP.PgpDecryptFile.PgpDecryptFile PrivateKeyFilePath: $'''C:\\temp\\test.xlsx''' Passphrase: $'''password''' InputFilePath: $'''C:\\temp\\test.xlsx''' OutputFilePath: $'''C:\\temp\\test.xlsx'''",
+      "input_params": [
+        {
+          "name": "PrivateKeyFilePath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "Passphrase",
+          "type": "EncryptableObject",
+          "required": false
+        },
+        {
+          "name": "InputFilePath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "OutputFilePath",
+          "type": "FileObject",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "PrivateKeyFilePath",
+        "InputFilePath",
+        "OutputFilePath"
+      ],
+      "constraints": {
+        "PrivateKeySource": "File"
+      },
+      "sibling_selectors": [
+        "PGP.PgpDecryptFile.PgpDecryptFilePrivateKeyAsText"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PGP.PgpDecryptFile.PgpDecryptFilePrivateKeyAsText",
+      "module": "PGP",
+      "kind": "Action",
+      "selector": "PgpDecryptFilePrivateKeyAsText",
+      "template": "PGP.PgpDecryptFile.PgpDecryptFilePrivateKeyAsText PrivateKeyText: `` Passphrase: `` InputFilePath: `` OutputFilePath: ``",
+      "golden_example": "PGP.PgpDecryptFile.PgpDecryptFilePrivateKeyAsText PrivateKeyText: $'''example''' Passphrase: $'''password''' InputFilePath: $'''C:\\temp\\test.xlsx''' OutputFilePath: $'''C:\\temp\\test.xlsx'''",
+      "input_params": [
+        {
+          "name": "PrivateKeyText",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "Passphrase",
+          "type": "EncryptableObject",
+          "required": false
+        },
+        {
+          "name": "InputFilePath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "OutputFilePath",
+          "type": "FileObject",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "PrivateKeyText",
+        "InputFilePath",
+        "OutputFilePath"
+      ],
+      "constraints": {
+        "PrivateKeySource": "Text"
+      },
+      "sibling_selectors": [
+        "PGP.PgpDecryptFile.PgpDecryptFile"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PGP.PgpEncryptFile.PgpEncryptFile",
+      "module": "PGP",
+      "kind": "Action",
+      "selector": "PgpEncryptFile",
+      "template": "PGP.PgpEncryptFile.PgpEncryptFile EncryptionAlgorithm: PGP.PgpEncryptionAlgorithm.AES256 PublicKeyFilePath: `` IsAsciiArmored: False CompressionAlgorithm: PGP.PgpCompressionAlgorithm.ZIP OutputFilePath: `` InputFilePath: ``",
+      "golden_example": "PGP.PgpEncryptFile.PgpEncryptFile EncryptionAlgorithm: PGP.PgpEncryptionAlgorithm.AES256 PublicKeyFilePath: $'''C:\\temp\\test.xlsx''' IsAsciiArmored: False CompressionAlgorithm: PGP.PgpCompressionAlgorithm.ZIP OutputFilePath: $'''C:\\temp\\test.xlsx''' InputFilePath: $'''C:\\temp\\test.xlsx'''",
+      "input_params": [
+        {
+          "name": "EncryptionAlgorithm",
+          "type": "PgpEncryptionAlgorithm",
+          "required": true,
+          "default": "AES256",
+          "enumValues": [
+            "AES256",
+            "AES192",
+            "AES128",
+            "TripleDES",
+            "CAST5"
+          ]
+        },
+        {
+          "name": "PublicKeyFilePath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "IsAsciiArmored",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "CompressionAlgorithm",
+          "type": "PgpCompressionAlgorithm",
+          "required": true,
+          "default": "ZIP",
+          "enumValues": [
+            "None",
+            "ZIP",
+            "ZLIB",
+            "BZIP2"
+          ]
+        },
+        {
+          "name": "OutputFilePath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "InputFilePath",
+          "type": "FileObject",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "EncryptionAlgorithm",
+        "PublicKeyFilePath",
+        "IsAsciiArmored",
+        "CompressionAlgorithm",
+        "OutputFilePath",
+        "InputFilePath"
+      ],
+      "constraints": {
+        "PublicKeySource": "File"
+      },
+      "sibling_selectors": [
+        "PGP.PgpEncryptFile.PgpEncryptFilePublicKeyAsText"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PGP.PgpEncryptFile.PgpEncryptFilePublicKeyAsText",
+      "module": "PGP",
+      "kind": "Action",
+      "selector": "PgpEncryptFilePublicKeyAsText",
+      "template": "PGP.PgpEncryptFile.PgpEncryptFilePublicKeyAsText EncryptionAlgorithm: PGP.PgpEncryptionAlgorithm.AES256 IsAsciiArmored: False CompressionAlgorithm: PGP.PgpCompressionAlgorithm.ZIP OutputFilePath: `` InputFilePath: `` PublicKeyText: ``",
+      "golden_example": "PGP.PgpEncryptFile.PgpEncryptFilePublicKeyAsText EncryptionAlgorithm: PGP.PgpEncryptionAlgorithm.AES256 IsAsciiArmored: False CompressionAlgorithm: PGP.PgpCompressionAlgorithm.ZIP OutputFilePath: $'''C:\\temp\\test.xlsx''' InputFilePath: $'''C:\\temp\\test.xlsx''' PublicKeyText: $'''example'''",
+      "input_params": [
+        {
+          "name": "EncryptionAlgorithm",
+          "type": "PgpEncryptionAlgorithm",
+          "required": true,
+          "default": "AES256",
+          "enumValues": [
+            "AES256",
+            "AES192",
+            "AES128",
+            "TripleDES",
+            "CAST5"
+          ]
+        },
+        {
+          "name": "IsAsciiArmored",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "CompressionAlgorithm",
+          "type": "PgpCompressionAlgorithm",
+          "required": true,
+          "default": "ZIP",
+          "enumValues": [
+            "None",
+            "ZIP",
+            "ZLIB",
+            "BZIP2"
+          ]
+        },
+        {
+          "name": "OutputFilePath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "InputFilePath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "PublicKeyText",
+          "type": "String",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "EncryptionAlgorithm",
+        "IsAsciiArmored",
+        "CompressionAlgorithm",
+        "OutputFilePath",
+        "InputFilePath",
+        "PublicKeyText"
+      ],
+      "constraints": {
+        "PublicKeySource": "Text"
+      },
+      "sibling_selectors": [
+        "PGP.PgpEncryptFile.PgpEncryptFile"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerAutomateEnvironment.GetEnvironmentMetadata",
+      "module": "PowerAutomateEnvironment",
+      "kind": "Action",
+      "selector": null,
+      "template": "PowerAutomateEnvironment.GetEnvironmentMetadata EnvironmentName=> EnvironmentName EnvironmentId=> EnvironmentId",
+      "golden_example": "PowerAutomateEnvironment.GetEnvironmentMetadata EnvironmentName=> EnvironmentName EnvironmentId=> EnvironmentId",
+      "input_params": [],
+      "output_params": [
+        {
+          "name": "EnvironmentName",
+          "type": "String",
+          "defaultVariable": "EnvironmentName"
+        },
+        {
+          "name": "EnvironmentId",
+          "type": "String",
+          "defaultVariable": "EnvironmentId"
+        }
+      ],
+      "required_params": [],
+      "constraints": {},
+      "sibling_selectors": [],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerAutomateEnvironment.GetFlowMetadata",
+      "module": "PowerAutomateEnvironment",
+      "kind": "Action",
+      "selector": null,
+      "template": "PowerAutomateEnvironment.GetFlowMetadata CurrentSubflowName=> CurrentSubflowName FlowId=> FlowId FlowName=> FlowName",
+      "golden_example": "PowerAutomateEnvironment.GetFlowMetadata CurrentSubflowName=> CurrentSubflowName FlowId=> FlowId FlowName=> FlowName",
+      "input_params": [],
+      "output_params": [
+        {
+          "name": "CurrentSubflowName",
+          "type": "String",
+          "defaultVariable": "CurrentSubflowName"
+        },
+        {
+          "name": "FlowId",
+          "type": "String",
+          "defaultVariable": "FlowId"
+        },
+        {
+          "name": "FlowName",
+          "type": "String",
+          "defaultVariable": "FlowName"
+        }
+      ],
+      "required_params": [],
+      "constraints": {},
+      "sibling_selectors": [],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.AddPowerPointSlide.AddSlideAsFirst",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "AddSlideAsFirst",
+      "template": "PowerPoint.AddPowerPointSlide.AddSlideAsFirst Instance: `` SlideIndex=> SlideIndex",
+      "golden_example": "PowerPoint.AddPowerPointSlide.AddSlideAsFirst Instance: PowerPointInstance SlideIndex=> SlideIndex",
+      "input_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "SlideIndex",
+          "type": "Int32",
+          "defaultVariable": "SlideIndex"
+        }
+      ],
+      "required_params": [
+        "Instance"
+      ],
+      "constraints": {
+        "AddSlidePosition": "FirstSlide"
+      },
+      "sibling_selectors": [
+        "PowerPoint.AddPowerPointSlide.AddSlideAsLast",
+        "PowerPoint.AddPowerPointSlide.AddSlideAtPosition"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.AddPowerPointSlide.AddSlideAsLast",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "AddSlideAsLast",
+      "template": "PowerPoint.AddPowerPointSlide.AddSlideAsLast Instance: `` SlideIndex=> SlideIndex",
+      "golden_example": "PowerPoint.AddPowerPointSlide.AddSlideAsLast Instance: PowerPointInstance SlideIndex=> SlideIndex",
+      "input_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "SlideIndex",
+          "type": "Int32",
+          "defaultVariable": "SlideIndex"
+        }
+      ],
+      "required_params": [
+        "Instance"
+      ],
+      "constraints": {
+        "AddSlidePosition": "LastSlide"
+      },
+      "sibling_selectors": [
+        "PowerPoint.AddPowerPointSlide.AddSlideAsFirst",
+        "PowerPoint.AddPowerPointSlide.AddSlideAtPosition"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.AddPowerPointSlide.AddSlideAtPosition",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "AddSlideAtPosition",
+      "template": "PowerPoint.AddPowerPointSlide.AddSlideAtPosition SlidePosition: 1 Instance: `` SlideIndex=> SlideIndex",
+      "golden_example": "PowerPoint.AddPowerPointSlide.AddSlideAtPosition SlidePosition: 1 Instance: PowerPointInstance SlideIndex=> SlideIndex",
+      "input_params": [
+        {
+          "name": "SlidePosition",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        },
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "SlideIndex",
+          "type": "Int32",
+          "defaultVariable": "SlideIndex"
+        }
+      ],
+      "required_params": [
+        "SlidePosition",
+        "Instance"
+      ],
+      "constraints": {
+        "AddSlidePosition": "AtPosition"
+      },
+      "sibling_selectors": [
+        "PowerPoint.AddPowerPointSlide.AddSlideAsFirst",
+        "PowerPoint.AddPowerPointSlide.AddSlideAsLast"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.AttachToRunningPowerPoint",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": null,
+      "template": "PowerPoint.AttachToRunningPowerPoint PresentationName: `` Instance=> PowerPointInstance",
+      "golden_example": "PowerPoint.AttachToRunningPowerPoint PresentationName: $'''C:\\temp\\test.xlsx''' Instance=> PowerPointInstance",
+      "input_params": [
+        {
+          "name": "PresentationName",
+          "type": "FileObject",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "defaultVariable": "PowerPointInstance"
+        }
+      ],
+      "required_params": [
+        "PresentationName"
+      ],
+      "constraints": {},
+      "sibling_selectors": [],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.ClosePowerPoint.Close",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "Close",
+      "template": "PowerPoint.ClosePowerPoint.Close Instance: ``",
+      "golden_example": "PowerPoint.ClosePowerPoint.Close Instance: PowerPointInstance",
+      "input_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "Instance"
+      ],
+      "constraints": {
+        "CloseMode": "DoNotSave"
+      },
+      "sibling_selectors": [
+        "PowerPoint.ClosePowerPoint.CloseAndSave",
+        "PowerPoint.ClosePowerPoint.CloseAndSaveAs"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.ClosePowerPoint.CloseAndSave",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "CloseAndSave",
+      "template": "PowerPoint.ClosePowerPoint.CloseAndSave Instance: ``",
+      "golden_example": "PowerPoint.ClosePowerPoint.CloseAndSave Instance: PowerPointInstance",
+      "input_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "Instance"
+      ],
+      "constraints": {
+        "CloseMode": "Save"
+      },
+      "sibling_selectors": [
+        "PowerPoint.ClosePowerPoint.Close",
+        "PowerPoint.ClosePowerPoint.CloseAndSaveAs"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.ClosePowerPoint.CloseAndSaveAs",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "CloseAndSaveAs",
+      "template": "PowerPoint.ClosePowerPoint.CloseAndSaveAs DocumentFormat: PowerPoint.PowerPointFormat.FromExtension DocumentPath: `` Instance: ``",
+      "golden_example": "PowerPoint.ClosePowerPoint.CloseAndSaveAs DocumentFormat: PowerPoint.PowerPointFormat.FromExtension DocumentPath: $'''C:\\temp\\test.xlsx''' Instance: PowerPointInstance",
+      "input_params": [
+        {
+          "name": "DocumentFormat",
+          "type": "PowerPointFormat",
+          "required": true,
+          "default": "FromExtension",
+          "enumValues": [
+            "PPTX",
+            "PPTM",
+            "PPT",
+            "PDF",
+            "XPS",
+            "POTX",
+            "POTM",
+            "PPSX",
+            "PPSM",
+            "ODP",
+            "FromExtension"
+          ]
+        },
+        {
+          "name": "DocumentPath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "DocumentFormat",
+        "DocumentPath",
+        "Instance"
+      ],
+      "constraints": {
+        "CloseMode": "SaveAs"
+      },
+      "sibling_selectors": [
+        "PowerPoint.ClosePowerPoint.Close",
+        "PowerPoint.ClosePowerPoint.CloseAndSave"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.CopyPastePowerPointSlide",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": null,
+      "template": "PowerPoint.CopyPastePowerPointSlide DestinationInstance: `` DestinationSlidePosition: 1 SourceInstance: `` SourceSlidePosition: 1",
+      "golden_example": "PowerPoint.CopyPastePowerPointSlide DestinationInstance: PowerPointInstance DestinationSlidePosition: 1 SourceInstance: PowerPointInstance SourceSlidePosition: 1",
+      "input_params": [
+        {
+          "name": "DestinationInstance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        },
+        {
+          "name": "DestinationSlidePosition",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        },
+        {
+          "name": "SourceInstance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        },
+        {
+          "name": "SourceSlidePosition",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "DestinationInstance",
+        "DestinationSlidePosition",
+        "SourceInstance",
+        "SourceSlidePosition"
+      ],
+      "constraints": {},
+      "sibling_selectors": [],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.DeletePowerPointSlide.DeleteSlideAtPosition",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "DeleteSlideAtPosition",
+      "template": "PowerPoint.DeletePowerPointSlide.DeleteSlideAtPosition SlidePosition: 1 Instance: ``",
+      "golden_example": "PowerPoint.DeletePowerPointSlide.DeleteSlideAtPosition SlidePosition: 1 Instance: PowerPointInstance",
+      "input_params": [
+        {
+          "name": "SlidePosition",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        },
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "SlidePosition",
+        "Instance"
+      ],
+      "constraints": {
+        "DeleteSlidePosition": "AtPosition"
+      },
+      "sibling_selectors": [
+        "PowerPoint.DeletePowerPointSlide.DeleteSlideFirst",
+        "PowerPoint.DeletePowerPointSlide.DeleteSlideLast"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.DeletePowerPointSlide.DeleteSlideFirst",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "DeleteSlideFirst",
+      "template": "PowerPoint.DeletePowerPointSlide.DeleteSlideFirst Instance: ``",
+      "golden_example": "PowerPoint.DeletePowerPointSlide.DeleteSlideFirst Instance: PowerPointInstance",
+      "input_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "Instance"
+      ],
+      "constraints": {
+        "DeleteSlidePosition": "FirstSlide"
+      },
+      "sibling_selectors": [
+        "PowerPoint.DeletePowerPointSlide.DeleteSlideLast",
+        "PowerPoint.DeletePowerPointSlide.DeleteSlideAtPosition"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.DeletePowerPointSlide.DeleteSlideLast",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "DeleteSlideLast",
+      "template": "PowerPoint.DeletePowerPointSlide.DeleteSlideLast Instance: ``",
+      "golden_example": "PowerPoint.DeletePowerPointSlide.DeleteSlideLast Instance: PowerPointInstance",
+      "input_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "Instance"
+      ],
+      "constraints": {
+        "DeleteSlidePosition": "LastSlide"
+      },
+      "sibling_selectors": [
+        "PowerPoint.DeletePowerPointSlide.DeleteSlideFirst",
+        "PowerPoint.DeletePowerPointSlide.DeleteSlideAtPosition"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.LaunchPowerPoint.Launch",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "Launch",
+      "template": "PowerPoint.LaunchPowerPoint.Launch Instance=> PowerPointInstance",
+      "golden_example": "PowerPoint.LaunchPowerPoint.Launch Instance=> PowerPointInstance",
+      "input_params": [],
+      "output_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "defaultVariable": "PowerPointInstance"
+        }
+      ],
+      "required_params": [],
+      "constraints": {
+        "LaunchPowerPointMode": "NewPresentation"
+      },
+      "sibling_selectors": [
+        "PowerPoint.LaunchPowerPoint.LaunchAndOpen"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.LaunchPowerPoint.LaunchAndOpen",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "LaunchAndOpen",
+      "template": "PowerPoint.LaunchPowerPoint.LaunchAndOpen ReadOnly: False Path: `` Instance=> PowerPointInstance",
+      "golden_example": "PowerPoint.LaunchPowerPoint.LaunchAndOpen ReadOnly: False Path: $'''C:\\temp\\test.xlsx''' Instance=> PowerPointInstance",
+      "input_params": [
+        {
+          "name": "ReadOnly",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "Path",
+          "type": "FileObject",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "defaultVariable": "PowerPointInstance"
+        }
+      ],
+      "required_params": [
+        "ReadOnly",
+        "Path"
+      ],
+      "constraints": {
+        "LaunchPowerPointMode": "StoredPresentation"
+      },
+      "sibling_selectors": [
+        "PowerPoint.LaunchPowerPoint.Launch"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.MovePowerPointSlide",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": null,
+      "template": "PowerPoint.MovePowerPointSlide DestinationInstance: `` DestinationSlidePosition: 1 SourceInstance: `` SourceSlidePosition: 1",
+      "golden_example": "PowerPoint.MovePowerPointSlide DestinationInstance: PowerPointInstance DestinationSlidePosition: 1 SourceInstance: PowerPointInstance SourceSlidePosition: 1",
+      "input_params": [
+        {
+          "name": "DestinationInstance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        },
+        {
+          "name": "DestinationSlidePosition",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        },
+        {
+          "name": "SourceInstance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        },
+        {
+          "name": "SourceSlidePosition",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "DestinationInstance",
+        "DestinationSlidePosition",
+        "SourceInstance",
+        "SourceSlidePosition"
+      ],
+      "constraints": {},
+      "sibling_selectors": [],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.ReadFromPowerPoint.Read",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "Read",
+      "template": "PowerPoint.ReadFromPowerPoint.Read Instance: `` PowerPointData=> PowerPointData",
+      "golden_example": "PowerPoint.ReadFromPowerPoint.Read Instance: PowerPointInstance PowerPointData=> PowerPointData",
+      "input_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "PowerPointData",
+          "type": "String",
+          "defaultVariable": "PowerPointData"
+        }
+      ],
+      "required_params": [
+        "Instance"
+      ],
+      "constraints": {
+        "ReadMode": "WholePresentation"
+      },
+      "sibling_selectors": [
+        "PowerPoint.ReadFromPowerPoint.ReadSlides"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.ReadFromPowerPoint.ReadSlides",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "ReadSlides",
+      "template": "PowerPoint.ReadFromPowerPoint.ReadSlides Slides: `` Instance: `` PowerPointData=> PowerPointData",
+      "golden_example": "PowerPoint.ReadFromPowerPoint.ReadSlides Slides: $'''example''' Instance: PowerPointInstance PowerPointData=> PowerPointData",
+      "input_params": [
+        {
+          "name": "Slides",
+          "type": "String",
+          "required": true,
+          "default": "1"
+        },
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "PowerPointData",
+          "type": "String",
+          "defaultVariable": "PowerPointData"
+        }
+      ],
+      "required_params": [
+        "Slides",
+        "Instance"
+      ],
+      "constraints": {
+        "ReadMode": "Slides"
+      },
+      "sibling_selectors": [
+        "PowerPoint.ReadFromPowerPoint.Read"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.SavePowerPoint.Save",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "Save",
+      "template": "PowerPoint.SavePowerPoint.Save Instance: ``",
+      "golden_example": "PowerPoint.SavePowerPoint.Save Instance: PowerPointInstance",
+      "input_params": [
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "Instance"
+      ],
+      "constraints": {
+        "SaveMode": "Save"
+      },
+      "sibling_selectors": [
+        "PowerPoint.SavePowerPoint.SaveAs"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.SavePowerPoint.SaveAs",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "SaveAs",
+      "template": "PowerPoint.SavePowerPoint.SaveAs DocumentFormat: PowerPoint.PowerPointFormat.FromExtension DocumentPath: `` Instance: ``",
+      "golden_example": "PowerPoint.SavePowerPoint.SaveAs DocumentFormat: PowerPoint.PowerPointFormat.FromExtension DocumentPath: $'''C:\\temp\\test.xlsx''' Instance: PowerPointInstance",
+      "input_params": [
+        {
+          "name": "DocumentFormat",
+          "type": "PowerPointFormat",
+          "required": true,
+          "default": "FromExtension",
+          "enumValues": [
+            "PPTX",
+            "PPTM",
+            "PPT",
+            "PDF",
+            "XPS",
+            "POTX",
+            "POTM",
+            "PPSX",
+            "PPSM",
+            "ODP",
+            "FromExtension"
+          ]
+        },
+        {
+          "name": "DocumentPath",
+          "type": "FileObject",
+          "required": true
+        },
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "DocumentFormat",
+        "DocumentPath",
+        "Instance"
+      ],
+      "constraints": {
+        "SaveMode": "SaveAs"
+      },
+      "sibling_selectors": [
+        "PowerPoint.SavePowerPoint.Save"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.WriteToPowerPoint.WriteToFirstSlide",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "WriteToFirstSlide",
+      "template": "PowerPoint.WriteToPowerPoint.WriteToFirstSlide AppendNewLine: False Instance: `` Text: ``",
+      "golden_example": "PowerPoint.WriteToPowerPoint.WriteToFirstSlide AppendNewLine: False Instance: PowerPointInstance Text: $'''example'''",
+      "input_params": [
+        {
+          "name": "AppendNewLine",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        },
+        {
+          "name": "Text",
+          "type": "String",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "AppendNewLine",
+        "Instance",
+        "Text"
+      ],
+      "constraints": {
+        "WriteMode": "FirstSlide"
+      },
+      "sibling_selectors": [
+        "PowerPoint.WriteToPowerPoint.WriteToLastSlide",
+        "PowerPoint.WriteToPowerPoint.WriteToSlideAtPosition"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.WriteToPowerPoint.WriteToLastSlide",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "WriteToLastSlide",
+      "template": "PowerPoint.WriteToPowerPoint.WriteToLastSlide AppendNewLine: False Instance: `` Text: ``",
+      "golden_example": "PowerPoint.WriteToPowerPoint.WriteToLastSlide AppendNewLine: False Instance: PowerPointInstance Text: $'''example'''",
+      "input_params": [
+        {
+          "name": "AppendNewLine",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        },
+        {
+          "name": "Text",
+          "type": "String",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "AppendNewLine",
+        "Instance",
+        "Text"
+      ],
+      "constraints": {
+        "WriteMode": "LastSlide"
+      },
+      "sibling_selectors": [
+        "PowerPoint.WriteToPowerPoint.WriteToFirstSlide",
+        "PowerPoint.WriteToPowerPoint.WriteToSlideAtPosition"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "PowerPoint.WriteToPowerPoint.WriteToSlideAtPosition",
+      "module": "PowerPoint",
+      "kind": "Action",
+      "selector": "WriteToSlideAtPosition",
+      "template": "PowerPoint.WriteToPowerPoint.WriteToSlideAtPosition SlidePosition: 1 AppendNewLine: False Instance: `` Text: ``",
+      "golden_example": "PowerPoint.WriteToPowerPoint.WriteToSlideAtPosition SlidePosition: 1 AppendNewLine: False Instance: PowerPointInstance Text: $'''example'''",
+      "input_params": [
+        {
+          "name": "SlidePosition",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        },
+        {
+          "name": "AppendNewLine",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "Instance",
+          "type": "PowerPointInstanceHandle",
+          "required": true
+        },
+        {
+          "name": "Text",
+          "type": "String",
+          "required": true
+        }
+      ],
+      "output_params": [],
+      "required_params": [
+        "SlidePosition",
+        "AppendNewLine",
+        "Instance",
+        "Text"
+      ],
+      "constraints": {
+        "WriteMode": "AtPosition"
+      },
+      "sibling_selectors": [
+        "PowerPoint.WriteToPowerPoint.WriteToFirstSlide",
+        "PowerPoint.WriteToPowerPoint.WriteToLastSlide"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
       "actionId": "SAP.AttachToRunning.AttachToRunningSapByActiveSession",
       "module": "SAP",
       "kind": "Action",
@@ -30478,46 +31733,145 @@
       "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
-      "actionId": "Scripting.RunPythonScript",
+      "actionId": "Scripting.RunPythonScript.RunPythonScript",
       "module": "System",
       "kind": "Action",
-      "selector": null,
-      "template": "Scripting.RunPythonScript PythonCode: `` PythonVersion: System.PythonVersion.Python2 ModuleFolderPaths: `` ScriptOutput=> PythonScriptOutput ScriptError=> ScriptError",
-      "golden_example": "Scripting.RunPythonScript PythonCode: $'''example''' PythonVersion: System.PythonVersion.Python2 ModuleFolderPaths: FileList ScriptOutput=> PythonScriptOutput ScriptError=> ScriptError",
+      "selector": "RunPythonScript",
+      "template": "Scripting.RunPythonScript.RunPythonScript PythonCode: `` ModuleFolderPaths: `` ScriptOutput=> PythonScriptOutput ScriptError=> ScriptError",
+      "golden_example": "Scripting.RunPythonScript.RunPythonScript PythonCode: $'''example''' ModuleFolderPaths: List ScriptOutput=> PythonScriptOutput ScriptError=> ScriptError",
       "input_params": [
         {
           "name": "PythonCode",
           "type": "String",
-          "required": false
+          "required": true
         },
         {
           "name": "ModuleFolderPaths",
-          "type": "List`1",
-          "required": false
-        },
-        {
-          "name": "PythonVersion",
-          "type": "PythonVersion",
-          "required": false
+          "type": "List`1<FolderObject>",
+          "required": false,
+          "default": ""
         }
       ],
       "output_params": [
         {
-          "name": "ScriptError",
-          "type": "String"
+          "name": "ScriptOutput",
+          "type": "String",
+          "defaultVariable": "PythonScriptOutput"
         },
         {
-          "name": "ScriptOutput",
-          "type": "String"
+          "name": "ScriptError",
+          "type": "String",
+          "defaultVariable": "ScriptError"
         }
       ],
       "required_params": [
-        "Python script to run"
+        "PythonCode"
       ],
-      "constraints": {},
-      "sibling_selectors": [],
+      "constraints": {
+        "PythonEngine": "IronPython2"
+      },
+      "sibling_selectors": [
+        "Scripting.RunPythonScript.RunPythonScript34",
+        "Scripting.RunPythonScript.RunPythonScriptCPython"
+      ],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "Scripting.RunPythonScript.RunPythonScript34",
+      "module": "System",
+      "kind": "Action",
+      "selector": "RunPythonScript34",
+      "template": "Scripting.RunPythonScript.RunPythonScript34 PythonCode: `` ModuleFolderPaths: `` ScriptOutput=> PythonScriptOutput ScriptError=> ScriptError",
+      "golden_example": "Scripting.RunPythonScript.RunPythonScript34 PythonCode: $'''example''' ModuleFolderPaths: List ScriptOutput=> PythonScriptOutput ScriptError=> ScriptError",
+      "input_params": [
+        {
+          "name": "PythonCode",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "ModuleFolderPaths",
+          "type": "List`1<FolderObject>",
+          "required": false,
+          "default": ""
+        }
+      ],
+      "output_params": [
+        {
+          "name": "ScriptOutput",
+          "type": "String",
+          "defaultVariable": "PythonScriptOutput"
+        },
+        {
+          "name": "ScriptError",
+          "type": "String",
+          "defaultVariable": "ScriptError"
+        }
+      ],
+      "required_params": [
+        "PythonCode"
+      ],
+      "constraints": {
+        "PythonEngine": "IronPython3"
+      },
+      "sibling_selectors": [
+        "Scripting.RunPythonScript.RunPythonScript",
+        "Scripting.RunPythonScript.RunPythonScriptCPython"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "Scripting.RunPythonScript.RunPythonScriptCPython",
+      "module": "System",
+      "kind": "Action",
+      "selector": "RunPythonScriptCPython",
+      "template": "Scripting.RunPythonScript.RunPythonScriptCPython PythonPath: `` PythonCode: `` ModuleFolderPaths: `` ScriptOutput=> PythonScriptOutput ScriptError=> ScriptError",
+      "golden_example": "Scripting.RunPythonScript.RunPythonScriptCPython PythonPath: $'''C:\\temp''' PythonCode: $'''example''' ModuleFolderPaths: List ScriptOutput=> PythonScriptOutput ScriptError=> ScriptError",
+      "input_params": [
+        {
+          "name": "PythonPath",
+          "type": "FolderObject",
+          "required": true
+        },
+        {
+          "name": "PythonCode",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "ModuleFolderPaths",
+          "type": "List`1<FolderObject>",
+          "required": false,
+          "default": ""
+        }
+      ],
+      "output_params": [
+        {
+          "name": "ScriptOutput",
+          "type": "String",
+          "defaultVariable": "PythonScriptOutput"
+        },
+        {
+          "name": "ScriptError",
+          "type": "String",
+          "defaultVariable": "ScriptError"
+        }
+      ],
+      "required_params": [
+        "PythonPath",
+        "PythonCode"
+      ],
+      "constraints": {
+        "PythonEngine": "CPython"
+      },
+      "sibling_selectors": [
+        "Scripting.RunPythonScript.RunPythonScript",
+        "Scripting.RunPythonScript.RunPythonScript34"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "Scripting.RunVBScript.RunVBScript",
@@ -34180,6 +35534,89 @@
       "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
     },
     {
+      "actionId": "Triggers.WaitForTriggerAction.WaitForTriggerAction",
+      "module": "Triggers",
+      "kind": "While",
+      "selector": "WaitForTriggerAction",
+      "template": "LOOP WHILE (Triggers.WaitForTriggerAction.WaitForTriggerAction Policy: Triggers.TriggerPolicy.OneTime TriggerEventInstanceHandle=> TriggerEventInstanceHandle)",
+      "golden_example": "LOOP WHILE (Triggers.WaitForTriggerAction.WaitForTriggerAction Policy: Triggers.TriggerPolicy.OneTime TriggerEventInstanceHandle=> TriggerEventInstanceHandle)",
+      "input_params": [
+        {
+          "name": "Policy",
+          "type": "TriggerPolicy",
+          "required": true,
+          "default": "OneTime",
+          "enumValues": [
+            "OneTime",
+            "Sequential"
+          ]
+        }
+      ],
+      "output_params": [
+        {
+          "name": "TriggerEventInstanceHandle",
+          "type": "TriggerEventInstanceHandle",
+          "defaultVariable": "TriggerEventInstanceHandle"
+        }
+      ],
+      "required_params": [
+        "Policy"
+      ],
+      "constraints": {
+        "FailWithTimeoutError": "False"
+      },
+      "sibling_selectors": [
+        "Triggers.WaitForTriggerAction.WaitForTriggerActionWithTimeout"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "Triggers.WaitForTriggerAction.WaitForTriggerActionWithTimeout",
+      "module": "Triggers",
+      "kind": "While",
+      "selector": "WaitForTriggerActionWithTimeout",
+      "template": "LOOP WHILE (Triggers.WaitForTriggerAction.WaitForTriggerActionWithTimeout Timeout: 0 Policy: Triggers.TriggerPolicy.OneTime TriggerEventInstanceHandle=> TriggerEventInstanceHandle)",
+      "golden_example": "LOOP WHILE (Triggers.WaitForTriggerAction.WaitForTriggerActionWithTimeout Timeout: 0 Policy: Triggers.TriggerPolicy.OneTime TriggerEventInstanceHandle=> TriggerEventInstanceHandle)",
+      "input_params": [
+        {
+          "name": "Timeout",
+          "type": "Int32",
+          "required": true,
+          "default": "0"
+        },
+        {
+          "name": "Policy",
+          "type": "TriggerPolicy",
+          "required": true,
+          "default": "OneTime",
+          "enumValues": [
+            "OneTime",
+            "Sequential"
+          ]
+        }
+      ],
+      "output_params": [
+        {
+          "name": "TriggerEventInstanceHandle",
+          "type": "TriggerEventInstanceHandle",
+          "defaultVariable": "TriggerEventInstanceHandle"
+        }
+      ],
+      "required_params": [
+        "Timeout",
+        "Policy"
+      ],
+      "constraints": {
+        "FailWithTimeoutError": "True"
+      },
+      "sibling_selectors": [
+        "Triggers.WaitForTriggerAction.WaitForTriggerAction"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
       "actionId": "UIAutomation.CloseWindow.CloseByInstanceOrHandle",
       "module": "UIAutomation",
       "kind": "Action",
@@ -36321,6 +37758,48 @@
       "sibling_selectors": [],
       "needs_ui_selector": false,
       "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
+    },
+    {
+      "actionId": "Variables.FilterList",
+      "module": "Variables",
+      "kind": "Action",
+      "selector": null,
+      "template": "Variables.FilterList IgnoreCase: False FilterParameters: `` ListToFilter: `` FilteredList=> FilteredList",
+      "golden_example": "Variables.FilterList IgnoreCase: False FilterParameters: RecognizedEntities ListToFilter: List FilteredList=> FilteredList",
+      "input_params": [
+        {
+          "name": "IgnoreCase",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "FilterParameters",
+          "type": "DataTable",
+          "required": true
+        },
+        {
+          "name": "ListToFilter",
+          "type": "List`1<Object>",
+          "required": true
+        }
+      ],
+      "output_params": [
+        {
+          "name": "FilteredList",
+          "type": "List`1<Object>",
+          "defaultVariable": "FilteredList"
+        }
+      ],
+      "required_params": [
+        "IgnoreCase",
+        "FilterParameters",
+        "ListToFilter"
+      ],
+      "constraints": {},
+      "sibling_selectors": [],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "Variables.FindCommonListItems",
@@ -63627,137 +65106,80 @@
       "module": "WorkQueues",
       "kind": "Action",
       "selector": null,
-      "template": "WorkQueues.BatchEnqueueWorkQueueItems WorkQueue: `` WorkQueueItemData: `` FailedWorkQueueItems=> FailedWorkQueueItems HasFailedItems=> HasFailedItems SuccessfulWorkQueueItems=> SuccessfulWorkQueueItems",
-      "golden_example": "WorkQueues.BatchEnqueueWorkQueueItems WorkQueue: $'''TestQueue''' WorkQueueItemData: DataTable FailedWorkQueueItems=> FailedWorkQueueItems HasFailedItems=> HasFailedItems SuccessfulWorkQueueItems=> SuccessfulWorkQueueItems",
+      "template": "WorkQueues.BatchEnqueueWorkQueueItems EnableParallelProcessing: False WorkQueueItemData: `` WorkQueue: `` FailedWorkQueueItems=> FailedWorkQueueItems HasFailedItems=> HasFailedItems SuccessfulWorkQueueItems=> SuccessfulWorkQueueItems",
+      "golden_example": "WorkQueues.BatchEnqueueWorkQueueItems EnableParallelProcessing: False WorkQueueItemData: RecognizedEntities WorkQueue: $'''TestQueue''' FailedWorkQueueItems=> FailedWorkQueueItems HasFailedItems=> HasFailedItems SuccessfulWorkQueueItems=> SuccessfulWorkQueueItems",
       "input_params": [
         {
-          "name": "WorkQueue",
-          "type": "WorkQueue",
-          "required": false
+          "name": "EnableParallelProcessing",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
         },
         {
           "name": "WorkQueueItemData",
           "type": "DataTable",
-          "required": false
+          "required": true
+        },
+        {
+          "name": "WorkQueue",
+          "type": "WorkQueue",
+          "required": true
         }
       ],
       "output_params": [
         {
-          "name": "SuccessfulWorkQueueItems",
-          "type": "List`1"
+          "name": "FailedWorkQueueItems",
+          "type": "List`1<BatchEnqueueFailuresResponse>",
+          "defaultVariable": "FailedWorkQueueItems"
         },
         {
           "name": "HasFailedItems",
-          "type": "Boolean"
+          "type": "Boolean",
+          "defaultVariable": "HasFailedItems"
         },
         {
-          "name": "FailedWorkQueueItems",
-          "type": "List`1"
+          "name": "SuccessfulWorkQueueItems",
+          "type": "List`1<BatchEnqueueSuccessfulResponse>",
+          "defaultVariable": "SuccessfulWorkQueueItems"
         }
       ],
       "required_params": [
-        "Work queue",
-        "Work queue item data"
+        "EnableParallelProcessing",
+        "WorkQueueItemData",
+        "WorkQueue"
       ],
       "constraints": {},
       "sibling_selectors": [],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "WorkQueues.EnqueueWorkQueueItem.WithoutUniqueId",
       "module": "WorkQueues",
       "kind": "Action",
       "selector": "WithoutUniqueId",
-      "template": "WorkQueues.EnqueueWorkQueueItem.WithoutUniqueId WorkQueue: `` Status: WorkQueues.WorkQueueItemEnqueueStatus.Queued Priority: WorkQueues.WorkQueueItemPriority.Normal Value: `` Name: `` ExpiryDate: `` DelayUntil: `` ProcessingResult: `` WorkQueueItem=> NewWorkQueueItem",
-      "golden_example": "WorkQueues.EnqueueWorkQueueItem.WithoutUniqueId WorkQueue: $'''TestQueue''' Status: WorkQueues.WorkQueueItemEnqueueStatus.Queued Priority: WorkQueues.WorkQueueItemPriority.Normal Value: $'''example''' Name: $'''example''' ExpiryDate: $'''2025-01-01''' DelayUntil: $'''2025-01-01''' ProcessingResult: $'''example''' WorkQueueItem=> NewWorkQueueItem",
+      "template": "WorkQueues.EnqueueWorkQueueItem.WithoutUniqueId ProcessingResult: `` DelayUntil: `` ThrowOnDuplicateWorkQueueItem: True ExpiryDate: `` Status: WorkQueues.WorkQueueItemEnqueueStatus.Queued WorkQueue: `` Priority: WorkQueues.WorkQueueItemPriority.Normal Value: `` Name: `` WorkQueueItem=> NewWorkQueueItem",
+      "golden_example": "WorkQueues.EnqueueWorkQueueItem.WithoutUniqueId ProcessingResult: $'''example''' DelayUntil: $'''2025-01-01''' ThrowOnDuplicateWorkQueueItem: True ExpiryDate: $'''2025-01-01''' Status: WorkQueues.WorkQueueItemEnqueueStatus.Queued WorkQueue: $'''TestQueue''' Priority: WorkQueues.WorkQueueItemPriority.Normal Value: $'''example''' Name: $'''example''' WorkQueueItem=> NewWorkQueueItem",
       "input_params": [
-        {
-          "name": "WorkQueue",
-          "type": "WorkQueue",
-          "required": false
-        },
-        {
-          "name": "Status",
-          "type": "WorkQueueItemEnqueueStatus",
-          "required": false
-        },
-        {
-          "name": "Priority",
-          "type": "WorkQueueItemPriority",
-          "required": false
-        },
-        {
-          "name": "Name",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "Value",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "ExpiryDate",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "DelayUntil",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "ProcessingResult",
-          "type": "String",
-          "required": false
-        }
-      ],
-      "output_params": [
-        {
-          "name": "WorkQueueItem",
-          "type": "WorkQueueItem"
-        }
-      ],
-      "required_params": [
-        "Work queue",
-        "Input"
-      ],
-      "constraints": {
-        "HasUniqueId": "False"
-      },
-      "sibling_selectors": [
-        "WorkQueues.EnqueueWorkQueueItem.WithUniqueId"
-      ],
-      "needs_ui_selector": false,
-      "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
-    },
-    {
-      "actionId": "WorkQueues.EnqueueWorkQueueItem.WithUniqueId",
-      "module": "WorkQueues",
-      "kind": "Action",
-      "selector": "WithUniqueId",
-      "template": "WorkQueues.EnqueueWorkQueueItem.WithUniqueId DelayUntil: `` ExpiryDate: `` ProcessingResult: `` UniqueId: `` Status: WorkQueues.WorkQueueItemEnqueueStatus.Queued WorkQueue: `` Priority: WorkQueues.WorkQueueItemPriority.Normal Value: `` Name: `` WorkQueueItem=> NewWorkQueueItem",
-      "golden_example": "WorkQueues.EnqueueWorkQueueItem.WithUniqueId DelayUntil: $'''2025-01-01''' ExpiryDate: $'''2025-01-01''' ProcessingResult: $'''example''' UniqueId: $'''example''' Status: WorkQueues.WorkQueueItemEnqueueStatus.Queued WorkQueue: $'''TestQueue''' Priority: WorkQueues.WorkQueueItemPriority.Normal Value: $'''example''' Name: $'''example''' WorkQueueItem=> NewWorkQueueItem",
-      "input_params": [
-        {
-          "name": "DelayUntil",
-          "type": "Nullable`1<DateTime>",
-          "required": false
-        },
-        {
-          "name": "ExpiryDate",
-          "type": "Nullable`1<DateTime>",
-          "required": false
-        },
         {
           "name": "ProcessingResult",
           "type": "String",
           "required": false
         },
         {
-          "name": "UniqueId",
-          "type": "String",
+          "name": "DelayUntil",
+          "type": "Nullable`1<DateTime>",
+          "required": false
+        },
+        {
+          "name": "ThrowOnDuplicateWorkQueueItem",
+          "type": "Boolean",
+          "required": true,
+          "default": "True"
+        },
+        {
+          "name": "ExpiryDate",
+          "type": "Nullable`1<DateTime>",
           "required": false
         },
         {
@@ -63805,6 +65227,101 @@
         }
       ],
       "required_params": [
+        "ThrowOnDuplicateWorkQueueItem",
+        "Status",
+        "WorkQueue",
+        "Priority",
+        "Value"
+      ],
+      "constraints": {
+        "HasUniqueId": "False"
+      },
+      "sibling_selectors": [
+        "WorkQueues.EnqueueWorkQueueItem.WithUniqueId"
+      ],
+      "needs_ui_selector": false,
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
+    },
+    {
+      "actionId": "WorkQueues.EnqueueWorkQueueItem.WithUniqueId",
+      "module": "WorkQueues",
+      "kind": "Action",
+      "selector": "WithUniqueId",
+      "template": "WorkQueues.EnqueueWorkQueueItem.WithUniqueId ProcessingResult: `` DelayUntil: `` ThrowOnDuplicateWorkQueueItem: True UniqueId: `` ExpiryDate: `` Status: WorkQueues.WorkQueueItemEnqueueStatus.Queued WorkQueue: `` Priority: WorkQueues.WorkQueueItemPriority.Normal Value: `` Name: `` WorkQueueItem=> NewWorkQueueItem",
+      "golden_example": "WorkQueues.EnqueueWorkQueueItem.WithUniqueId ProcessingResult: $'''example''' DelayUntil: $'''2025-01-01''' ThrowOnDuplicateWorkQueueItem: True UniqueId: $'''example''' ExpiryDate: $'''2025-01-01''' Status: WorkQueues.WorkQueueItemEnqueueStatus.Queued WorkQueue: $'''TestQueue''' Priority: WorkQueues.WorkQueueItemPriority.Normal Value: $'''example''' Name: $'''example''' WorkQueueItem=> NewWorkQueueItem",
+      "input_params": [
+        {
+          "name": "ProcessingResult",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "DelayUntil",
+          "type": "Nullable`1<DateTime>",
+          "required": false
+        },
+        {
+          "name": "ThrowOnDuplicateWorkQueueItem",
+          "type": "Boolean",
+          "required": true,
+          "default": "True"
+        },
+        {
+          "name": "UniqueId",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "ExpiryDate",
+          "type": "Nullable`1<DateTime>",
+          "required": false
+        },
+        {
+          "name": "Status",
+          "type": "WorkQueueItemEnqueueStatus",
+          "required": true,
+          "default": "Queued",
+          "enumValues": [
+            "Queued",
+            "Paused"
+          ]
+        },
+        {
+          "name": "WorkQueue",
+          "type": "WorkQueue",
+          "required": true
+        },
+        {
+          "name": "Priority",
+          "type": "WorkQueueItemPriority",
+          "required": true,
+          "default": "Normal",
+          "enumValues": [
+            "High",
+            "Normal",
+            "Low"
+          ]
+        },
+        {
+          "name": "Value",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "Name",
+          "type": "String",
+          "required": false
+        }
+      ],
+      "output_params": [
+        {
+          "name": "WorkQueueItem",
+          "type": "WorkQueueItem",
+          "defaultVariable": "NewWorkQueueItem"
+        }
+      ],
+      "required_params": [
+        "ThrowOnDuplicateWorkQueueItem",
         "Status",
         "WorkQueue",
         "Priority",
@@ -63817,46 +65334,56 @@
         "WorkQueues.EnqueueWorkQueueItem.WithoutUniqueId"
       ],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-09 (PAD 2.67): example values filled by parameter type, pasted into PAD Designer, zero errors"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "WorkQueues.GetWorkQueueItems",
       "module": "WorkQueues",
       "kind": "Action",
       "selector": null,
-      "template": "WorkQueues.GetWorkQueueItems WorkQueue: `` FilterRows: `` RowsToReturn: 5000 WorkQueueItems=> WorkQueueItems",
-      "golden_example": "WorkQueues.GetWorkQueueItems WorkQueue: $'''TestQueue''' FilterRows: $'''example''' RowsToReturn: 5000 WorkQueueItems=> WorkQueueItems",
+      "template": "WorkQueues.GetWorkQueueItems RowsToReturn: 5000 ThrowIfWorkQueueNotFound: True WorkQueue: `` FilterRows: `` WorkQueueItems=> WorkQueueItems",
+      "golden_example": "WorkQueues.GetWorkQueueItems RowsToReturn: 5000 ThrowIfWorkQueueNotFound: True WorkQueue: $'''TestQueue''' FilterRows: $'''example''' WorkQueueItems=> WorkQueueItems",
       "input_params": [
+        {
+          "name": "RowsToReturn",
+          "type": "Int32",
+          "required": true,
+          "default": "5000"
+        },
+        {
+          "name": "ThrowIfWorkQueueNotFound",
+          "type": "Boolean",
+          "required": true,
+          "default": "True"
+        },
         {
           "name": "WorkQueue",
           "type": "WorkQueue",
-          "required": false
+          "required": true
         },
         {
           "name": "FilterRows",
           "type": "String",
-          "required": false
-        },
-        {
-          "name": "RowsToReturn",
-          "type": "Int32",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [
         {
           "name": "WorkQueueItems",
-          "type": "List`1"
+          "type": "List`1<WorkQueueItem>",
+          "defaultVariable": "WorkQueueItems"
         }
       ],
       "required_params": [
-        "Work queue",
-        "Filter rows"
+        "RowsToReturn",
+        "ThrowIfWorkQueueNotFound",
+        "WorkQueue",
+        "FilterRows"
       ],
       "constraints": {},
       "sibling_selectors": [],
       "needs_ui_selector": false,
-      "validation": "paste-validated 2026-03 and re-checked in producer/consumer chains; example values are placeholders"
+      "validation": "paste-validated 2026-09 (PAD 2.72): example values filled by parameter type, pasted into PAD Designer, zero errors"
     },
     {
       "actionId": "WorkQueues.ProcessWorkQueueItem.ProcessWorkQueueItem",
