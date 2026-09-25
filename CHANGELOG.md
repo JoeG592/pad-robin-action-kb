@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.3 (2026-09-24)
+
+- **Parameter lists fixed on 18 records.** Their `input_params` listed 83 arguments the action form does not accept. Most were properties the selector already fixes, such as `CheckMode` on `File.IfFile.Exists` and `WaitFor` on `Services.WaitForService.Started`. Others belonged to sibling forms: 19 each on the two `OCR ...WithWindowsOcr` records, plus the Web and WebAutomation condition records. Adding any of them to a script gives "Unknown argument". `Web.InvokeSoapService` listed its address as `Url`; the real argument is `Endpoint`.
+- Missing entries added on the same records: `RetrieveMode`, `Connection` and `ExchangeFolder` inputs and the `EmailMessages` output on `Exchange.RetrieveExchangeMessages.RetrieveEmails`, the `PrinterName` output on `Workstation.GetDefaultPrinter`, and default output variable names where they were missing.
+- Golden examples unchanged. They only ever used real arguments, which is why they passed the full 2.72 re-paste.
+- Every record, and every Type Reference producer, is now checked against the PAD 2.72 module DLLs before release: argument and output names and types, the arguments used in each template and golden example, selectors, constraints and sibling forms.
+
 ## 3.1.2 (2026-09-24)
 
 - **Confirmed on PAD 2.72:** the old bare ids `Database.Connect` and `Scripting.RunPythonScript` are rejected on paste as "Unknown action" ("Module 'Database' or action 'Connect' wasn't found."). Removing `PythonVersion` does not help. Use `Database.Connect.Connect` / `.ConnectOracle` and `Scripting.RunPythonScript.RunPythonScript` / `.RunPythonScript34` / `.RunPythonScriptCPython`.
