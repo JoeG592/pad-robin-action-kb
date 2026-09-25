@@ -1,6 +1,6 @@
 {
   "name": "PAD Robin Action Knowledge Base",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "date": "2026-09-24",
   "pad_build": "2.72.00183.26250",
   "license": "CC BY 4.0",
@@ -2941,7 +2941,8 @@
       "output_params": [
         {
           "name": "Snapshot",
-          "type": "Snapshot"
+          "type": "AzureSnapshot",
+          "defaultVariable": "Snapshot"
         }
       ],
       "required_params": [
@@ -16912,7 +16913,8 @@
       "output_params": [
         {
           "name": "Connection",
-          "type": "SqlConnectionHandle"
+          "type": "FtpConnectionBase",
+          "defaultVariable": "FTPConnection"
         }
       ],
       "required_params": [
@@ -39401,12 +39403,9 @@
       ],
       "output_params": [
         {
-          "name": "DownloadedFile",
-          "type": "FileObject"
-        },
-        {
           "name": "WebPageText",
-          "type": "String"
+          "type": "String",
+          "defaultVariable": "WebPageText"
         }
       ],
       "required_params": [
@@ -42623,20 +42622,19 @@
       ],
       "output_params": [
         {
+          "name": "StatusCode",
+          "type": "Int32",
+          "defaultVariable": "StatusCode"
+        },
+        {
           "name": "Response",
-          "type": "String"
+          "type": "String",
+          "defaultVariable": "WebServiceResponse"
         },
         {
           "name": "ResponseHeaders",
-          "type": "List`1"
-        },
-        {
-          "name": "DownloadedFile",
-          "type": "FileObject"
-        },
-        {
-          "name": "StatusCode",
-          "type": "Int32"
+          "type": "List`1<String>",
+          "defaultVariable": "WebServiceResponseHeaders"
         }
       ],
       "required_params": [
