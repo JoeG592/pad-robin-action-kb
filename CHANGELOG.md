@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.1 (2026-09-24)
+
+- **Full regression on PAD 2.72.00183.26250:** all 988 golden examples re-pasted exactly as published (83 batches, 1,111 canvas rows), zero errors. The 942 records first validated on 2.67 or earlier now say so in their `validation` field, and the file header carries a `regression` summary.
+- **Fix:** `FTP.CloseConnection` listed its `Connection` input as `SqlConnectionHandle`; the correct type is `FtpConnectionBase`. This was the only input type in the KB that disagreed with the PAD module DLLs.
+- No records added or removed. File names stay `_v3_1`.
+
 ## 3.1 (2026-09-24)
 
 Updated for PAD 2.72 (2.72.00183.26250). 988 records across 45 modules.
