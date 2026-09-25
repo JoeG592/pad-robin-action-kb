@@ -14,7 +14,7 @@ This repo is the missing reference.
 | `PAD_Robin_TypeReference_v3_1.json` | 44 parameter types with the exact syntax PAD accepts for each: strings, numbers, file paths, handle variables, lists, UI selectors, and the rule for enums. |
 | `PROMPT.md` | A system prompt that turns a model into a template filler over these two files. This is how the data is meant to be used. |
 
-Current for PAD 2.72 (build 2.72.00183.26250), September 2026. Every record's action id and arguments match the 2.72 module DLLs. The 46 records that are new or changed in 2.72 were paste-validated on 2.72; the rest were paste-validated on 2.67 or earlier and their arguments did not change. Each record's `validation` field says which build it was pasted on.
+Validated against PAD 2.72 (build 2.72.00183.26250), September 2026: all 988 golden examples were re-pasted exactly as published into the 2.72 Designer, with zero errors.
 
 ## The two-table idea
 
@@ -61,7 +61,7 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
 
 Every golden example was pasted into PAD Designer through UI automation and accepted with zero errors in the error pane. The March 2026 set (369 records) was additionally run through producer-to-consumer chains, so that, for example, an Excel action was validated with a real `ExcelInstance` from a launch action before it. The September 2026 sets were validated the same way in batches, with each action's error flag read back from the canvas individually: 578 records on PAD 2.67, and 46 records on PAD 2.72 (the new PowerPoint, PGP, LLM, Triggers and environment actions, plus records whose arguments changed in 2.72).
 
-After each PAD update, the action ids and argument lists of every record are re-extracted from the module DLLs and compared. Records whose arguments changed are re-pasted on the new build; records that no longer exist are removed (see CHANGELOG).
+After each PAD update, the action ids and argument lists of every record are re-extracted from the module DLLs and compared. Records whose arguments changed are re-pasted on the new build, and records that no longer exist are removed (see CHANGELOG). Then every golden example in the release is re-pasted exactly as published on the new build. Each example gets the variables it references, such as an `ExcelInstance` or a `FileList`, from a validated producer action placed before it in the same paste. For PAD 2.72 that full re-paste was 988 examples in 83 batches with zero errors; each record's `validation` field records it.
 
 Validation means the Designer accepts the line. It does not mean the placeholder values make sense for your task; that is the model's job.
 
