@@ -10,11 +10,11 @@ This repo is the missing reference.
 
 | File | Contents |
 |---|---|
-| `PAD_Robin_ActionKB_v3_0.json` | 953 Robin actions across 41 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters, and the other selector forms of the same action. |
-| `PAD_Robin_TypeReference_v3_0.json` | 42 parameter types with the exact syntax PAD accepts for each: strings, numbers, file paths, handle variables, lists, UI selectors, and the rule for enums. |
+| `PAD_Robin_ActionKB_v3_1.json` | 988 Robin actions across 45 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters, and the other selector forms of the same action. |
+| `PAD_Robin_TypeReference_v3_1.json` | 44 parameter types with the exact syntax PAD accepts for each: strings, numbers, file paths, handle variables, lists, UI selectors, and the rule for enums. |
 | `PROMPT.md` | A system prompt that turns a model into a template filler over these two files. This is how the data is meant to be used. |
 
-Validated against PAD 2.67 (build 2.67.00143.26090), September 2026.
+Current for PAD 2.72 (build 2.72.00183.26250), September 2026. Every record's action id and arguments match the 2.72 module DLLs. The 46 records that are new or changed in 2.72 were paste-validated on 2.72; the rest were paste-validated on 2.67 or earlier and their arguments did not change. Each record's `validation` field says which build it was pasted on.
 
 ## The two-table idea
 
@@ -35,7 +35,7 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
   "constraints": { "DelimiterType": "Standard" },
   "sibling_selectors": [ "Text.JoinText.Join", "Text.JoinText.JoinWithCustomDelimiter" ],
   "needs_ui_selector": false,
-  "validation": "paste-validated 2026-09 (PAD 2.67) ..."
+  "validation": "paste-validated 2026-09 (PAD 2.72) ..."
 }
 ```
 
@@ -59,13 +59,15 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
 
 ## How it was validated
 
-Every golden example was pasted into PAD Designer through UI automation and accepted with zero errors in the error pane. The March 2026 set (369 records) was additionally run through producer-to-consumer chains, so that, for example, an Excel action was validated with a real `ExcelInstance` from a launch action before it. The September 2026 set (584 records) was validated the same way in batches, with each action's error flag read back from the canvas individually.
+Every golden example was pasted into PAD Designer through UI automation and accepted with zero errors in the error pane. The March 2026 set (369 records) was additionally run through producer-to-consumer chains, so that, for example, an Excel action was validated with a real `ExcelInstance` from a launch action before it. The September 2026 sets were validated the same way in batches, with each action's error flag read back from the canvas individually: 578 records on PAD 2.67, and 46 records on PAD 2.72 (the new PowerPoint, PGP, LLM, Triggers and environment actions, plus records whose arguments changed in 2.72).
+
+After each PAD update, the action ids and argument lists of every record are re-extracted from the module DLLs and compared. Records whose arguments changed are re-pasted on the new build; records that no longer exist are removed (see CHANGELOG).
 
 Validation means the Designer accepts the line. It does not mean the placeholder values make sense for your task; that is the model's job.
 
 ## What is not in this release
 
-PAD 2.67 exposes 231 further selector variants that are not included here: 198 need a recorded UI element or image and cannot be validated from text, 25 need a live mail or work-queue connection to validate, and 8 are deprecated or unknown to the Designer. They may follow in a later release.
+PAD 2.72 exposes 236 further selector variants that are not included here: 200 need a recorded UI element or image and cannot be validated from text, 25 need a live mail or work-queue connection to validate, and 11 are deprecated, removed, or unknown to the Designer. They may follow in a later release.
 
 ## Using it with an AI assistant
 
