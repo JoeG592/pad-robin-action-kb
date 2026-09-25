@@ -1,6 +1,6 @@
 {
   "name": "PAD Robin Data Type Reference",
-  "version": "3.1",
+  "version": "3.1.1",
   "date": "2026-09-24",
   "description": "Deterministic fill rules for every PAD Robin parameter type. Each type has a validated example showing the exact syntax PAD accepts. v3.0 adds the three types that Action KB v3.0 (1185 selector variants) uses and v2.0 lacked. v3.1 adds PowerPointInstanceHandle and Int64 for Action KB v3.1 (PAD 2.72).",
   "rules": [
@@ -158,9 +158,9 @@
       "type": "TerminalSessionHandle",
       "category": "handle",
       "example": "TerminalSession",
-      "description": "Terminal session from OpenTerminalSession output",
+      "description": "Terminal session from TerminalEmulation.OpenTerminalSession.* output",
       "format": "bare_variable_name",
-      "created_by": "TerminalEmulation.OpenTerminalSession"
+      "created_by": "TerminalEmulation.OpenTerminalSession.OpenSession or TerminalEmulation.OpenTerminalSession.OpenSessionUsingReflection or TerminalEmulation.OpenTerminalSession.OpenSessionUsingReflectionProfile"
     },
     {
       "type": "Ec2ClientObject",
@@ -182,17 +182,17 @@
       "type": "SqlConnectionHandle",
       "category": "handle",
       "example": "SQLConnection",
-      "description": "Database connection from Database.Connect output",
+      "description": "Database connection from Database.Connect.Connect (or .ConnectOracle) output. The bare id Database.Connect is rejected by PAD 2.72 as Unknown action.",
       "format": "bare_variable_name",
-      "created_by": "Database.Connect"
+      "created_by": "Database.Connect.Connect or Database.Connect.ConnectOracle"
     },
     {
       "type": "FtpConnectionBase",
       "category": "handle",
       "example": "SftpConnection",
-      "description": "FTP/SFTP connection from OpenSecureConnection output",
+      "description": "FTP/FTPS/SFTP connection from FTP.OpenConnection or FTP.OpenSecureConnection.* output",
       "format": "bare_variable_name",
-      "created_by": "FTP.OpenSecureConnection"
+      "created_by": "FTP.OpenConnection or FTP.OpenSecureConnection.ConnectWithFtpsExplicit or FTP.OpenSecureConnection.ConnectWithFtpsImplicit or FTP.OpenSecureConnection.ConnectWithSftpPrivateKey or FTP.OpenSecureConnection.ConnectWithSftpPrivateKeyAndPassPhrase or FTP.OpenSecureConnection.ConnectWithSftpUsernameAndPassword"
     },
     {
       "type": "ActiveDirectoryEntry",

@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.1.2 (2026-09-24)
+
+- **Confirmed on PAD 2.72:** the old bare ids `Database.Connect` and `Scripting.RunPythonScript` are rejected on paste as "Unknown action" ("Module 'Database' or action 'Connect' wasn't found."). Removing `PythonVersion` does not help. Use `Database.Connect.Connect` / `.ConnectOracle` and `Scripting.RunPythonScript.RunPythonScript` / `.RunPythonScript34` / `.RunPythonScriptCPython`.
+- **Type Reference 3.1.1:** `created_by` now lists exact PAD 2.72 action ids for `SqlConnectionHandle` (was the rejected `Database.Connect`), `TerminalSessionHandle` and `FtpConnectionBase` (were action names without their selector). Every `created_by` id now exists in PAD 2.72.
+- **Output metadata fixes** from the PAD 2.72 DLLs (golden examples unchanged; they were already correct):
+  - `FTP.OpenConnection` output type is `FtpConnectionBase`, not `SqlConnectionHandle`.
+  - `Azure.CreateSnapshot` output type is `AzureSnapshot`.
+  - `Web.DownloadFromWeb.Download` and `Web.InvokeWebService.InvokeWebService` no longer list a `DownloadedFile` output they do not have.
+- No records added or removed.
+
 ## 3.1.1 (2026-09-24)
 
 - **Full regression on PAD 2.72.00183.26250:** all 988 golden examples re-pasted exactly as published (83 batches, 1,111 canvas rows), zero errors. The 942 records first validated on 2.67 or earlier now say so in their `validation` field, and the file header carries a `regression` summary.
