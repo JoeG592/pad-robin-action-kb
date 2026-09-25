@@ -1,6 +1,6 @@
 {
   "name": "PAD Robin Action Knowledge Base",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "date": "2026-09-24",
   "pad_build": "2.72.00183.26250",
   "license": "CC BY 4.0",
@@ -14472,32 +14472,73 @@
       "golden_example": "Exchange.RetrieveExchangeMessages.RetrieveEmails Connection: ExchangeConnection ExchangeFolder: Exchange.Folder.Inbox RetrieveMode: Exchange.RetrieveMessagesMode.Unread MarkAsRead: True EmailMessages=> RetrievedEmails",
       "input_params": [
         {
-          "name": "BodyContains",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "FromContains",
-          "type": "String",
-          "required": false
+          "name": "RetrieveMode",
+          "type": "RetrieveMessagesMode",
+          "required": true,
+          "default": "Unread",
+          "enumValues": [
+            "All",
+            "Unread",
+            "Read"
+          ]
         },
         {
           "name": "MarkAsRead",
           "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "SubjectContains",
-          "type": "String",
-          "required": false
+          "required": true,
+          "default": "True"
         },
         {
           "name": "ToContains",
           "type": "String",
-          "required": false
+          "required": false,
+          "default": ""
+        },
+        {
+          "name": "SubjectContains",
+          "type": "String",
+          "required": false,
+          "default": ""
+        },
+        {
+          "name": "Connection",
+          "type": "ExchangeConnectionHandle",
+          "required": true
+        },
+        {
+          "name": "BodyContains",
+          "type": "String",
+          "required": false,
+          "default": ""
+        },
+        {
+          "name": "ExchangeFolder",
+          "type": "Folder",
+          "required": true,
+          "default": "Inbox",
+          "enumValues": [
+            "Inbox",
+            "DeletedItems",
+            "Drafts",
+            "Outbox",
+            "SentItems",
+            "JunkEmail"
+          ]
+        },
+        {
+          "name": "FromContains",
+          "type": "String",
+          "required": false,
+          "default": ""
         }
       ],
-      "output_params": [],
+      "output_params": [
+        {
+          "name": "EmailMessages",
+          "type": "List`1<ExchangeMailMessage>",
+          "defaultVariable": "RetrievedEmails"
+        }
+      ],
       "required_params": [
         "Exchange connection"
       ],
@@ -14874,14 +14915,9 @@
       "golden_example": "IF (File.IfFile.Exists File: $'''C:\\temp\\test.xlsx''') THEN",
       "input_params": [
         {
-          "name": "CheckMode",
-          "type": "IfFile",
-          "required": false
-        },
-        {
           "name": "File",
           "type": "FileObject",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -15917,14 +15953,9 @@
       "golden_example": "WAIT (File.WaitForFile.Created File: $'''C:\\temp\\test.xlsx''')",
       "input_params": [
         {
-          "name": "WaitFor",
-          "type": "WaitForFile",
-          "required": false
-        },
-        {
           "name": "File",
           "type": "FileObject",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -16512,14 +16543,9 @@
       "golden_example": "IF (Folder.IfFolderExists.Exists Path: $'''C:\\temp''') THEN",
       "input_params": [
         {
-          "name": "CheckMode",
-          "type": "IfFolder",
-          "required": false
-        },
-        {
           "name": "Path",
           "type": "FolderObject",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -20661,14 +20687,19 @@
       "golden_example": "WAIT (MouseAndKeyboard.WaitForMouse.WaitForMouseToBecome MousePointerState: MouseAndKeyboard.MousePointerState.Arrow)",
       "input_params": [
         {
-          "name": "MouseEvent",
-          "type": "WaitForMouseEvent",
-          "required": false
-        },
-        {
           "name": "MousePointerState",
           "type": "MousePointerState",
-          "required": false
+          "required": true,
+          "default": "Arrow",
+          "enumValues": [
+            "Arrow",
+            "AppStarting",
+            "Cross",
+            "Hand",
+            "Help",
+            "IBeam",
+            "WaitCursor"
+          ]
         }
       ],
       "output_params": [],
@@ -24148,139 +24179,82 @@
       "golden_example": "IF (OCR.IfTextOnScreen.TextOnScreenExistsWithWindowsOcr TextToFind: $'''example''' IsRegex: False WindowsOcrLanguage: OCR.WindowsOcrLanguage.English SearchForTextOn: OCR.SearchTarget.EntireScreen ImageWidthMultiplier: 1 ImageHeightMultiplier: 1 TextLocationX=> LocationOfTextFoundX TextLocationY=> LocationOfTextFoundY) THEN",
       "input_params": [
         {
-          "name": "CheckMode",
-          "type": "IfTextOnScreen",
-          "required": false
-        },
-        {
-          "name": "Images",
-          "type": "List`1",
-          "required": false
-        },
-        {
-          "name": "ImageX1",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "ImageX2",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "ImageY1",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "ImageY2",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "IsRegex",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "SearchAlgorithm",
-          "type": "ImageFinderAlgorithm",
-          "required": false
-        },
-        {
-          "name": "SearchForTextOn",
-          "type": "SearchTarget",
-          "required": false
-        },
-        {
-          "name": "SearchMode",
-          "type": "SourceScanMode",
-          "required": false
-        },
-        {
-          "name": "TextToFind",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "Tolerance",
-          "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "X1",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "X2",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "Y1",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "Y2",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "OCREngine",
-          "type": "OCREngineObject",
-          "required": false
-        },
-        {
-          "name": "OCREngineType",
-          "type": "OCREngineType",
-          "required": false
-        },
-        {
           "name": "ImageHeightMultiplier",
           "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "ImageWidthMultiplier",
-          "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "Language",
-          "type": "TesseractLanguage",
-          "required": false
-        },
-        {
-          "name": "LanguageAbbreviation",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "LanguageDataPath",
-          "type": "FolderObject",
-          "required": false
-        },
-        {
-          "name": "UseOtherLanguage",
-          "type": "Boolean",
-          "required": false
+          "required": true,
+          "default": "1"
         },
         {
           "name": "WindowsOcrLanguage",
           "type": "WindowsOcrLanguage",
-          "required": false
+          "required": true,
+          "default": "English",
+          "enumValues": [
+            "ChineseSimplified",
+            "ChineseTraditional",
+            "Czech",
+            "Danish",
+            "Dutch",
+            "English",
+            "Finnish",
+            "French",
+            "German",
+            "Greek",
+            "Hungarian",
+            "Italian",
+            "Japanese",
+            "Korean",
+            "Norwegian",
+            "Polish",
+            "Portuguese",
+            "Romanian",
+            "Russian",
+            "SerbianCyrillic",
+            "SerbianLatin",
+            "Slovak",
+            "Spanish",
+            "Swedish",
+            "Turkish"
+          ]
+        },
+        {
+          "name": "ImageWidthMultiplier",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        },
+        {
+          "name": "TextToFind",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "IsRegex",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "SearchForTextOn",
+          "type": "SearchTarget",
+          "required": true,
+          "default": "EntireScreen",
+          "enumValues": [
+            "EntireScreen",
+            "ForegroundWindow"
+          ]
         }
       ],
       "output_params": [
         {
-          "name": "TextLocationX",
-          "type": "Int32"
+          "name": "TextLocationY",
+          "type": "Int32",
+          "defaultVariable": "LocationOfTextFoundY"
         },
         {
-          "name": "TextLocationY",
-          "type": "Int32"
+          "name": "TextLocationX",
+          "type": "Int32",
+          "defaultVariable": "LocationOfTextFoundX"
         }
       ],
       "required_params": [
@@ -25650,139 +25624,82 @@
       "golden_example": "WAIT (OCR.WaitForTextOnScreen.TextOnScreenToAppearWithWindowsOcr TextToFind: $'''example''' IsRegex: False WindowsOcrLanguage: OCR.WindowsOcrLanguage.English SearchForTextOn: OCR.SearchTarget.EntireScreen ImageWidthMultiplier: 1 ImageHeightMultiplier: 1 TextLocationX=> LocationOfTextFoundX TextLocationY=> LocationOfTextFoundY)",
       "input_params": [
         {
-          "name": "CheckMode",
-          "type": "IfTextOnScreen",
-          "required": false
-        },
-        {
-          "name": "Images",
-          "type": "List`1",
-          "required": false
-        },
-        {
-          "name": "ImageX1",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "ImageX2",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "ImageY1",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "ImageY2",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "IsRegex",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "SearchAlgorithm",
-          "type": "ImageFinderAlgorithm",
-          "required": false
-        },
-        {
-          "name": "SearchForTextOn",
-          "type": "SearchTarget",
-          "required": false
-        },
-        {
-          "name": "SearchMode",
-          "type": "SourceScanMode",
-          "required": false
-        },
-        {
-          "name": "TextToFind",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "Tolerance",
-          "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "X1",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "X2",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "Y1",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "Y2",
-          "type": "Nullable`1",
-          "required": false
-        },
-        {
-          "name": "OCREngine",
-          "type": "OCREngineObject",
-          "required": false
-        },
-        {
-          "name": "OCREngineType",
-          "type": "OCREngineType",
-          "required": false
-        },
-        {
           "name": "ImageHeightMultiplier",
           "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "ImageWidthMultiplier",
-          "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "Language",
-          "type": "TesseractLanguage",
-          "required": false
-        },
-        {
-          "name": "LanguageAbbreviation",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "LanguageDataPath",
-          "type": "FolderObject",
-          "required": false
-        },
-        {
-          "name": "UseOtherLanguage",
-          "type": "Boolean",
-          "required": false
+          "required": true,
+          "default": "1"
         },
         {
           "name": "WindowsOcrLanguage",
           "type": "WindowsOcrLanguage",
-          "required": false
+          "required": true,
+          "default": "English",
+          "enumValues": [
+            "ChineseSimplified",
+            "ChineseTraditional",
+            "Czech",
+            "Danish",
+            "Dutch",
+            "English",
+            "Finnish",
+            "French",
+            "German",
+            "Greek",
+            "Hungarian",
+            "Italian",
+            "Japanese",
+            "Korean",
+            "Norwegian",
+            "Polish",
+            "Portuguese",
+            "Romanian",
+            "Russian",
+            "SerbianCyrillic",
+            "SerbianLatin",
+            "Slovak",
+            "Spanish",
+            "Swedish",
+            "Turkish"
+          ]
+        },
+        {
+          "name": "ImageWidthMultiplier",
+          "type": "Int32",
+          "required": true,
+          "default": "1"
+        },
+        {
+          "name": "TextToFind",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "IsRegex",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "SearchForTextOn",
+          "type": "SearchTarget",
+          "required": true,
+          "default": "EntireScreen",
+          "enumValues": [
+            "EntireScreen",
+            "ForegroundWindow"
+          ]
         }
       ],
       "output_params": [
         {
-          "name": "TextLocationX",
-          "type": "Int32"
+          "name": "TextLocationY",
+          "type": "Int32",
+          "defaultVariable": "LocationOfTextFoundY"
         },
         {
-          "name": "TextLocationY",
-          "type": "Int32"
+          "name": "TextLocationX",
+          "type": "Int32",
+          "defaultVariable": "LocationOfTextFoundX"
         }
       ],
       "required_params": [
@@ -32055,14 +31972,9 @@
       "golden_example": "IF (Services.IfService.IsRunning Service: $'''example''') THEN",
       "input_params": [
         {
-          "name": "ServiceStatus",
-          "type": "IfService",
-          "required": false
-        },
-        {
           "name": "Service",
           "type": "String",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -32240,14 +32152,9 @@
       "golden_example": "WAIT (Services.WaitForService.Started Service: $'''example''')",
       "input_params": [
         {
-          "name": "WaitFor",
-          "type": "WaitForService",
-          "required": false
-        },
-        {
           "name": "Service",
           "type": "String",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -32435,24 +32342,9 @@
       "golden_example": "IF (System.IfProcess.ProcessIsRunning ProcessName: $'''example''') THEN",
       "input_params": [
         {
-          "name": "CheckMode",
-          "type": "IfProcess",
-          "required": false
-        },
-        {
           "name": "ProcessName",
           "type": "String",
-          "required": false
-        },
-        {
-          "name": "ProcessUser",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "UseProcessUser",
-          "type": "Boolean",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -32956,24 +32848,9 @@
       "golden_example": "WAIT (System.WaitForProcess.ProcessToStart ProcessName: $'''example''')",
       "input_params": [
         {
-          "name": "WaitFor",
-          "type": "WaitForProcess",
-          "required": false
-        },
-        {
           "name": "ProcessName",
           "type": "String",
-          "required": false
-        },
-        {
-          "name": "ProcessUser",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "UseProcessUser",
-          "type": "Boolean",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -39321,84 +39198,188 @@
       "golden_example": "Web.DownloadFromWeb.Download Url: $'''example''' ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False WebPageText=> WebPageText",
       "input_params": [
         {
-          "name": "AcceptUntrustedCertificates",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "ClearCookies",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "ConnectionTimeout",
-          "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "DestinationFolder",
-          "type": "FolderObject",
-          "required": false
-        },
-        {
-          "name": "Encoding",
-          "type": "Encoding",
-          "required": false
-        },
-        {
-          "name": "FileName",
-          "type": "FileName",
-          "required": false
-        },
-        {
-          "name": "FilePath",
-          "type": "FileObject",
-          "required": false
-        },
-        {
-          "name": "FollowRedirection",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "Method",
-          "type": "DownloadMethod",
-          "required": false
-        },
-        {
-          "name": "Parameters",
-          "type": "DataTable",
-          "required": false
-        },
-        {
-          "name": "Password",
-          "type": "EncryptableObject",
-          "required": false
-        },
-        {
-          "name": "SaveResponse",
-          "type": "SaveResponse",
-          "required": false
+          "name": "UserAgent",
+          "type": "String",
+          "required": false,
+          "default": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6"
         },
         {
           "name": "Url",
           "type": "String",
-          "required": false
+          "required": true
         },
         {
-          "name": "UseCredentials",
+          "name": "ConnectionTimeout",
+          "type": "Int32",
+          "required": true,
+          "default": "30"
+        },
+        {
+          "name": "AcceptUntrustedCertificates",
           "type": "Boolean",
-          "required": false
+          "required": true,
+          "default": "False"
         },
         {
-          "name": "UserAgent",
-          "type": "String",
-          "required": false
+          "name": "ClearCookies",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
         },
         {
-          "name": "UserName",
-          "type": "String",
-          "required": false
+          "name": "FollowRedirection",
+          "type": "Boolean",
+          "required": true,
+          "default": "True"
+        },
+        {
+          "name": "Encoding",
+          "type": "Encoding",
+          "required": true,
+          "default": "AutoDetect",
+          "enumValues": [
+            "AutoDetect",
+            "IBM037",
+            "IBM437",
+            "IBM500",
+            "ASMO_708",
+            "DOS_720",
+            "ibm737",
+            "ibm775",
+            "ibm850",
+            "ibm852",
+            "IBM855",
+            "ibm857",
+            "IBM00858",
+            "IBM860",
+            "ibm861",
+            "DOS_862",
+            "IBM863",
+            "IBM864",
+            "IBM865",
+            "cp866",
+            "ibm869",
+            "IBM870",
+            "windows_874",
+            "cp875",
+            "shift_jis",
+            "gb2312",
+            "ks_c_5601_1987",
+            "big5",
+            "IBM1026",
+            "IBM01047",
+            "IBM01140",
+            "IBM01141",
+            "IBM01142",
+            "IBM01143",
+            "IBM01144",
+            "IBM01145",
+            "IBM01146",
+            "IBM01147",
+            "IBM01148",
+            "IBM01149",
+            "utf_16",
+            "utf_16BE",
+            "windows_1250",
+            "windows_1251",
+            "Windows_1252",
+            "windows_1253",
+            "windows_1254",
+            "windows_1255",
+            "windows_1256",
+            "windows_1257",
+            "windows_1258",
+            "Johab",
+            "macintosh",
+            "x_mac_japanese",
+            "x_mac_chinesetrad",
+            "x_mac_korean",
+            "x_mac_arabic",
+            "x_mac_hebrew",
+            "x_mac_greek",
+            "x_mac_cyrillic",
+            "x_mac_chinesesimp",
+            "x_mac_romanian",
+            "x_mac_ukrainian",
+            "x_mac_thai",
+            "x_mac_ce",
+            "x_mac_icelandic",
+            "x_mac_turkish",
+            "x_mac_croatian",
+            "utf_32",
+            "utf_32BE",
+            "x_Chinese_CNS",
+            "x_cp20001",
+            "x_Chinese_Eten",
+            "x_cp20003",
+            "x_cp20004",
+            "x_cp20005",
+            "x_IA5",
+            "x_IA5_German",
+            "x_IA5_Swedish",
+            "x_IA5_Norwegian",
+            "us_ascii",
+            "x_cp20261",
+            "x_cp20269",
+            "IBM273",
+            "IBM277",
+            "IBM278",
+            "IBM280",
+            "IBM284",
+            "IBM285",
+            "IBM290",
+            "IBM297",
+            "IBM420",
+            "IBM423",
+            "IBM424",
+            "x_EBCDIC_KoreanExtended",
+            "IBM_Thai",
+            "koi8_r",
+            "IBM871",
+            "IBM880",
+            "IBM905",
+            "IBM00924",
+            "EUC_JP_20932",
+            "x_cp20936",
+            "x_cp20949",
+            "cp1025",
+            "koi8_u",
+            "iso_8859_1",
+            "iso_8859_2",
+            "iso_8859_3",
+            "iso_8859_4",
+            "iso_8859_5",
+            "iso_8859_6",
+            "iso_8859_7",
+            "iso_8859_8",
+            "iso_8859_9",
+            "iso_8859_13",
+            "iso_8859_15",
+            "x_Europa",
+            "iso_8859_8_i",
+            "iso_2022_jp_50220",
+            "csISO2022JP",
+            "iso_2022_jp_50222",
+            "iso_2022_kr",
+            "x_cp50227",
+            "euc_jp_51932",
+            "EUC_CN",
+            "euc_kr",
+            "hz_gb_2312",
+            "GB18030",
+            "x_iscii_de",
+            "x_iscii_be",
+            "x_iscii_ta",
+            "x_iscii_te",
+            "x_iscii_as",
+            "x_iscii_or",
+            "x_iscii_ka",
+            "x_iscii_ma",
+            "x_iscii_gu",
+            "x_iscii_pa",
+            "utf_7",
+            "utf_8"
+          ]
         }
       ],
       "output_params": [
@@ -42124,88 +42105,228 @@
       "golden_example": "Web.InvokeSoapService.InvokeSoapService Endpoint: $'''https://example.com/soap''' RequestBody: $'''example''' ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False TrimRequestBody: True ResponseHeaders=> SoapServiceResponseHeaders Response=> SoapServiceResponse StatusCode=> StatusCode",
       "input_params": [
         {
-          "name": "Url",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "CustomHeaders",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "RequestBody",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "ConnectionTimeout",
-          "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "FollowRedirection",
+          "name": "AcceptUntrustedCertificates",
           "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "ClearCookies",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "FailOnErrorStatus",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "UserAgent",
-          "type": "String",
-          "required": false
+          "required": true,
+          "default": "False"
         },
         {
           "name": "Encoding",
           "type": "Encoding",
-          "required": false
+          "required": true,
+          "default": "AutoDetect",
+          "enumValues": [
+            "AutoDetect",
+            "IBM037",
+            "IBM437",
+            "IBM500",
+            "ASMO_708",
+            "DOS_720",
+            "ibm737",
+            "ibm775",
+            "ibm850",
+            "ibm852",
+            "IBM855",
+            "ibm857",
+            "IBM00858",
+            "IBM860",
+            "ibm861",
+            "DOS_862",
+            "IBM863",
+            "IBM864",
+            "IBM865",
+            "cp866",
+            "ibm869",
+            "IBM870",
+            "windows_874",
+            "cp875",
+            "shift_jis",
+            "gb2312",
+            "ks_c_5601_1987",
+            "big5",
+            "IBM1026",
+            "IBM01047",
+            "IBM01140",
+            "IBM01141",
+            "IBM01142",
+            "IBM01143",
+            "IBM01144",
+            "IBM01145",
+            "IBM01146",
+            "IBM01147",
+            "IBM01148",
+            "IBM01149",
+            "utf_16",
+            "utf_16BE",
+            "windows_1250",
+            "windows_1251",
+            "Windows_1252",
+            "windows_1253",
+            "windows_1254",
+            "windows_1255",
+            "windows_1256",
+            "windows_1257",
+            "windows_1258",
+            "Johab",
+            "macintosh",
+            "x_mac_japanese",
+            "x_mac_chinesetrad",
+            "x_mac_korean",
+            "x_mac_arabic",
+            "x_mac_hebrew",
+            "x_mac_greek",
+            "x_mac_cyrillic",
+            "x_mac_chinesesimp",
+            "x_mac_romanian",
+            "x_mac_ukrainian",
+            "x_mac_thai",
+            "x_mac_ce",
+            "x_mac_icelandic",
+            "x_mac_turkish",
+            "x_mac_croatian",
+            "utf_32",
+            "utf_32BE",
+            "x_Chinese_CNS",
+            "x_cp20001",
+            "x_Chinese_Eten",
+            "x_cp20003",
+            "x_cp20004",
+            "x_cp20005",
+            "x_IA5",
+            "x_IA5_German",
+            "x_IA5_Swedish",
+            "x_IA5_Norwegian",
+            "us_ascii",
+            "x_cp20261",
+            "x_cp20269",
+            "IBM273",
+            "IBM277",
+            "IBM278",
+            "IBM280",
+            "IBM284",
+            "IBM285",
+            "IBM290",
+            "IBM297",
+            "IBM420",
+            "IBM423",
+            "IBM424",
+            "x_EBCDIC_KoreanExtended",
+            "IBM_Thai",
+            "koi8_r",
+            "IBM871",
+            "IBM880",
+            "IBM905",
+            "IBM00924",
+            "EUC_JP_20932",
+            "x_cp20936",
+            "x_cp20949",
+            "cp1025",
+            "koi8_u",
+            "iso_8859_1",
+            "iso_8859_2",
+            "iso_8859_3",
+            "iso_8859_4",
+            "iso_8859_5",
+            "iso_8859_6",
+            "iso_8859_7",
+            "iso_8859_8",
+            "iso_8859_9",
+            "iso_8859_13",
+            "iso_8859_15",
+            "x_Europa",
+            "iso_8859_8_i",
+            "iso_2022_jp_50220",
+            "csISO2022JP",
+            "iso_2022_jp_50222",
+            "iso_2022_kr",
+            "x_cp50227",
+            "euc_jp_51932",
+            "EUC_CN",
+            "euc_kr",
+            "hz_gb_2312",
+            "GB18030",
+            "x_iscii_de",
+            "x_iscii_be",
+            "x_iscii_ta",
+            "x_iscii_te",
+            "x_iscii_as",
+            "x_iscii_or",
+            "x_iscii_ka",
+            "x_iscii_ma",
+            "x_iscii_gu",
+            "x_iscii_pa",
+            "utf_7",
+            "utf_8"
+          ]
         },
         {
-          "name": "AcceptUntrustedCertificates",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "UseAuthentication",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "Username",
+          "name": "UserAgent",
           "type": "String",
-          "required": false
-        },
-        {
-          "name": "Password",
-          "type": "EncryptableObject",
-          "required": false
+          "required": false,
+          "default": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6"
         },
         {
           "name": "TrimRequestBody",
           "type": "Boolean",
-          "required": false
+          "required": true,
+          "default": "True"
+        },
+        {
+          "name": "RequestBody",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "CustomHeaders",
+          "type": "String",
+          "required": false,
+          "default": ""
+        },
+        {
+          "name": "Endpoint",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "ConnectionTimeout",
+          "type": "Int32",
+          "required": true,
+          "default": "30"
+        },
+        {
+          "name": "FailOnErrorStatus",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "ClearCookies",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "FollowRedirection",
+          "type": "Boolean",
+          "required": true,
+          "default": "True"
         }
       ],
       "output_params": [
         {
-          "name": "Response",
-          "type": "String"
+          "name": "StatusCode",
+          "type": "Int32",
+          "defaultVariable": "StatusCode"
         },
         {
           "name": "ResponseHeaders",
-          "type": "List`1"
+          "type": "List`1<String>",
+          "defaultVariable": "SoapServiceResponseHeaders"
         },
         {
-          "name": "StatusCode",
-          "type": "Int32"
+          "name": "Response",
+          "type": "String",
+          "defaultVariable": "SoapServiceResponse"
         }
       ],
       "required_params": [
@@ -42495,129 +42616,247 @@
       "golden_example": "Web.InvokeWebService.InvokeWebService Url: $'''example''' Method: Web.Method.Get Accept: $'''application/xml''' ContentType: $'''application/xml''' ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False EncodeRequestBody: True UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False TrimRequestBody: True ResponseHeaders=> WebServiceResponseHeaders Response=> WebServiceResponse StatusCode=> StatusCode",
       "input_params": [
         {
-          "name": "RequestBody",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "Accept",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "ContentType",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "DestinationFolder",
-          "type": "FolderObject",
-          "required": false
-        },
-        {
-          "name": "EncodeRequestBody",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "FileName",
-          "type": "FileName",
-          "required": false
-        },
-        {
-          "name": "FilePath",
-          "type": "FileObject",
-          "required": false
-        },
-        {
-          "name": "Method",
-          "type": "Method",
-          "required": false
-        },
-        {
-          "name": "SaveResponse",
-          "type": "SaveResponse",
-          "required": false
-        },
-        {
-          "name": "UploadAttachments",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "Attachments",
-          "type": "DataTable",
-          "required": false
-        },
-        {
-          "name": "UploadType",
-          "type": "UploadType",
-          "required": false
-        },
-        {
-          "name": "Url",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "CustomHeaders",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "ConnectionTimeout",
-          "type": "Int32",
-          "required": false
-        },
-        {
-          "name": "FollowRedirection",
-          "type": "Boolean",
-          "required": false
-        },
-        {
           "name": "ClearCookies",
           "type": "Boolean",
-          "required": false
+          "required": true,
+          "default": "False"
         },
         {
           "name": "FailOnErrorStatus",
           "type": "Boolean",
-          "required": false
+          "required": true,
+          "default": "False"
         },
         {
           "name": "UserAgent",
           "type": "String",
-          "required": false
+          "required": false,
+          "default": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6"
         },
         {
-          "name": "Encoding",
-          "type": "Encoding",
-          "required": false
-        },
-        {
-          "name": "AcceptUntrustedCertificates",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "UseAuthentication",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "Username",
+          "name": "CustomHeaders",
           "type": "String",
-          "required": false
+          "required": false,
+          "default": ""
         },
         {
-          "name": "Password",
-          "type": "EncryptableObject",
-          "required": false
+          "name": "ConnectionTimeout",
+          "type": "Int32",
+          "required": true,
+          "default": "30"
+        },
+        {
+          "name": "FollowRedirection",
+          "type": "Boolean",
+          "required": true,
+          "default": "True"
         },
         {
           "name": "TrimRequestBody",
           "type": "Boolean",
-          "required": false
+          "required": true,
+          "default": "True"
+        },
+        {
+          "name": "Encoding",
+          "type": "Encoding",
+          "required": true,
+          "default": "AutoDetect",
+          "enumValues": [
+            "AutoDetect",
+            "IBM037",
+            "IBM437",
+            "IBM500",
+            "ASMO_708",
+            "DOS_720",
+            "ibm737",
+            "ibm775",
+            "ibm850",
+            "ibm852",
+            "IBM855",
+            "ibm857",
+            "IBM00858",
+            "IBM860",
+            "ibm861",
+            "DOS_862",
+            "IBM863",
+            "IBM864",
+            "IBM865",
+            "cp866",
+            "ibm869",
+            "IBM870",
+            "windows_874",
+            "cp875",
+            "shift_jis",
+            "gb2312",
+            "ks_c_5601_1987",
+            "big5",
+            "IBM1026",
+            "IBM01047",
+            "IBM01140",
+            "IBM01141",
+            "IBM01142",
+            "IBM01143",
+            "IBM01144",
+            "IBM01145",
+            "IBM01146",
+            "IBM01147",
+            "IBM01148",
+            "IBM01149",
+            "utf_16",
+            "utf_16BE",
+            "windows_1250",
+            "windows_1251",
+            "Windows_1252",
+            "windows_1253",
+            "windows_1254",
+            "windows_1255",
+            "windows_1256",
+            "windows_1257",
+            "windows_1258",
+            "Johab",
+            "macintosh",
+            "x_mac_japanese",
+            "x_mac_chinesetrad",
+            "x_mac_korean",
+            "x_mac_arabic",
+            "x_mac_hebrew",
+            "x_mac_greek",
+            "x_mac_cyrillic",
+            "x_mac_chinesesimp",
+            "x_mac_romanian",
+            "x_mac_ukrainian",
+            "x_mac_thai",
+            "x_mac_ce",
+            "x_mac_icelandic",
+            "x_mac_turkish",
+            "x_mac_croatian",
+            "utf_32",
+            "utf_32BE",
+            "x_Chinese_CNS",
+            "x_cp20001",
+            "x_Chinese_Eten",
+            "x_cp20003",
+            "x_cp20004",
+            "x_cp20005",
+            "x_IA5",
+            "x_IA5_German",
+            "x_IA5_Swedish",
+            "x_IA5_Norwegian",
+            "us_ascii",
+            "x_cp20261",
+            "x_cp20269",
+            "IBM273",
+            "IBM277",
+            "IBM278",
+            "IBM280",
+            "IBM284",
+            "IBM285",
+            "IBM290",
+            "IBM297",
+            "IBM420",
+            "IBM423",
+            "IBM424",
+            "x_EBCDIC_KoreanExtended",
+            "IBM_Thai",
+            "koi8_r",
+            "IBM871",
+            "IBM880",
+            "IBM905",
+            "IBM00924",
+            "EUC_JP_20932",
+            "x_cp20936",
+            "x_cp20949",
+            "cp1025",
+            "koi8_u",
+            "iso_8859_1",
+            "iso_8859_2",
+            "iso_8859_3",
+            "iso_8859_4",
+            "iso_8859_5",
+            "iso_8859_6",
+            "iso_8859_7",
+            "iso_8859_8",
+            "iso_8859_9",
+            "iso_8859_13",
+            "iso_8859_15",
+            "x_Europa",
+            "iso_8859_8_i",
+            "iso_2022_jp_50220",
+            "csISO2022JP",
+            "iso_2022_jp_50222",
+            "iso_2022_kr",
+            "x_cp50227",
+            "euc_jp_51932",
+            "EUC_CN",
+            "euc_kr",
+            "hz_gb_2312",
+            "GB18030",
+            "x_iscii_de",
+            "x_iscii_be",
+            "x_iscii_ta",
+            "x_iscii_te",
+            "x_iscii_as",
+            "x_iscii_or",
+            "x_iscii_ka",
+            "x_iscii_ma",
+            "x_iscii_gu",
+            "x_iscii_pa",
+            "utf_7",
+            "utf_8"
+          ]
+        },
+        {
+          "name": "AcceptUntrustedCertificates",
+          "type": "Boolean",
+          "required": true,
+          "default": "False"
+        },
+        {
+          "name": "Url",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "EncodeRequestBody",
+          "type": "Boolean",
+          "required": true,
+          "default": "True"
+        },
+        {
+          "name": "RequestBody",
+          "type": "String",
+          "required": false,
+          "default": ""
+        },
+        {
+          "name": "Accept",
+          "type": "String",
+          "required": true,
+          "default": "application/xml"
+        },
+        {
+          "name": "ContentType",
+          "type": "String",
+          "required": true,
+          "default": "application/xml"
+        },
+        {
+          "name": "Method",
+          "type": "Method",
+          "required": true,
+          "default": "Get",
+          "enumValues": [
+            "Get",
+            "Post",
+            "Connect",
+            "Head",
+            "Put",
+            "Delete",
+            "Options",
+            "Trace",
+            "Patch"
+          ]
         }
       ],
       "output_params": [
@@ -56842,34 +57081,14 @@
       "golden_example": "IF (WebAutomation.IfWebPageContains.WebPageContainsElement BrowserInstance: Browser Control: $'''body''') THEN",
       "input_params": [
         {
-          "name": "ContainsMode",
-          "type": "IfWebPage",
-          "required": false
-        },
-        {
-          "name": "Text",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "CheckElementState",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "State",
-          "type": "ElementState",
-          "required": false
-        },
-        {
           "name": "BrowserInstance",
           "type": "WebBrowserInstanceHandle",
-          "required": false
+          "required": true
         },
         {
           "name": "Control",
           "type": "WebControl",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -63629,34 +63848,14 @@
       "golden_example": "WAIT (WebAutomation.WaitForWebPageContent.WebPageToContainElement BrowserInstance: Browser Control: $'''body''')",
       "input_params": [
         {
-          "name": "ContainsMode",
-          "type": "WaitForWebPage",
-          "required": false
-        },
-        {
-          "name": "Text",
-          "type": "String",
-          "required": false
-        },
-        {
-          "name": "CheckElementState",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "State",
-          "type": "ElementState",
-          "required": false
-        },
-        {
           "name": "BrowserInstance",
           "type": "WebBrowserInstanceHandle",
-          "required": false
+          "required": true
         },
         {
           "name": "Control",
           "type": "WebControl",
-          "required": false
+          "required": true
         }
       ],
       "output_params": [],
@@ -65395,28 +65594,19 @@
         {
           "name": "WorkQueue",
           "type": "WorkQueue",
-          "required": false
+          "required": true
         },
         {
           "name": "FilterRows",
           "type": "String",
-          "required": false
-        },
-        {
-          "name": "IsOverridingAutoRetry",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "MaxRetryCount",
-          "type": "Int32",
           "required": false
         }
       ],
       "output_params": [
         {
           "name": "WorkQueueItem",
-          "type": "WorkQueueItem"
+          "type": "WorkQueueItem",
+          "defaultVariable": "WorkQueueItem"
         }
       ],
       "required_params": [
@@ -65634,7 +65824,13 @@
       "template": "Workstation.GetDefaultPrinter PrinterName=> PrinterName",
       "golden_example": "Workstation.GetDefaultPrinter PrinterName=> PrinterName",
       "input_params": [],
-      "output_params": [],
+      "output_params": [
+        {
+          "name": "PrinterName",
+          "type": "String",
+          "defaultVariable": "DefaultPrinterName"
+        }
+      ],
       "required_params": [],
       "constraints": {},
       "sibling_selectors": [],
