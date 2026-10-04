@@ -1,0 +1,9 @@
+Folder.GetFiles Folder: $'''C:\Invoices''' FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
+LOOP FOREACH CurrentItem IN Files
+    Excel.LaunchExcel.LaunchAndOpen Path: CurrentItem Visible: False ReadOnly: False LoadAddInsAndMacros: False Instance=> ExcelInstance
+    Excel.GetFirstFreeColumnRow Instance: ExcelInstance FirstFreeColumn=> FirstFreeColumn FirstFreeRow=> FirstFreeRow
+    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Processed %CurrentDateTime%''' Column: $'''A''' Row: FirstFreeRow
+    Excel.CloseExcel.CloseAndSave Instance: ExcelInstance
+END
+Display.ShowMessageDialog.ShowMessage Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Message: $'''Stamped %Files.Count% invoices''' Title: $'''Invoice roll-up''' ButtonPressed=> ButtonPressed
