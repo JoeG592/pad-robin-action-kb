@@ -11,7 +11,7 @@
       beats: [{ t: 2.5, focus: { from: 2, to: 6 } }] },
     { id: "fix", type: "paste", flow: "00-hook-kb", t0: 5, t1: 10, paste: 5.5,
       beats: [{ t: 7.4, focus: { from: 1, to: 7 } }],
-      chip: { t: 6.4, text: "{n} actions · 0 errors" }, title: { t: 7.6, text: "PAD Robin Action KB" } },
+      chip: { t: 6.4, text: "{n} actions · 0 errors" } },
     { id: "how", type: "how", t0: 10, t1: 18, row: { flow: "00-hook-kb", index: 2 } },
     { id: "ex1", type: "paste", flow: "01-backup-downloads", t0: 18, t1: 27, paste: 18.6,
       beats: [{ t: 20.6, focus: { from: 1, to: 2 } }],
@@ -33,15 +33,14 @@
 
   const CAPTIONS = [
     { t0: 0.4, t1: 4.8, text: "AI-written PAD scripts rarely paste." },
-    { t0: 5.6, t1: 9.8, text: "Built from the KB, it pastes clean." },
+    { t0: 5.6, t1: 9.8, text: "PAD Robin Action KB:\nbuilt from it, every action pastes." },
     { t0: 10.4, t1: 13.9, text: "Every action has a paste-tested example." },
     { t0: 14.1, t1: 17.8, text: "988 actions. Your AI copies,\nyou paste." },
     { t0: 18.4, t1: 26.6, text: "1 · Back up a folder" },
     { t0: 27.4, t1: 37.6, text: "2 · Save Outlook attachments by date" },
     { t0: 38.4, t1: 49.6, text: "3 · Monthly invoice report" },
     { t0: 50.4, t1: 63.6, text: "4 · Sales API to an Excel report" },
-    { t0: 64.4, t1: 71.6, text: "All 988 examples re-pasted on PAD 2.72.\n0 errors." },
-    { t0: 72.6, t1: 79.6, text: "Free · CC BY 4.0" },
+    { t0: 64.4, t1: 71.6, text: "Every example pasted exactly as published." },
   ];
 
   const Scenes = { DURATION, shots, captions: () => CAPTIONS };
