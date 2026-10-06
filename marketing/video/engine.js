@@ -58,8 +58,10 @@
   }
   function rangeRect(flow, focus, scroll) {
     const rows = C[flow].rows, cv = C[flow].canvas, a = rows[focus.from], b = rows[focus.to];
-    const w = fmt === "4x5" ? Math.min(cv.w, 980) : cv.w - SCROLLBAR;
-    return { x: cv.x - BORDER, y: cv.y - BORDER + STRIP_TOP + a.y - scroll, w, h: b.y + b.h - a.y };
+    // 4:5: frame the left of the row (gutter edge, icon, title, start of description) for phone-size text
+    const x = fmt === "4x5" ? cv.x - BORDER + 100 : cv.x - BORDER;
+    const w = fmt === "4x5" ? 760 : cv.w - SCROLLBAR;
+    return { x, y: cv.y - BORDER + STRIP_TOP + a.y - scroll, w, h: b.y + b.h - a.y };
   }
 
   function tracks(shot) {
@@ -80,7 +82,7 @@
   function drawPaste(s, t) {
     world.style.opacity = 1;
     const cap = C[s.flow], cv = cap.canvas, n = cap.rows.length;
-    const shown = M.revealCount(t, s.paste, n, 0.05);
+    const shown = M.revealCount(t, s.paste, n, Math.min(0.05, 1.2 / n));   // a paste lands within 1.2 s
     base.style.backgroundImage = `url(${img(s.flow, shown >= n ? "full" : "empty")})`;
     base.style.backgroundSize = `${cap.window.w * s0}px ${cap.window.h * s0}px`;
     base.style.backgroundPosition = `${-BORDER * s0}px ${-BORDER * s0}px`;
