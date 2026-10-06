@@ -144,15 +144,16 @@ foreach ($file in $files) {
     }
     $g.Dispose(); $strip.Save((Join-Path $OutDir "$name-strip.png"), [System.Drawing.Imaging.ImageFormat]::Png); $strip.Dispose()
 
-    $W = $wr.Right - $wr.Left; $H = $wr.Bottom - $wr.Top
-    $patch = $full.GetPixel($W - 14, 100)   # right-rail background, used to cover the flow-checker icon + badge
+    # (PowerShell names are case-insensitive: never name these $W/$H, $h is the window handle)
+    $winW = $wr.Right - $wr.Left; $winH = $wr.Bottom - $wr.Top
+    $patch = $full.GetPixel($winW - 14, 100)   # right-rail background, used to cover the flow-checker icon + badge
     $full.Dispose()
     [pscustomobject]@{
         flow = $name; status = $r.Status; errors = @($r.Errors -split '; ' | Where-Object { $_ }); actions = $r.ActionCount
-        window = @{ w = $W; h = $H }; canvas = $canvas; stripHeight = $height; rows = $rows
-        badge = @{ x = $W - 58; y = 104; w = 44; h = 44; color = ('#{0:X2}{1:X2}{2:X2}' -f $patch.R, $patch.G, $patch.B) }
+        window = @{ w = $winW; h = $winH }; canvas = $canvas; stripHeight = $height; rows = $rows
+        badge = @{ x = $winW - 58; y = 104; w = 44; h = 44; color = ('#{0:X2}{1:X2}{2:X2}' -f $patch.R, $patch.G, $patch.B) }
     } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $OutDir "$name.json") -Encoding UTF8
-    Write-Host "   captured $W x $H, strip $($canvas.w) x $height, $total rows" -ForegroundColor Green
+    Write-Host "   captured $winW x $winH, strip $($canvas.w) x $height, $total rows" -ForegroundColor Green
 }
 Clear-Canvas
 Write-Host "done"
