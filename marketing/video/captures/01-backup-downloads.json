@@ -1,0 +1,52 @@
+﻿{
+    "flow":  "01-backup-downloads",
+    "status":  "PASS",
+    "errors":  [
+
+               ],
+    "actions":  4,
+    "window":  {
+                   "h":  1038,
+                   "w":  1938
+               },
+    "canvas":  {
+                   "y":  163,
+                   "w":  1526,
+                   "h":  808,
+                   "x":  342
+               },
+    "stripHeight":  338,
+    "rows":  [
+                 {
+                     "i":  0,
+                     "name":  "Get current date and time",
+                     "y":  0,
+                     "h":  79
+                 },
+                 {
+                     "i":  1,
+                     "name":  "Get files in folder",
+                     "y":  79,
+                     "h":  78
+                 },
+                 {
+                     "i":  2,
+                     "name":  "Copy file(s)",
+                     "y":  157,
+                     "h":  78
+                 },
+                 {
+                     "i":  3,
+                     "name":  "Display message",
+                     "y":  235,
+                     "h":  103
+                 }
+             ],
+    "badge":  {
+                  "y":  104,
+                  "w":  44,
+                  "h":  44,
+                  "color":  "#F3F2F1",
+                  "x":  1880
+              }
+}
