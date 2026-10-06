@@ -1,0 +1,9 @@
+Folder.GetFiles Folder: $'''C:\Invoices''' Filter: $'''*.xlsx''' Files=> Files
+LOOP FOREACH CurrentItem IN Files
+    Excel.LaunchExcel Path: CurrentItem Visible: False Instance=> ExcelInstance
+    Excel.GetFirstFreeRow Instance: ExcelInstance FirstFreeRow=> FirstFreeRow
+    DateTime.GetCurrentDateTime CurrentDateTime=> CurrentDateTime
+    Excel.WriteToExcel Instance: ExcelInstance Value: $'''Processed %CurrentDateTime%''' Column: $'''A''' Row: FirstFreeRow
+    Excel.CloseExcel Instance: ExcelInstance Save: True
+END
+Display.ShowMessage Message: $'''Stamped %Files.Count% invoices''' Title: $'''Invoice roll-up'''

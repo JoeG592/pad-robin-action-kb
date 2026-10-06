@@ -1,0 +1,64 @@
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+Text.ConvertDateTimeToText.FromCustomDateTime CustomFormat: $'''yyyy-MM-dd''' DateTime: CurrentDateTime Result=> ReportDate
+SET ReportFolder TO $'''C:\Reports\Sales\\%ReportDate%'''
+IF (Folder.IfFolderExists.DoesNotExist Path: ReportFolder) THEN
+    Folder.Create FolderPath: $'''C:\Reports\Sales''' FolderName: ReportDate Folder=> NewFolder
+END
+SET OrderCount TO 0
+SET Revenue TO 0
+SET Row TO 2
+Variables.CreateNewList List=> Regions
+Variables.CreateNewList List=> CancelledOrders
+Logging.LogMessage Message: $'''Sales report %ReportDate% started''' LogLevel: Logging.LogLevel.InfoLevel
+BLOCK FetchOrders
+ON BLOCK ERROR
+    SET StatusCode TO 0
+END
+    Web.InvokeWebService.InvokeWebService Url: $'''https://api.example.com/orders?date=%ReportDate%''' Method: Web.Method.Get Accept: $'''application/json''' ContentType: $'''application/json''' ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: True EncodeRequestBody: True UserAgent: $'''Mozilla/5.0''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False TrimRequestBody: True ResponseHeaders=> WebServiceResponseHeaders Response=> WebServiceResponse StatusCode=> StatusCode
+END
+IF StatusCode <> 200 THEN
+    Logging.LogMessage Message: $'''Orders API returned %StatusCode%''' LogLevel: Logging.LogLevel.ErrorLevel
+    Display.ShowMessageDialog.ShowMessage Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Message: $'''The orders API returned %StatusCode%. No report was created.''' Title: $'''Sales report''' ButtonPressed=> ButtonPressed
+ELSE
+    Variables.ConvertJsonToCustomObject Json: WebServiceResponse CustomObject=> Orders
+    Excel.LaunchExcel.Launch UseMachineLocale: False Visible: False LoadAddInsAndMacros: False Instance=> ExcelInstance
+    Excel.AddWorksheet Instance: ExcelInstance Name: $'''Orders''' WorksheetPosition: Excel.WorksheetPosition.First
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: ExcelInstance Name: $'''Orders'''
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Order''' Column: $'''A''' Row: 1
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Region''' Column: $'''B''' Row: 1
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Amount''' Column: $'''C''' Row: 1
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Status''' Column: $'''D''' Row: 1
+    LOOP FOREACH Order IN Orders.orders
+        SET OrderStatus TO Order.status
+        IF OrderStatus = $'''cancelled''' THEN
+            Variables.AddItemToList Item: Order.id List: CancelledOrders
+            Logging.LogMessage Message: $'''Skipped cancelled order %Order.id%''' LogLevel: Logging.LogLevel.WarningLevel
+        ELSE
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: Order.id Column: $'''A''' Row: Row
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: Order.region Column: $'''B''' Row: Row
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: Order.amount Column: $'''C''' Row: Row
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: Order.status Column: $'''D''' Row: Row
+            Variables.AddItemToList Item: Order.region List: Regions
+            Variables.IncreaseVariable Value: Revenue IncrementValue: Order.amount
+            Variables.IncreaseVariable Value: OrderCount IncrementValue: 1
+            Variables.IncreaseVariable Value: Row IncrementValue: 1
+        END
+    END
+    Variables.RemoveDuplicateItemsFromList List: Regions IgnoreCase: True
+    Variables.SortList.SortList List: Regions
+    Text.JoinText.JoinWithDelimiter List: Regions StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> RegionText
+    Text.FromNumber Number: Revenue DecimalPlaces: 2 UseThousandsSeparator: True FormattedNumber=> RevenueText
+    Excel.AddWorksheet Instance: ExcelInstance Name: $'''Summary''' WorksheetPosition: Excel.WorksheetPosition.First
+    Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: ExcelInstance Name: $'''Summary'''
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Orders''' Column: $'''A''' Row: 1
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: OrderCount Column: $'''B''' Row: 1
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Revenue''' Column: $'''A''' Row: 2
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: RevenueText Column: $'''B''' Row: 2
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Regions''' Column: $'''A''' Row: 3
+    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: RegionText Column: $'''B''' Row: 3
+    Excel.CloseExcel.CloseAndSaveAs Instance: ExcelInstance XmlMapName: $'''''' DocumentPath: $'''%ReportFolder%\Sales %ReportDate%.xlsx''' DocumentFormat: Excel.ExcelFormat.FromExtension
+    Text.JoinText.JoinWithDelimiter List: CancelledOrders StandardDelimiter: Text.StandardDelimiter.NewLine DelimiterTimes: 1 Result=> CancelledText
+    File.WriteText File: $'''%ReportFolder%\Cancelled orders.txt''' AppendNewLine: True IfFileExists: File.IfFileExists.Overwrite Encoding: File.FileEncoding.UTF8 TextToWrite: CancelledText
+    Logging.LogMessage Message: $'''Sales report %ReportDate%: %OrderCount% orders, %RevenueText%''' LogLevel: Logging.LogLevel.InfoLevel
+    Display.ShowMessageDialog.ShowMessage Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Message: $'''%OrderCount% orders, %RevenueText% revenue. Saved to %ReportFolder%.''' Title: $'''Sales report''' ButtonPressed=> ButtonPressed
+END

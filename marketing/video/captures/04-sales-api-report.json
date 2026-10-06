@@ -1,0 +1,394 @@
+﻿{
+    "flow":  "04-sales-api-report",
+    "status":  "PASS",
+    "errors":  [
+
+               ],
+    "actions":  61,
+    "window":  {
+                   "h":  1038,
+                   "w":  1938
+               },
+    "canvas":  {
+                   "y":  163,
+                   "w":  1526,
+                   "h":  808,
+                   "x":  342
+               },
+    "stripHeight":  4651,
+    "rows":  [
+                 {
+                     "i":  0,
+                     "name":  "Get current date and time",
+                     "y":  0,
+                     "h":  79
+                 },
+                 {
+                     "i":  1,
+                     "name":  "Convert datetime to text",
+                     "y":  79,
+                     "h":  78
+                 },
+                 {
+                     "i":  2,
+                     "name":  "Set variable",
+                     "y":  157,
+                     "h":  78
+                 },
+                 {
+                     "i":  3,
+                     "name":  "If folder exists",
+                     "y":  235,
+                     "h":  78
+                 },
+                 {
+                     "i":  4,
+                     "name":  "Create folder",
+                     "y":  313,
+                     "h":  79
+                 },
+                 {
+                     "i":  5,
+                     "name":  "End",
+                     "y":  392,
+                     "h":  60
+                 },
+                 {
+                     "i":  6,
+                     "name":  "Set variable",
+                     "y":  452,
+                     "h":  78
+                 },
+                 {
+                     "i":  7,
+                     "name":  "Set variable",
+                     "y":  530,
+                     "h":  78
+                 },
+                 {
+                     "i":  8,
+                     "name":  "Set variable",
+                     "y":  608,
+                     "h":  78
+                 },
+                 {
+                     "i":  9,
+                     "name":  "Create new list",
+                     "y":  686,
+                     "h":  79
+                 },
+                 {
+                     "i":  10,
+                     "name":  "Create new list",
+                     "y":  765,
+                     "h":  79
+                 },
+                 {
+                     "i":  11,
+                     "name":  "Log message",
+                     "y":  844,
+                     "h":  78
+                 },
+                 {
+                     "i":  12,
+                     "name":  "On block error FetchOrders, Error handling enabled",
+                     "y":  922,
+                     "h":  60
+                 },
+                 {
+                     "i":  13,
+                     "name":  "Invoke web service",
+                     "y":  982,
+                     "h":  103
+                 },
+                 {
+                     "i":  14,
+                     "name":  "End",
+                     "y":  1085,
+                     "h":  60
+                 },
+                 {
+                     "i":  15,
+                     "name":  "If StatusCode \u003c\u003e200 then",
+                     "y":  1145,
+                     "h":  60
+                 },
+                 {
+                     "i":  16,
+                     "name":  "Log message",
+                     "y":  1205,
+                     "h":  78
+                 },
+                 {
+                     "i":  17,
+                     "name":  "Display message",
+                     "y":  1283,
+                     "h":  104
+                 },
+                 {
+                     "i":  18,
+                     "name":  "Else",
+                     "y":  1387,
+                     "h":  60
+                 },
+                 {
+                     "i":  19,
+                     "name":  "Convert JSON to custom object",
+                     "y":  1447,
+                     "h":  78
+                 },
+                 {
+                     "i":  20,
+                     "name":  "Launch Excel",
+                     "y":  1525,
+                     "h":  79
+                 },
+                 {
+                     "i":  21,
+                     "name":  "Add new worksheet",
+                     "y":  1604,
+                     "h":  78
+                 },
+                 {
+                     "i":  22,
+                     "name":  "Set active Excel worksheet",
+                     "y":  1682,
+                     "h":  78
+                 },
+                 {
+                     "i":  23,
+                     "name":  "Write to Excel worksheet",
+                     "y":  1760,
+                     "h":  78
+                 },
+                 {
+                     "i":  24,
+                     "name":  "Write to Excel worksheet",
+                     "y":  1838,
+                     "h":  79
+                 },
+                 {
+                     "i":  25,
+                     "name":  "Write to Excel worksheet",
+                     "y":  1917,
+                     "h":  78
+                 },
+                 {
+                     "i":  26,
+                     "name":  "Write to Excel worksheet",
+                     "y":  1995,
+                     "h":  78
+                 },
+                 {
+                     "i":  27,
+                     "name":  "For each Order in Orders.orders",
+                     "y":  2073,
+                     "h":  60
+                 },
+                 {
+                     "i":  28,
+                     "name":  "Set variable",
+                     "y":  2133,
+                     "h":  78
+                 },
+                 {
+                     "i":  29,
+                     "name":  "If OrderStatus =\u0027cancelled\u0027 then",
+                     "y":  2211,
+                     "h":  60
+                 },
+                 {
+                     "i":  30,
+                     "name":  "Add item to list",
+                     "y":  2271,
+                     "h":  79
+                 },
+                 {
+                     "i":  31,
+                     "name":  "Log message",
+                     "y":  2350,
+                     "h":  78
+                 },
+                 {
+                     "i":  32,
+                     "name":  "Else",
+                     "y":  2428,
+                     "h":  60
+                 },
+                 {
+                     "i":  33,
+                     "name":  "Write to Excel worksheet",
+                     "y":  2488,
+                     "h":  78
+                 },
+                 {
+                     "i":  34,
+                     "name":  "Write to Excel worksheet",
+                     "y":  2566,
+                     "h":  78
+                 },
+                 {
+                     "i":  35,
+                     "name":  "Write to Excel worksheet",
+                     "y":  2644,
+                     "h":  79
+                 },
+                 {
+                     "i":  36,
+                     "name":  "Write to Excel worksheet",
+                     "y":  2723,
+                     "h":  78
+                 },
+                 {
+                     "i":  37,
+                     "name":  "Add item to list",
+                     "y":  2801,
+                     "h":  78
+                 },
+                 {
+                     "i":  38,
+                     "name":  "Increase variable",
+                     "y":  2879,
+                     "h":  78
+                 },
+                 {
+                     "i":  39,
+                     "name":  "Increase variable",
+                     "y":  2957,
+                     "h":  79
+                 },
+                 {
+                     "i":  40,
+                     "name":  "Increase variable",
+                     "y":  3036,
+                     "h":  79
+                 },
+                 {
+                     "i":  41,
+                     "name":  "End",
+                     "y":  3115,
+                     "h":  60
+                 },
+                 {
+                     "i":  42,
+                     "name":  "End",
+                     "y":  3175,
+                     "h":  60
+                 },
+                 {
+                     "i":  43,
+                     "name":  "Remove duplicate items from list",
+                     "y":  3235,
+                     "h":  78
+                 },
+                 {
+                     "i":  44,
+                     "name":  "Sort list",
+                     "y":  3313,
+                     "h":  78
+                 },
+                 {
+                     "i":  45,
+                     "name":  "Join text",
+                     "y":  3391,
+                     "h":  78
+                 },
+                 {
+                     "i":  46,
+                     "name":  "Convert number to text",
+                     "y":  3469,
+                     "h":  79
+                 },
+                 {
+                     "i":  47,
+                     "name":  "Add new worksheet",
+                     "y":  3548,
+                     "h":  78
+                 },
+                 {
+                     "i":  48,
+                     "name":  "Set active Excel worksheet",
+                     "y":  3626,
+                     "h":  78
+                 },
+                 {
+                     "i":  49,
+                     "name":  "Write to Excel worksheet",
+                     "y":  3704,
+                     "h":  78
+                 },
+                 {
+                     "i":  50,
+                     "name":  "Write to Excel worksheet",
+                     "y":  3782,
+                     "h":  79
+                 },
+                 {
+                     "i":  51,
+                     "name":  "Write to Excel worksheet",
+                     "y":  3861,
+                     "h":  78
+                 },
+                 {
+                     "i":  52,
+                     "name":  "Write to Excel worksheet",
+                     "y":  3939,
+                     "h":  78
+                 },
+                 {
+                     "i":  53,
+                     "name":  "Write to Excel worksheet",
+                     "y":  4017,
+                     "h":  78
+                 },
+                 {
+                     "i":  54,
+                     "name":  "Write to Excel worksheet",
+                     "y":  4095,
+                     "h":  79
+                 },
+                 {
+                     "i":  55,
+                     "name":  "Close Excel",
+                     "y":  4174,
+                     "h":  78
+                 },
+                 {
+                     "i":  56,
+                     "name":  "Join text",
+                     "y":  4252,
+                     "h":  78
+                 },
+                 {
+                     "i":  57,
+                     "name":  "Write text to file",
+                     "y":  4330,
+                     "h":  78
+                 },
+                 {
+                     "i":  58,
+                     "name":  "Log message",
+                     "y":  4408,
+                     "h":  79
+                 },
+                 {
+                     "i":  59,
+                     "name":  "Display message",
+                     "y":  4487,
+                     "h":  104
+                 },
+                 {
+                     "i":  60,
+                     "name":  "End",
+                     "y":  4591,
+                     "h":  60
+                 }
+             ],
+    "badge":  {
+                  "y":  104,
+                  "w":  44,
+                  "h":  44,
+                  "color":  "#F3F2F1",
+                  "x":  1880
+              }
+}
