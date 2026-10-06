@@ -9,6 +9,12 @@ const kb = { actions: [
   { actionId: "Display.ShowMessageDialog.ShowMessage", input_params: [{ name: "Message" }, { name: "Title" }], output_params: [{ name: "ButtonPressed" }] },
 ] };
 
+test("WAIT <seconds> is a built-in delay, WAIT (...) is still checked as an action", () => {
+  const r = checkRobin("WAIT 5\nWAIT (Folder.NoSuchWait Path: $'''C:\\x''')", kb);
+  assert.deepStrictEqual(r.errors, ["line 2: unknown action Folder.NoSuchWait"]);
+  assert.strictEqual(r.actionLines, 1);
+});
+
 test("valid action line passes", () => {
   const r = checkRobin("Folder.GetFiles Folder: $'''C:\\x: y''' FileFilter: $'''*''' Files=> Files", kb);
   assert.deepStrictEqual(r.errors, []);

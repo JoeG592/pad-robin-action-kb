@@ -4,7 +4,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const CONTROL = /^(SET |LOOP |END\b|ELSE\b|ELSE IF |IF (?!\()|NEXT LOOP|EXIT|CALL |FUNCTION |LABEL |GOTO |BLOCK |ON BLOCK ERROR|ON ERROR|THROW ERROR|DISABLE |#)/;
+// Built-in Robin statements (not KB actions). `WAIT <seconds>` is a delay; `WAIT (Action ...)` wraps a KB Wait action.
+const CONTROL = /^(SET |LOOP |END\b|ELSE\b|ELSE IF |IF (?!\()|WAIT (?!\()|NEXT LOOP|EXIT|CALL |FUNCTION |LABEL |GOTO |BLOCK |ON BLOCK ERROR|ON ERROR|THROW ERROR|DISABLE |#)/;
 
 function parseLine(line) {
   let s = line.trim()
