@@ -1,28 +1,55 @@
 # Promo video
 
-`pad-robin-kb-promo.mp4` is a 73-second, 1920×1080, 30 fps promo for the KB, with no audio. It is an HTML animation (`video.html`) rendered frame by frame in headless Chromium and encoded with ffmpeg.
+`pad-robin-kb-promo.mp4` (1920×1080) and `pad-robin-kb-promo-4x5.mp4` (1080×1350, for feeds) are 80-second, 30 fps promos for the KB, with no audio. They are made to work muted: captions carry the story.
 
-The look follows Power Automate's light Fluent style: a bright brand blue, teal loop blocks, purple variable cards and neutral greys. The colours sit close to the product's but aren't the exact brand values. The fonts are Microsoft's open-source ones: Selawik, the Segoe UI fallback, and Cascadia Mono. There are no Microsoft logos.
+**Every PAD Designer frame is a real capture of a real paste into PAD 2.72** (2.72.00183.26250), taken by `capture.ps1`. The paste animation and camera moves are recreated from those captures:
+- rows are revealed top to bottom
+- the cursor is drawn
+- zooms crop the capture, at most 1.4× its native resolution
 
-| Time | Scene |
-|---|---|
-| 0–10 s | An AI writes Robin from memory, it gets pasted into the Designer, and the canvas stays empty |
-| 10–16.5 s | Why: there is no official Robin reference |
-| 16.5–24 s | Title on brand blue, plus counters: 988 actions, 45 modules, 44 types, 0 paste errors on PAD 2.72 |
-| 24–35 s | The two-table idea: a template, a filled line, sibling selectors, and the Type Reference |
-| 35–52 s | The same request built with the KB: the script is pasted into a designer mock-up and 9 actions appear |
-| 52–59 s | Proof: a real PAD Designer screenshot of that paste (`assets/pad-real-paste.png`) |
-| 59–66 s | Results from the README, as cards styled like cloud-flow steps |
-| 66–73 s | Call to action: repo URL, CC BY 4.0, trademark notice |
+The one edit to the captured pixels: the flow checker's notification badge in the right-hand toolbar is covered.
 
-## Robin files
+| Time | Beat | Flow |
+|---|---|---|
+| 0–5 s | A script written from memory is pasted, and PAD shows real errors | `flows/00-hook-memory.robin` |
+| 5–10 s | The same request built from the KB pastes clean | `flows/00-hook-kb.robin` (9 actions) |
+| 10–18 s | KB template → golden example → the pasted row | `Excel.LaunchExcel.LaunchAndOpen` |
+| 18–27 s | 1 · Back up a folder | `flows/01-backup-downloads.robin` (4 actions) |
+| 27–38 s | 2 · Save Outlook attachments by date | `flows/02-outlook-attachments.robin` (16 actions) |
+| 38–50 s | 3 · Monthly invoice report | `flows/03-monthly-invoice-report.robin` (29 actions) |
+| 50–64 s | 4 · Sales API to an Excel report, with an error-handling block | `flows/04-sales-api-report.robin` (61 actions) |
+| 64–72 s | Proof: all 988 examples re-pasted on PAD 2.72, 0 errors | |
+| 72–80 s | Repo and licence | |
 
-- `demo-flow.robin` is the 9-action script shown in scenes 5 and 6. It was pasted into PAD Designer, giving 9 actions and Status: Ready (see the screenshot).
-- `showcase/monthly-invoice-report.robin` is a larger 27-line flow built from golden examples. It covers dates, a folder check with `IF`, CSV, a loop with `IF/ELSE`, Excel, a list join, a zip and a dialog. It hasn't been pasted yet. Paste it into PAD and screen-record the paste to get footage for a longer cut.
+All example flows are built only from the KB's golden examples. Each pasted with 0 errors, and the hook flow failed as intended; the results are in `captures/*.json`. The flows were paste-validated, not run.
+
+Two Robin rules came up while building them. Each makes PAD 2.72 reject the **whole** paste with no error message: the canvas just stays empty.
+- **A backslash directly before a `%variable%` in a string.** `$'''C:\Reports\%Month%'''` is rejected. Write `$'''C:\Reports\\%Month%'''`.
+- **Property access in an `IF` condition.** `IF Files.Count = 0 THEN` is rejected. `SET FileCount TO Files.Count` first, then `IF FileCount = 0 THEN`.
+
+`tools/check-flows.js` checks both, as well as the action ids and argument names.
+
+## Re-capturing
+
+Needs PAD Designer open on a flow named `PAD_Robin_test`, plus the paste validator from the maintainer's toolchain (`-Validator` parameter). Run it in a visible terminal and keep your hands off the mouse and keyboard while it works:
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File .\capture.ps1                                # all flows
+powershell.exe -ExecutionPolicy Bypass -File .\capture.ps1 -Flow "02-outlook-attachments"
+node tools/build-capture-index.js
+```
+
+## Checks
+
+```sh
+node --test "tools/*.test.js" motion.test.js
+node tools/check-flows.js ../../PAD_Robin_ActionKB_v3_1.json flows/00-hook-kb.robin flows/01-backup-downloads.robin flows/02-outlook-attachments.robin flows/03-monthly-invoice-report.robin flows/04-sales-api-report.robin --expect-fail flows/00-hook-memory.robin
+node tools/audit-captions.js
+```
 
 ## Re-rendering
 
-Requirements: Node 18+, Playwright with Chromium, and ffmpeg. The fonts in `fonts/` are not committed. To fetch them:
+Requirements: Node 18+, Playwright with Chromium (`tools/browser.cjs` also finds an already-installed Playwright Chromium), and ffmpeg. Fonts are not committed:
 
 ```sh
 mkdir -p fonts && cd fonts
@@ -33,8 +60,16 @@ curl -LO https://github.com/microsoft/cascadia-code/releases/download/v2407.24/C
 unzip -j CascadiaCode-2407.24.zip ttf/CascadiaMono.ttf
 cd ..
 
-node render.mjs --stills                  # one PNG per scene, for review
-node render.mjs pad-robin-kb-promo.mp4    # full render, about 9 minutes
+node render.mjs --stills --format 16x9      # one PNG per beat
+node render.mjs --format 16x9               # pad-robin-kb-promo.mp4
+node render.mjs --format 4x5                # pad-robin-kb-promo-4x5.mp4
 ```
 
-To edit the video, change the text in `video.html`, and the timing in the `S` table and the `render(t)` function. Opening `video.html` in a browser shows frame 0; run `render(30)` in the console to jump to any second.
+The code is split into three files:
+- `scenes.js`: timing, captions and camera beats
+- `motion.js`: motion math (Fluent easing curves, camera framing)
+- `engine.js`: drawing
+
+To inspect any moment, open `video.html?format=4x5` in a browser and call `render(42)` in the console.
+
+Power Automate is a trademark of Microsoft. This project is not affiliated with or endorsed by Microsoft.
