@@ -25,7 +25,7 @@ const duration = await page.evaluate(() => window.DURATION);
 
 if (stills) {
   // One still per scene, for review
-  for (const t of [7.5, 13, 21, 33, 47.5, 56.5, 64]) {
+  for (const t of [7.5, 13, 21, 33, 47.5, 57, 64, 71]) {
     await page.evaluate(t => window.render(t), t);
     await page.screenshot({ path: path.join(here, `still-${String(t).replace(".", "_")}.png`) });
   }
