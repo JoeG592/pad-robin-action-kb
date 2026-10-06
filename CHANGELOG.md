@@ -1,5 +1,14 @@
 # Changelog
 
+## Documentation (2026-10-06)
+
+- Two syntax rules that make PAD 2.72 reject the **whole** paste with no error (README rules 8 and 9, and PROMPT.md):
+  - A backslash directly before `%Variable%` in a string. Write `\\%Variable%`.
+  - Property access in an `IF` condition. `SET` it to a variable first.
+
+  Found by paste probes while building the example flows for the promo video. No data files changed.
+- Promo video v2 (`marketing/video/`): 80 s, 16:9 and 4:5, built from real PAD 2.72 captures of four example flows (4 to 61 actions), all pasted with 0 errors.
+
 ## 3.1.3 (2026-09-24)
 
 - **Parameter lists fixed on 18 records.** Their `input_params` listed 83 arguments the action form does not accept. Most were properties the selector already fixes, such as `CheckMode` on `File.IfFile.Exists` and `WaitFor` on `Services.WaitForService.Started`. Others belonged to sibling forms: 19 each on the two `OCR ...WithWindowsOcr` records, plus the Web and WebAutomation condition records. Adding any of them to a script gives "Unknown argument". `Web.InvokeSoapService` listed its address as `Url`; the real argument is `Endpoint`.
