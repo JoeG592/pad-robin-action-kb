@@ -1,0 +1,202 @@
+﻿{
+    "flow":  "03-monthly-invoice-report",
+    "status":  "PASS",
+    "errors":  [
+
+               ],
+    "actions":  29,
+    "window":  {
+                   "h":  1038,
+                   "w":  1938
+               },
+    "canvas":  {
+                   "y":  163,
+                   "w":  1526,
+                   "h":  808,
+                   "x":  342
+               },
+    "stripHeight":  2235,
+    "rows":  [
+                 {
+                     "i":  0,
+                     "name":  "Get current date and time",
+                     "y":  0,
+                     "h":  79
+                 },
+                 {
+                     "i":  1,
+                     "name":  "Convert datetime to text",
+                     "y":  79,
+                     "h":  78
+                 },
+                 {
+                     "i":  2,
+                     "name":  "If folder exists",
+                     "y":  157,
+                     "h":  78
+                 },
+                 {
+                     "i":  3,
+                     "name":  "Create folder",
+                     "y":  235,
+                     "h":  78
+                 },
+                 {
+                     "i":  4,
+                     "name":  "End",
+                     "y":  313,
+                     "h":  60
+                 },
+                 {
+                     "i":  5,
+                     "name":  "Get files in folder",
+                     "y":  373,
+                     "h":  79
+                 },
+                 {
+                     "i":  6,
+                     "name":  "Create new list",
+                     "y":  452,
+                     "h":  78
+                 },
+                 {
+                     "i":  7,
+                     "name":  "Set variable",
+                     "y":  530,
+                     "h":  78
+                 },
+                 {
+                     "i":  8,
+                     "name":  "Launch Excel",
+                     "y":  608,
+                     "h":  78
+                 },
+                 {
+                     "i":  9,
+                     "name":  "Write to Excel worksheet",
+                     "y":  686,
+                     "h":  79
+                 },
+                 {
+                     "i":  10,
+                     "name":  "Write to Excel worksheet",
+                     "y":  765,
+                     "h":  79
+                 },
+                 {
+                     "i":  11,
+                     "name":  "For each CurrentItem in Files",
+                     "y":  844,
+                     "h":  60
+                 },
+                 {
+                     "i":  12,
+                     "name":  "Read from CSV file",
+                     "y":  904,
+                     "h":  78
+                 },
+                 {
+                     "i":  13,
+                     "name":  "Get file path part",
+                     "y":  982,
+                     "h":  103
+                 },
+                 {
+                     "i":  14,
+                     "name":  "Get first free column/row from Excel worksheet",
+                     "y":  1085,
+                     "h":  103
+                 },
+                 {
+                     "i":  15,
+                     "name":  "Write to Excel worksheet",
+                     "y":  1188,
+                     "h":  79
+                 },
+                 {
+                     "i":  16,
+                     "name":  "Set variable",
+                     "y":  1267,
+                     "h":  78
+                 },
+                 {
+                     "i":  17,
+                     "name":  "Write to Excel worksheet",
+                     "y":  1345,
+                     "h":  78
+                 },
+                 {
+                     "i":  18,
+                     "name":  "If LineItems =0 then",
+                     "y":  1423,
+                     "h":  60
+                 },
+                 {
+                     "i":  19,
+                     "name":  "Log message",
+                     "y":  1483,
+                     "h":  78
+                 },
+                 {
+                     "i":  20,
+                     "name":  "Else",
+                     "y":  1561,
+                     "h":  60
+                 },
+                 {
+                     "i":  21,
+                     "name":  "Add item to list",
+                     "y":  1621,
+                     "h":  78
+                 },
+                 {
+                     "i":  22,
+                     "name":  "Increase variable",
+                     "y":  1699,
+                     "h":  78
+                 },
+                 {
+                     "i":  23,
+                     "name":  "End",
+                     "y":  1777,
+                     "h":  60
+                 },
+                 {
+                     "i":  24,
+                     "name":  "End",
+                     "y":  1837,
+                     "h":  60
+                 },
+                 {
+                     "i":  25,
+                     "name":  "Join text",
+                     "y":  1897,
+                     "h":  78
+                 },
+                 {
+                     "i":  26,
+                     "name":  "Close Excel",
+                     "y":  1975,
+                     "h":  79
+                 },
+                 {
+                     "i":  27,
+                     "name":  "Zip files",
+                     "y":  2054,
+                     "h":  78
+                 },
+                 {
+                     "i":  28,
+                     "name":  "Display message",
+                     "y":  2132,
+                     "h":  103
+                 }
+             ],
+    "badge":  {
+                  "y":  104,
+                  "w":  44,
+                  "h":  44,
+                  "color":  "#F3F2F1",
+                  "x":  1880
+              }
+}

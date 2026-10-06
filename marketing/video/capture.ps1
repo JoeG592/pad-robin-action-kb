@@ -23,6 +23,7 @@ public static class W {
     [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll")] public static extern void mouse_event(uint f, uint dx, uint dy, uint d, IntPtr e);
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+    [DllImport("user32.dll")] public static extern void keybd_event(byte vk, byte scan, uint f, IntPtr e);
     [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
 }
 "@
@@ -84,6 +85,17 @@ function Deselect {
     if ($y -lt $cv.Bottom - 5) {
         [W]::SetCursorPos([int]($cv.X + $cv.Width * 0.6), $y) | Out-Null; Start-Sleep -Milliseconds 150
         [W]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero); [W]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero); Start-Sleep -Milliseconds 500
+    }
+    if (-not ((Get-StatusTexts) -contains "0 Selected actions")) {
+        # No empty canvas to click (e.g. the error pane shortened it): click the first row to select only it,
+        # then Ctrl+click the same row to deselect it.
+        $first = Get-Rows | Where-Object { -not $_.off } | Select-Object -First 1
+        $px = [int]($first.x + $first.w * 0.5); $py = [int]($first.y + $first.h * 0.5)
+        [W]::SetCursorPos($px, $py) | Out-Null; Start-Sleep -Milliseconds 150
+        [W]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero); [W]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero); Start-Sleep -Milliseconds 400
+        [W]::keybd_event(0x11, 0, 0, [IntPtr]::Zero); Start-Sleep -Milliseconds 80
+        [W]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero); [W]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero); Start-Sleep -Milliseconds 80
+        [W]::keybd_event(0x11, 0, 2, [IntPtr]::Zero); Start-Sleep -Milliseconds 500
     }
     [W]::SetCursorPos(5, 5) | Out-Null
     if (-not ((Get-StatusTexts) -contains "0 Selected actions")) { throw "Could not deselect actions" }

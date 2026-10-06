@@ -1,0 +1,84 @@
+﻿{
+    "flow":  "00-hook-memory",
+    "status":  "FAIL",
+    "errors":  [
+                   "Unknown argument(s): \u0027Filter\u0027.",
+                   "Parameter \u0027Value to iterate\u0027: Variable \u0027Files\u0027 doesn\u0027t exist.",
+                   "Module \u0027Excel\u0027 or action \u0027LaunchExcel\u0027 wasn\u0027t found."
+               ],
+    "actions":  9,
+    "window":  {
+                   "h":  1038,
+                   "w":  1938
+               },
+    "canvas":  {
+                   "y":  163,
+                   "w":  1526,
+                   "h":  583,
+                   "x":  342
+               },
+    "stripHeight":  668,
+    "rows":  [
+                 {
+                     "i":  0,
+                     "name":  "Get files in folder, Has error",
+                     "y":  0,
+                     "h":  79
+                 },
+                 {
+                     "i":  1,
+                     "name":  "For each CurrentItem in Files, Has error",
+                     "y":  79,
+                     "h":  60
+                 },
+                 {
+                     "i":  2,
+                     "name":  "Unknown action, Has error",
+                     "y":  139,
+                     "h":  78
+                 },
+                 {
+                     "i":  3,
+                     "name":  "Unknown action, Has error",
+                     "y":  217,
+                     "h":  78
+                 },
+                 {
+                     "i":  4,
+                     "name":  "Unknown action, Has error",
+                     "y":  295,
+                     "h":  78
+                 },
+                 {
+                     "i":  5,
+                     "name":  "Unknown action, Has error",
+                     "y":  373,
+                     "h":  79
+                 },
+                 {
+                     "i":  6,
+                     "name":  "Unknown action, Has error",
+                     "y":  452,
+                     "h":  78
+                 },
+                 {
+                     "i":  7,
+                     "name":  "End",
+                     "y":  530,
+                     "h":  60
+                 },
+                 {
+                     "i":  8,
+                     "name":  "Unknown action, Has error",
+                     "y":  590,
+                     "h":  78
+                 }
+             ],
+    "badge":  {
+                  "y":  104,
+                  "w":  44,
+                  "h":  44,
+                  "color":  "#F3F2F1",
+                  "x":  1880
+              }
+}

@@ -1,0 +1,82 @@
+﻿{
+    "flow":  "00-hook-kb",
+    "status":  "PASS",
+    "errors":  [
+
+               ],
+    "actions":  9,
+    "window":  {
+                   "h":  1038,
+                   "w":  1938
+               },
+    "canvas":  {
+                   "y":  163,
+                   "w":  1526,
+                   "h":  808,
+                   "x":  342
+               },
+    "stripHeight":  693,
+    "rows":  [
+                 {
+                     "i":  0,
+                     "name":  "Get files in folder",
+                     "y":  0,
+                     "h":  79
+                 },
+                 {
+                     "i":  1,
+                     "name":  "For each CurrentItem in Files",
+                     "y":  79,
+                     "h":  60
+                 },
+                 {
+                     "i":  2,
+                     "name":  "Launch Excel",
+                     "y":  139,
+                     "h":  78
+                 },
+                 {
+                     "i":  3,
+                     "name":  "Get first free column/row from Excel worksheet",
+                     "y":  217,
+                     "h":  103
+                 },
+                 {
+                     "i":  4,
+                     "name":  "Get current date and time",
+                     "y":  320,
+                     "h":  78
+                 },
+                 {
+                     "i":  5,
+                     "name":  "Write to Excel worksheet",
+                     "y":  398,
+                     "h":  79
+                 },
+                 {
+                     "i":  6,
+                     "name":  "Close Excel",
+                     "y":  477,
+                     "h":  78
+                 },
+                 {
+                     "i":  7,
+                     "name":  "End",
+                     "y":  555,
+                     "h":  60
+                 },
+                 {
+                     "i":  8,
+                     "name":  "Display message",
+                     "y":  615,
+                     "h":  78
+                 }
+             ],
+    "badge":  {
+                  "y":  104,
+                  "w":  44,
+                  "h":  44,
+                  "color":  "#F3F2F1",
+                  "x":  1880
+              }
+}
