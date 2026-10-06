@@ -6,6 +6,8 @@ There is no official Robin reference. The original language site went offline in
 
 This repo is the missing reference.
 
+[![Watch the 80-second promo: real pastes into PAD Designer, from 4 to 61 actions](marketing/video/poster.png)](marketing/video/pad-robin-kb-promo.mp4)
+
 ## What is in it
 
 | File | Contents |
