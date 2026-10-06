@@ -28,6 +28,15 @@ function checkRobin(text, kb) {
   text.split(/\r?\n/).forEach((raw, i) => {
     const line = raw.trim();
     if (!line) return;
+    // PAD 2.72 silently rejects the whole paste for these two (paste probes, 2026-10-06).
+    for (const m of line.matchAll(/\$'''([\s\S]*?)'''/g))
+      for (const v of m[1].matchAll(/(?<!\\)\\%(\w[\w.]*)%/g))
+        errors.push(`line ${i + 1}: backslash before %${v[1]}% in a string; write \\\\%${v[1]}% (PAD rejects the whole paste)`);
+    const cond = line.match(/^(?:ELSE )?IF (?!\()(.*) THEN$/);
+    if (cond) {
+      const prop = cond[1].replace(/\$'''[\s\S]*?'''/g, '""').match(/\b[A-Za-z_]\w*\.[A-Za-z_]\w*/);
+      if (prop) errors.push(`line ${i + 1}: property access ${prop[0]} in an IF condition; SET it to a variable first (PAD rejects the whole paste)`);
+    }
     const isAction = /^(IF|WAIT|LOOP WHILE) \(/.test(line) || !CONTROL.test(line);
     if (!isAction) return;
     actionLines++;
