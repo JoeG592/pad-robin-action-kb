@@ -28,6 +28,19 @@ test("unknown argument and output are errors, case-insensitive match is ok", () 
   ]);
 });
 
+// Found by paste probes on PAD 2.72 (2026-10-06): both make the Designer reject the WHOLE paste silently.
+test("backslash directly before a %variable% is an error, doubled backslash is fine", () => {
+  const bad = checkRobin("SET Folder TO $'''C:\\Reports\\%ReportDate%'''", kb);
+  assert.deepStrictEqual(bad.errors, ["line 1: backslash before %ReportDate% in a string; write \\\\%ReportDate% (PAD rejects the whole paste)"]);
+  assert.deepStrictEqual(checkRobin("SET Folder TO $'''C:\\Reports\\\\%ReportDate%'''", kb).errors, []);
+  assert.deepStrictEqual(checkRobin("SET Path TO $'''%Folder%\\Report.xlsx'''", kb).errors, []);
+});
+
+test("property access in an IF condition is an error", () => {
+  const r = checkRobin("IF Files.Count = 0 THEN\nEND\nIF Count = 0 THEN\nEND", kb);
+  assert.deepStrictEqual(r.errors, ["line 1: property access Files.Count in an IF condition; SET it to a variable first (PAD rejects the whole paste)"]);
+});
+
 test("control flow is skipped, conditions are checked", () => {
   const src = [
     "SET Count TO 0",
