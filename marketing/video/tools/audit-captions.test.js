@@ -21,5 +21,6 @@ test("flags long lines, too many lines, short display, unknown numbers", () => {
 });
 
 test("clean captions pass", () => {
-  assert.deepStrictEqual(audit([{ t0: 0, t1: 3, text: "988 paste-tested actions.\nYour AI copies, you paste." }], new Set(["988"])), []);
+  // 52 chars needs 52/17 = 3.06 s on screen
+  assert.deepStrictEqual(audit([{ t0: 0, t1: 3.2, text: "988 paste-tested actions.\nYour AI copies, you paste." }], new Set(["988"])), []);
 });
