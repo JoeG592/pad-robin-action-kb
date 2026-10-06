@@ -8,519 +8,78 @@
 @font-face { font-family: "UI"; src: url("fonts/Selawik-Semilight.ttf"); font-weight: 300; }
 @font-face { font-family: "UI"; src: url("fonts/Selawik-Regular.ttf"); font-weight: 400; }
 @font-face { font-family: "UI"; src: url("fonts/Selawik-Semibold.ttf"); font-weight: 600; }
-@font-face { font-family: "UI"; src: url("fonts/Selawik-Bold.ttf"); font-weight: 700 900; }
-@font-face { font-family: "Code"; src: url("fonts/CascadiaMono.ttf"); font-weight: 200 700; }
-:root {
-  /* Close to the Power Automate / Fluent look, not exact brand values */
-  --brand: #0A64F0; --brand-2: #0759E6; --brand-dark: #0A3FA8; --brand-tint: #DCEBFF; --brand-tint-2: #EEF5FF;
-  --chip-bg: #E3EFFE; --chip-bd: #A9CBFB; --chip-ink: #1149AE;
-  --teal: #4FDBD6; --teal-tint: #E2F9FA; --purple: #7414CF; --purple-tint: #EDDDF9;
-  --ink: #242424; --ink-2: #424242; --mute: #616161; --dim: #8A8886;
-  --bg: #F5F7FB; --surface: #FFFFFF; --pane: #FAF9F8; --line: #E1DFDD; --line-2: #EDEBE9;
-  --green: #138A36; --green-tint: #E3F4E8; --red: #C42B1C; --red-tint: #FDE7E9;
-  /* code (dark editor) */
-  --code-bg: #1E1E1E; --code-ink: #D4D4D4;
-}
+@font-face { font-family: "UI"; src: url("fonts/Selawik-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "Code"; src: url("fonts/CascadiaMono.ttf"); }
+:root { --accent: #0F6CBD; --ink: #1B1B1B; --mute: #5C5C5C; --bg1: #EEF1F5; --bg2: #E2E7EE; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+html, body { width: var(--fw); height: var(--fh); overflow: hidden; background: var(--bg1); }
 body { font-family: "UI", "Segoe UI", sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
-#stage { position: absolute; inset: 0; overflow: hidden; background: var(--bg); }
-#dots { position: absolute; inset: -60px; opacity: .55;
-  background-image: radial-gradient(#D5DCE8 1.3px, transparent 1.4px); background-size: 30px 30px; }
-.scene { position: absolute; inset: 0; opacity: 0; }
-.scene.blue { background: linear-gradient(135deg, #0B5BE0 0%, #0A64F0 45%, #2E7BF6 100%); color: #fff; }
-.scene.blue::before { content: ""; position: absolute; inset: 0; opacity: .14;
-  background-image: radial-gradient(#fff 1.3px, transparent 1.4px); background-size: 30px 30px; }
-.abs { position: absolute; }
-.mono, .code, .chip-code, .url { font-family: "Code", monospace; font-variant-ligatures: none; }
+#stage { position: absolute; inset: 0; overflow: hidden; background: linear-gradient(180deg, var(--bg1), var(--bg2)); opacity: var(--shot, 1); }
 
-/* ---------- type ---------- */
-.kicker { font-size: 22px; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); font-weight: 700; }
-.blue .kicker { color: #CFE2FF; }
-.h1 { font-size: 88px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.04; }
-.h2 { font-size: 56px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.1; }
-.h3 { font-size: 32px; font-weight: 400; color: var(--mute); line-height: 1.35; }
-.blue .h3 { color: #DCE9FF; }
-.acc { color: var(--brand); } .red { color: var(--red); } .green { color: var(--green); }
+/* PAD window */
+.world { position: absolute; left: 0; top: 0; width: var(--fw); height: var(--fh); transform-origin: 0 0; will-change: transform; }
+.win { position: absolute; border-radius: 8px; overflow: hidden; background: #fff;
+  box-shadow: 0 1px 2px rgba(20,30,50,.08), 0 14px 40px rgba(20,30,50,.16); }
+.win-img { position: absolute; inset: 0; background-repeat: no-repeat; }
+.viewport { position: absolute; overflow: hidden; }
+.strip { position: absolute; left: 0; top: 0; background-repeat: no-repeat; }
+.sbmask { position: absolute; right: 0; top: 0; bottom: 0; background: #fff; }
+.badge { position: absolute; }
+.cursor { position: absolute; left: 0; top: 0; width: 22px; height: 22px; transform-origin: 0 0; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.35)); }
+.keyhint { position: absolute; left: 0; top: 0; font: 600 15px "UI"; color: #fff; background: rgba(24,24,24,.86); padding: 5px 10px; border-radius: 6px; }
 
-/* ---------- Fluent card ---------- */
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
-  box-shadow: 0 1.6px 3.6px rgba(0,0,0,.08), 0 12px 32px rgba(0,0,0,.10); }
+/* overlays */
+.caption { position: absolute; left: 50%; bottom: 46px; max-width: 86%; text-align: center; font-size: 34px; font-weight: 600; line-height: 1.3;
+  color: #fff; background: #1C1C1C; padding: 12px 26px; border-radius: 14px; letter-spacing: -0.005em;
+  transform: translateX(-50%) translateY(var(--rise, 0px)); }
+.f4x5 .caption { bottom: 120px; font-size: 34px; max-width: 94%; white-space: nowrap; }
+.chip { position: absolute; right: 7%; top: 5.5%; font: 600 22px "UI"; color: var(--accent); background: #fff; border: 1px solid #CFE0F3;
+  padding: 8px 16px; border-radius: 999px; box-shadow: 0 2px 8px rgba(20,30,50,.08); transform: translateY(var(--rise, 0px)); }
+.f4x5 .chip { top: 1048px; right: 50%; transform: translateX(50%) translateY(var(--rise, 0px)); }
+.title { position: absolute; left: 5%; top: 5.5%; font: 600 26px "UI"; color: var(--ink); }
+.f4x5 .title { top: 64px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
 
-/* chat */
-.chat { padding: 24px 26px; }
-.bubble-u { background: var(--brand); color: #fff; padding: 15px 20px; border-radius: 12px 12px 4px 12px; font-size: 22px; line-height: 1.4; margin-left: 70px; }
-.ai-label { margin: 20px 0 10px; font-size: 17px; color: var(--mute); display: flex; gap: 10px; align-items: center; font-weight: 600; }
-.ai-dot { width: 26px; height: 26px; border-radius: 6px; background: linear-gradient(135deg, var(--purple), var(--brand)); }
+/* how it works */
+.how { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 34px; padding: 0 9% 150px; }
+.f4x5 .how { padding: 0 6% 260px; gap: 30px; }
+.how-col { width: 100%; max-width: 1380px; }
+.how-lbl { font: 600 22px "UI"; color: var(--mute); margin-bottom: 10px; }
+.how-code { font: 25px/1.55 "Code"; white-space: pre-wrap; word-break: normal; overflow-wrap: anywhere; background: #fff; border: 1px solid #DADFE6;
+  border-radius: 8px; padding: 18px 24px; color: #242424; box-shadow: 0 1px 2px rgba(20,30,50,.05); }
+.f4x5 .how-code { font-size: 21px; }
+.how-row { background-repeat: no-repeat; background-color: #fff; border: 1px solid #DADFE6; border-radius: 8px; width: 100%; box-shadow: 0 1px 2px rgba(20,30,50,.05); }
 
-/* code editor (VS Code dark-like) */
-.codebox { background: var(--code-bg); border-radius: 6px; padding: 16px 18px; overflow: hidden; position: relative; }
-.code { font-size: 16.5px; line-height: 1.75; white-space: pre; color: var(--code-ink); }
-.t-act { color: #4EC9B0; } .t-arg { color: #9CDCFE; } .t-str { color: #CE9178; } .t-kw { color: #C586C0; font-weight: 700; }
-.t-enum { color: #DCDCAA; } .t-bool { color: #569CD6; } .t-num { color: #B5CEA8; } .t-out { color: #569CD6; }
-.t-bad { color: #F48771; text-decoration: underline wavy #F14C4C; text-underline-offset: 4px; }
-.caret { display: inline-block; width: 2px; height: 20px; background: #AEAFAD; vertical-align: -4px; margin-left: 1px; }
-
-/* ---------- designer window (generic, styled after a Fluent desktop app) ---------- */
-.win { background: var(--surface); border-radius: 8px; overflow: hidden; color: var(--ink); border: 1px solid #C8C6C4;
-  box-shadow: 0 6.4px 14.4px rgba(0,0,0,.13), 0 30px 70px rgba(0,0,0,.16); }
-.win-title { height: 38px; background: var(--brand); color: #fff; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 16px; font-size: 14.5px; }
-.win-title .menu { display: flex; gap: 22px; }
-.win-title .ctl { justify-self: end; display: flex; gap: 26px; font-size: 15px; opacity: .95; }
-.toolbar { height: 50px; border-bottom: 1px solid var(--line-2); display: flex; align-items: center; gap: 22px; padding: 0 18px; color: var(--brand); background: #fff; }
-.toolbar svg { width: 22px; height: 22px; }
-.toolbar .sep { width: 1px; height: 26px; background: var(--line); }
-.win-body { display: grid; grid-template-columns: 250px 1fr; }
-.pane { background: var(--pane); border-right: 1px solid var(--line-2); padding: 16px 16px; font-size: 15px; }
-.pane h4 { font-size: 22px; font-weight: 600; margin-bottom: 14px; }
-.search { height: 34px; border: 1px solid #D1D1D1; border-radius: 4px; background: #fff; margin-bottom: 14px; color: var(--mute); font-size: 14px; display: flex; align-items: center; padding: 0 10px; gap: 8px; }
-.tree div { padding: 6px 4px; color: var(--ink); display: flex; gap: 10px; align-items: center; }
-.tree div::before { content: "›"; color: var(--mute); font-size: 17px; }
-.canvas { position: relative; background: #fff; overflow: hidden; }
-.tabbar { height: 44px; border-bottom: 1px solid var(--line-2); display: flex; align-items: stretch; font-size: 15px; }
-.tabbar .sub { display: flex; align-items: center; gap: 8px; padding: 0 16px; color: var(--ink); border-right: 1px solid var(--line-2); }
-.tabbar .tab { display: flex; align-items: center; padding: 0 30px; font-weight: 600; border-bottom: 3px solid var(--brand-2); }
-.empty { position: absolute; left: 0; right: 0; top: 46%; text-align: center; color: var(--dim); font-size: 18px; }
-.rows { display: grid; grid-template-columns: 64px 1fr; padding-top: 10px; }
-.ln { color: var(--mute); font-size: 15px; text-align: center; border-right: 1px solid var(--line-2); }
-.rowwrap { padding: 4px 18px 4px 14px; position: relative; }
-.row { display: grid; grid-template-columns: 34px 1fr 20px; align-items: center; gap: 12px; background: #fff;
-  border: 1.5px solid var(--brand-2); border-radius: 6px; padding: 8px 12px; }
-.row .ic { color: var(--ink-2); display: grid; place-items: center; }
-.row .ic svg { width: 24px; height: 24px; }
-.row .t { font-size: 17px; font-weight: 600; color: var(--ink); }
-.row .d { font-size: 14px; color: var(--ink-2); margin-top: 3px; line-height: 1.7; }
-.row .dots { color: var(--mute); font-weight: 700; text-align: center; }
-.row.ctl { border-color: var(--teal); background: var(--teal-tint); width: max-content; padding: 6px 12px; grid-template-columns: 26px auto 20px; }
-.row.ctl .t { font-weight: 400; font-size: 17px; }
-.indent { margin-left: 34px; }
-.guide { position: absolute; left: 22px; width: 2px; background: var(--teal); opacity: .6; }
-.v { display: inline-block; background: var(--chip-bg); border: 1px solid var(--chip-bd); color: var(--chip-ink); border-radius: 999px; padding: 0 8px; line-height: 1.45; font-size: 13.5px; margin: 0 1px; }
-.q { color: var(--brand-2); }
-.statusbar { height: 42px; background: #fff; border-top: 1px solid var(--line-2); display: flex; align-items: center; padding: 0 18px; gap: 30px; font-size: 14.5px; color: var(--ink); }
-.statusbar .ok { display: inline-flex; gap: 8px; align-items: center; }
-.statusbar .ok i { width: 18px; height: 18px; border-radius: 50%; border: 1.6px solid var(--green); color: var(--green); display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 700; }
-
-/* keycap */
-.keys { display: flex; gap: 14px; align-items: center; }
-.key { min-width: 92px; height: 92px; padding: 0 22px; border-radius: 12px; background: #fff; border: 1px solid #D1D1D1;
-  box-shadow: 0 6px 0 #C8C6C4, 0 18px 40px rgba(0,0,0,.18); display: grid; place-items: center; font-size: 34px; font-weight: 700; color: var(--ink); }
-.plus { font-size: 40px; color: var(--mute); font-weight: 600; }
-
-/* KB cards */
-.kbcard { padding: 26px 30px; }
-.label { font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); font-weight: 700; margin: 18px 0 8px; }
-.label:first-child { margin-top: 0; }
-.hole { background: rgba(220,220,170,.16); color: #DCDCAA; border: 1px dashed #DCDCAA; border-radius: 4px; padding: 0 6px; }
-.fill { background: rgba(78,201,176,.18); border-radius: 4px; padding: 0 4px; }
-.trow { display: grid; grid-template-columns: 150px 1fr; padding: 12px 0; border-bottom: 1px solid var(--line-2); font-size: 20px; align-items: center; }
-.trow:last-child { border-bottom: 0; }
-.trow .ty { color: var(--mute); font-weight: 600; }
-.trow .mono { color: var(--chip-ink); }
-.chip-code { display: inline-block; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-size: 17px; margin: 4px 6px 4px 0; color: var(--ink-2); }
-.chip-code.on { border-color: var(--green); color: var(--green); background: var(--green-tint); }
-.chip-code.off { border-color: var(--red); color: var(--red); background: var(--red-tint); text-decoration: line-through; }
-
-/* stats */
-.stat .num { font-size: 124px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; color: #fff; }
-.stat .lab { font-size: 26px; color: #DCE9FF; margin-top: 10px; font-weight: 600; }
-
-/* cloud-flow style result cards */
-.flowcard { display: grid; grid-template-columns: 76px 1fr; align-items: stretch; border-radius: 4px; overflow: hidden; width: 1100px;
-  box-shadow: 0 1.6px 3.6px rgba(0,0,0,.10), 0 8px 24px rgba(0,0,0,.08); }
-.flowcard .ico { display: grid; place-items: center; color: #fff; font-size: 30px; font-weight: 700; }
-.flowcard .body { padding: 18px 24px; }
-.flowcard .big { font-size: 32px; font-weight: 600; }
-.flowcard .small { font-size: 21px; color: var(--ink-2); margin-top: 4px; }
-.arrow { width: 1100px; height: 46px; position: relative; }
-.arrow::before { content: ""; position: absolute; left: 50%; top: 4px; bottom: 10px; width: 2px; background: #605E5C; }
-.arrow::after { content: ""; position: absolute; left: calc(50% - 7px); bottom: 4px; width: 12px; height: 12px; border-right: 2px solid #605E5C; border-bottom: 2px solid #605E5C; transform: rotate(45deg); }
-
-.foot { font-size: 17px; color: #CFE2FF; }
-.url { font-size: 40px; padding: 20px 34px; border-radius: 8px; background: #fff; color: var(--ink); display: inline-block; box-shadow: 0 12px 40px rgba(0,0,0,.2); }
-.progress { position: absolute; left: 0; bottom: 0; height: 5px; background: var(--brand); }
-.flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
-.shot { border-radius: 8px; overflow: hidden; border: 1px solid #C8C6C4; box-shadow: 0 6.4px 14.4px rgba(0,0,0,.13), 0 30px 70px rgba(0,0,0,.18); background: #fff; }
-.shot img { display: block; width: 100%; }
-.ring { position: absolute; border: 3px solid var(--green); border-radius: 8px; box-shadow: 0 0 0 6px rgba(19,138,54,.18); }
+/* proof + CTA */
+.proof, .cta { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 9%; }
+.proof { flex-direction: row; align-items: center; justify-content: space-between; gap: 6%; padding-bottom: 80px; }
+.proof-strip { width: 720px; height: 780px; flex: none; border-radius: 8px; background-color: #fff; background-repeat: no-repeat;
+  box-shadow: 0 1px 2px rgba(20,30,50,.08), 0 14px 40px rgba(20,30,50,.14);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%); }
+.f4x5 .proof { flex-direction: column; justify-content: center; align-items: flex-start; gap: 44px; padding: 0 8% 220px; }
+.f4x5 .proof-strip { width: 100%; height: 400px; }
+.proof-num { font: 700 150px/1 "UI"; letter-spacing: -0.03em; }
+.proof-num span { color: var(--mute); font-weight: 400; }
+.proof-num.z { margin-top: 36px; color: var(--accent); }
+.proof-sub { font: 400 34px "UI"; color: var(--mute); margin-top: 6px; }
+.f4x5 .proof-num { font-size: 120px; }
+.cta-name { font: 700 76px "UI"; letter-spacing: -0.02em; }
+.cta-url { font: 36px "Code"; color: var(--accent); margin-top: 18px; }
+.cta-sub { font: 400 26px "UI"; color: var(--mute); margin-top: 22px; }
+.f4x5 .cta-name { font-size: 64px; } .f4x5 .cta-url { font-size: 27px; }
 </style>
 </head>
 <body>
-<div id="stage">
-  <div id="dots"></div>
-
-  <!-- ============ S1: the problem ============ -->
-  <section class="scene" id="s1">
-    <div class="abs" style="left:100px; top:84px;"><div class="kicker" id="s1k">Desktop flows + AI</div></div>
-    <div class="abs card chat" id="s1chat" style="left:100px; top:150px; width:860px;">
-      <div class="bubble-u">Write a Power Automate Desktop flow that stamps every invoice in <b>C:\Invoices</b> with today’s date.</div>
-      <div class="ai-label"><span class="ai-dot"></span>AI assistant</div>
-      <div class="codebox"><div class="code" id="s1code"></div></div>
-    </div>
-    <div class="abs win" id="s1win" style="left:1010px; top:150px; width:810px; height:650px;">
-      <div class="win-title"><div class="menu"><span>File</span><span>Edit</span><span>Debug</span><span>Tools</span><span>View</span><span>Help</span></div><div>Invoice roll-up</div><div class="ctl"><span>—</span><span>☐</span><span>✕</span></div></div>
-      <div class="toolbar" data-tb></div>
-      <div class="canvas" style="height:calc(100% - 38px - 50px - 42px);">
-        <div class="tabbar"><div class="sub">Subflows</div><div class="tab">Main</div></div>
-        <div class="empty" id="s1empty">Drag an action here, or paste Robin code</div>
-      </div>
-      <div class="statusbar"><span class="ok"><i>✓</i>Status: Ready</span><span>0 Actions</span><span>1 Subflow</span></div>
-    </div>
-    <div class="abs keys" id="s1keys" style="left:1270px; top:410px;"><div class="key">Ctrl</div><div class="plus">+</div><div class="key">V</div></div>
-    <div class="abs" id="s1cap" style="left:100px; top:860px; width:1720px;">
-      <div class="h2">Paste it into PAD. <span class="red">Nothing happens.</span></div>
-      <div class="h3" style="margin-top:12px;">No error. No line number. Just an empty canvas.</div>
-    </div>
-  </section>
-
-  <!-- ============ S2: why ============ -->
-  <section class="scene" id="s2">
-    <div class="abs" style="left:160px; top:300px; width:1600px;">
-      <div class="kicker" id="s2k">Why it fails</div>
-      <div class="h1" id="s2a" style="margin-top:26px;">There is no official<br>Robin reference.</div>
-      <div class="h3" id="s2b" style="margin-top:34px; max-width:1300px;">The language site went offline in 2021. The Designer is the only thing that knows the syntax, and every action has selector forms with different arguments that it never shows you as text.</div>
-    </div>
-  </section>
-
-  <!-- ============ S3: title + counters (brand blue) ============ -->
-  <section class="scene blue" id="s3">
-    <div class="abs" style="left:160px; top:110px; width:1600px;">
-      <div class="kicker" id="s3k">Introducing</div>
-      <div class="h1" id="s3t" style="margin-top:22px; font-size:108px;">PAD Robin<br>Action Knowledge Base</div>
-      <div class="h3" id="s3s" style="margin-top:22px;">A paste-validated reference so AI writes desktop flows that actually paste.</div>
-    </div>
-    <div class="abs" style="left:160px; top:660px; display:grid; grid-template-columns: repeat(4, 380px); gap: 20px;">
-      <div class="stat" id="st1"><div class="num" id="n1">0</div><div class="lab">Robin actions</div></div>
-      <div class="stat" id="st2"><div class="num" id="n2">0</div><div class="lab">modules</div></div>
-      <div class="stat" id="st3"><div class="num" id="n3">0</div><div class="lab">parameter types</div></div>
-      <div class="stat" id="st4"><div class="num" id="n4">0</div><div class="lab">paste errors on PAD 2.72</div></div>
-    </div>
-  </section>
-
-  <!-- ============ S4: the two-table idea ============ -->
-  <section class="scene" id="s4">
-    <div class="abs" style="left:100px; top:80px; width:1720px;">
-      <div class="kicker">The two-table idea</div>
-      <div class="h2" style="margin-top:14px;">Don’t ask the model to write Robin. <span class="acc">Ask it to fill a template.</span></div>
-    </div>
-    <div class="abs card kbcard" id="s4a" style="left:100px; top:290px; width:1060px;">
-      <div class="label">Action KB record · Text.JoinText.JoinWithDelimiter</div>
-      <div class="codebox" style="padding:14px 18px;">
-        <div class="label" style="margin-top:0; color:#9DA5B4;">template</div>
-        <div class="code" style="font-size:16px;"><span class="t-act">Text.JoinText.JoinWithDelimiter</span> <span class="t-arg">List:</span> <span class="hole">``</span>
-  <span class="t-arg">StandardDelimiter:</span> <span class="t-enum">Text.StandardDelimiter.Space</span> <span class="t-arg">DelimiterTimes:</span> <span class="t-num">1</span> <span class="t-out">Result=&gt;</span> JoinedText</div>
-        <div id="s4gw">
-        <div class="label" style="color:#9DA5B4;">your line · the golden example with new values</div>
-        <div class="code" style="font-size:16px;"><span class="t-act">Text.JoinText.JoinWithDelimiter</span> <span class="t-arg">List:</span> <span class="fill">Names</span>
-  <span class="t-arg">StandardDelimiter:</span> <span class="t-enum fill">Text.StandardDelimiter.NewLine</span> <span class="t-arg">DelimiterTimes:</span> <span class="t-num">1</span> <span class="t-out">Result=&gt;</span> JoinedText</div>
-        </div>
-      </div>
-      <div id="s4sw">
-        <div class="label">sibling selectors</div>
-        <div><span class="chip-code off">Text.JoinText.Join  + Delimiter:</span><span class="chip-code on">…JoinWithDelimiter</span><span class="chip-code">…JoinWithCustomDelimiter</span></div>
-      </div>
-    </div>
-    <div class="abs card kbcard" id="s4b" style="left:1200px; top:290px; width:620px;">
-      <div class="label">Type Reference</div>
-      <div class="trow"><span class="ty">String</span><span class="mono">$'''value'''</span></div>
-      <div class="trow"><span class="ty">Boolean</span><span class="mono">True · False</span></div>
-      <div class="trow"><span class="ty">Number</span><span class="mono">25</span></div>
-      <div class="trow"><span class="ty">Enum</span><span class="mono">Module.EnumType.Value</span></div>
-      <div class="trow"><span class="ty">Handle</span><span class="mono">ExcelInstance</span></div>
-      <div class="trow"><span class="ty">Output</span><span class="mono">Name=&gt; Variable</span></div>
-    </div>
-    <div class="abs" id="s4cap" style="left:100px; top:830px; width:1720px;">
-      <div class="h3"><span style="color:var(--ink); font-weight:700;">Lookup and substitution, not code generation.</span> Same action id, same arguments, new values.</div>
-    </div>
-  </section>
-
-  <!-- ============ S5: the demo paste ============ -->
-  <section class="scene" id="s5">
-    <div class="abs" style="left:60px; top:44px;"><div class="kicker">Same request, with the KB</div></div>
-    <div class="abs card" id="s5ed" style="left:60px; top:96px; width:700px; height:800px; padding:0; overflow:hidden;">
-      <div style="height:48px; display:flex; align-items:center; padding:0 18px; gap:12px; border-bottom:1px solid var(--line-2); font-size:16px; color:var(--mute); font-weight:600;">
-        <span class="ai-dot" style="width:20px;height:20px;border-radius:5px;"></span>AI assistant + PROMPT.md + KB records
-      </div>
-      <div class="codebox" style="margin:14px; height:724px;"><div class="code" id="s5code" style="font-size:15px; line-height:1.7; white-space:pre-wrap; word-break:break-all;"></div></div>
-    </div>
-    <div class="abs win" id="s5win" style="left:790px; top:96px; width:1070px; height:800px;">
-      <div class="win-title"><div class="menu"><span>File</span><span>Edit</span><span>Debug</span><span>Tools</span><span>View</span><span>Help</span></div><div>Invoice roll-up</div><div class="ctl"><span>—</span><span>☐</span><span>✕</span></div></div>
-      <div class="toolbar" data-tb></div>
-      <div class="win-body" style="height:calc(100% - 38px - 50px - 42px);">
-        <div class="pane">
-          <h4>Actions</h4>
-          <div class="search">⌕ Search actions</div>
-          <div class="tree"><div>Variables</div><div>Conditionals</div><div>Loops</div><div>Flow control</div><div>Run flow</div><div>System</div><div>File</div><div>Folder</div><div>Excel</div><div>Date time</div><div>Text</div><div>Outlook</div></div>
-        </div>
-        <div class="canvas">
-          <div class="tabbar"><div class="sub">Subflows</div><div class="tab">Main</div></div>
-          <div class="empty" id="s5empty">Drag an action here, or paste Robin code</div>
-          <div class="rows" id="s5rows"></div>
-        </div>
-      </div>
-      <div class="statusbar"><span class="ok"><i>✓</i>Status: Ready</span><span id="s5cnt">0 Actions</span><span>1 Subflow</span><span style="margin-left:auto; color:var(--green); font-weight:600;" id="s5ok">✓ Pasted with no errors</span></div>
-    </div>
-    <div class="abs keys" id="s5keys" style="left:1230px; top:420px;"><div class="key">Ctrl</div><div class="plus">+</div><div class="key">V</div></div>
-    <div class="abs" id="s5cap" style="left:60px; top:930px; width:1800px;">
-      <div class="h2">9 actions. Loop, Excel, dates, dialog. <span class="green">Pastes clean, first try.</span></div>
-    </div>
-  </section>
-
-  <!-- ============ S5b: proof (real screenshot) ============ -->
-  <section class="scene" id="s5b">
-    <div class="abs" style="left:100px; top:300px; width:520px;">
-      <div class="kicker" id="pk">Not a mock-up</div>
-      <div class="h2" id="ph" style="margin-top:18px;">The real paste.</div>
-      <div class="h3" id="ps" style="margin-top:22px;">The same script in Power Automate Desktop: 9 actions, variables wired up, <b style="color:var(--green)">Status: Ready</b>.</div>
-    </div>
-    <div class="abs shot" id="pshot" style="left:700px; top:110px; width:1120px;">
-      <img src="assets/pad-real-paste.png" alt="">
-      <div class="ring" id="pring" style="left:4px; top:775px; width:800px; height:46px;"></div>
-    </div>
-  </section>
-
-  <!-- ============ S6: results (cloud-flow style cards) ============ -->
-  <section class="scene" id="s6">
-    <div class="abs" style="left:160px; top:100px;">
-      <div class="kicker">What changes</div>
-      <div class="h2" style="margin-top:14px;">From guesswork to <span class="acc">first-try pastes.</span></div>
-    </div>
-    <div class="abs" style="left:410px; top:310px;">
-      <div class="flowcard" id="r1" style="background:var(--brand-tint);"><div class="ico" style="background:var(--brand);">1/5</div><div class="body"><div class="big">Before: about one working script in five</div><div class="small">After: scripts that paste clean on the first try</div></div></div>
-      <div class="arrow" id="a1"></div>
-      <div class="flowcard" id="r2" style="background:var(--purple-tint);"><div class="ico" style="background:var(--purple);">30</div><div class="body"><div class="big">30-action compositions with loops and conditions</div><div class="small">Producer-to-consumer chains: launch Excel, then use the real ExcelInstance</div></div></div>
-      <div class="arrow" id="a2"></div>
-      <div class="flowcard" id="r3" style="background:var(--teal-tint);"><div class="ico" style="background:#0F9D97;">✓</div><div class="body"><div class="big">Re-validated on every PAD release</div><div class="small">988 golden examples re-pasted on PAD 2.72 in 83 batches, with zero errors</div></div></div>
-    </div>
-  </section>
-
-  <!-- ============ S7: CTA (brand blue) ============ -->
-  <section class="scene blue" id="s7">
-    <div class="abs" style="left:0; right:0; top:230px; text-align:center;">
-      <div class="kicker" id="s7k">Free and open · CC BY 4.0</div>
-      <div class="h1" id="s7t" style="margin-top:24px;">Give your AI the missing reference.</div>
-      <div class="h3" id="s7s" style="margin-top:22px;">PROMPT.md as the system prompt · KB records for your modules · paste into the Designer</div>
-      <div id="s7u" style="margin-top:60px;"><span class="url">github.com/<span style="color:var(--brand)">joeg592</span>/pad-robin-action-kb</span></div>
-    </div>
-    <div class="abs foot" id="s7f" style="left:0; right:0; bottom:46px; text-align:center;">Power Automate, Power Automate Desktop and Robin are trademarks of Microsoft Corporation. This project is not affiliated with or endorsed by Microsoft.</div>
-  </section>
-
-  <div class="flash" id="flash"></div>
-  <div class="progress" id="prog"></div>
-</div>
-
+<div id="stage"></div>
+<script src="captures/index.js"></script>
 <script>
-/* ---------- timeline helpers ---------- */
-const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-const prog = (t, a, b) => clamp((t - a) / (b - a));
-const easeOut = x => 1 - Math.pow(1 - x, 3);
-const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-const backOut = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
-const $ = id => document.getElementById(id);
-function set(el, o, dx = 0, dy = 0, s = 1) {
-  if (typeof el === "string") el = $(el);
-  el.style.opacity = o;
-  el.style.transform = `translate(${dx}px, ${dy}px) scale(${s})`;
-}
-/* fade/slide in over [a, a+d], optional fade out over [b, b+d2] */
-function enter(el, t, a, d = .6, dy = 30, b = 1e9, d2 = .5) {
-  const p = easeOut(prog(t, a, a + d));
-  const q = 1 - easeInOut(prog(t, b, b + d2));
-  set(el, p * q, 0, (1 - p) * dy);
-}
-
-/* ---------- line icons ---------- */
-const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
-const ICON = {
-  files: svg(`<path d="M8 4h7l4 4v11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M15 4v4h4"/><path d="M4 8v12a1 1 0 0 0 1 1h9"/>`),
-  loop: svg(`<path d="M20 12a8 8 0 0 1-13.7 5.6"/><path d="M4 12a8 8 0 0 1 13.7-5.6"/><path d="M18 3v4h-4"/><path d="M6 21v-4h4"/>`),
-  launch: svg(`<path d="M5 19L19 5"/><path d="M9 5h10v10"/>`),
-  close: svg(`<path d="M19 5L5 19"/><path d="M15 19H5V9"/>`),
-  grid: svg(`<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18M3 14h18M9 4v16"/><path d="M4.5 10.5l3 3m0-3l-3 3"/>`),
-  cal: svg(`<rect x="3" y="5" width="18" height="16" rx="1.5"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M7 14h2M11 14h2M15 14h2M7 17h2M11 17h2"/>`),
-  flag: svg(`<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>`),
-  msg: svg(`<path d="M4 5h16v11H9l-5 4z"/>`),
-};
-const TB = svg(`<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>`) + svg(`<rect x="4" y="5" width="13" height="13" rx="1"/><path d="M8 9h5"/><circle cx="18" cy="17" r="3.5" fill="currentColor" stroke="none"/>`)
-  + `<span class="sep"></span>` + svg(`<path d="M7 5l12 7-12 7z"/>`) + svg(`<path d="M7 10l5 5 5-5"/>`) + svg(`<rect x="6" y="6" width="12" height="12" rx="1"/>`)
-  + svg(`<path d="M6 5l10 7-10 7zM18 5v14"/>`) + `<span class="sep"></span>` + svg(`<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"/>`);
-document.querySelectorAll("[data-tb]").forEach(el => el.innerHTML = TB);
-
-/* ---------- Robin syntax highlighting with char-by-char reveal ---------- */
-function tokenize(line) {
-  const out = []; let m;
-  const re = /(\$'''[^']*''')|(\b(?:LOOP|FOREACH|IN|END|IF|THEN|ELSE|SET|TO)\b)|([A-Za-z]+(?:\.[A-Za-z0-9]+){1,})|(\b[A-Za-z0-9]+=>)|(\b[A-Za-z0-9]+:)|(\b(?:True|False)\b)|(\b\d+(?:\.\d+)?\b)|("[^"]*")|(\s+|[^\s]+?)/g;
-  let first = true;
-  while ((m = re.exec(line))) {
-    let cls = "";
-    if (m[1]) cls = "t-str"; else if (m[2]) cls = "t-kw"; else if (m[3]) cls = first ? "t-act" : "t-enum";
-    else if (m[4]) cls = "t-out"; else if (m[5]) cls = "t-arg"; else if (m[6]) cls = "t-bool"; else if (m[7]) cls = "t-num"; else if (m[8]) cls = "t-bad";
-    if (m[0].trim()) first = false;
-    out.push([cls, m[0]]);
-  }
-  return out;
-}
-const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-function renderCode(el, lines, chars, caret, badLines = []) {
-  let left = chars, html = "";
-  for (let i = 0; i < lines.length && left > 0; i++) {
-    const toks = tokenize(lines[i]);
-    let lineHtml = "";
-    for (const [cls, txt] of toks) {
-      if (left <= 0) break;
-      const part = txt.slice(0, left); left -= part.length;
-      const c = badLines.includes(i) && cls === "t-arg" && /^(Filter|Text):$/.test(txt) ? "t-bad" : cls;
-      lineHtml += c ? `<span class="${c}">${esc(part)}</span>` : esc(part);
-    }
-    left -= 1; // newline
-    html += lineHtml + (left > 0 && i < lines.length - 1 ? "\n" : "");
-  }
-  if (caret) html += `<span class="caret"></span>`;
-  el.innerHTML = html;
-}
-const total = lines => lines.reduce((a, l) => a + l.length + 1, 0);
-
-/* Scene 1: plausible-looking Robin from training data (wrong ids, quotes, args) */
-const BAD = [
-  `Folder.GetFiles Folder: "C:\\Invoices" Filter: "*.xlsx" Files=> Files`,
-  `LOOP FOREACH CurrentItem IN Files`,
-  `    Excel.LaunchExcel Path: CurrentItem Instance=> ExcelInstance`,
-  `    DateTime.GetCurrentDateTime CurrentDateTime=> Today`,
-  `    Excel.WriteCell Instance: ExcelInstance Text: "Processed %Today%"`,
-  `    Excel.CloseExcel Instance: ExcelInstance Save: True`,
-  `END`,
-];
-/* Scene 5: the real demo flow (marketing/video/demo-flow.robin) */
-const GOOD = [
-  `Folder.GetFiles Folder: $'''C:\\Invoices''' FileFilter: $'''*.xlsx''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files`,
-  `LOOP FOREACH CurrentItem IN Files`,
-  `    Excel.LaunchExcel.LaunchAndOpen Path: CurrentItem Visible: False ReadOnly: False LoadAddInsAndMacros: False Instance=> ExcelInstance`,
-  `    Excel.GetFirstFreeColumnRow Instance: ExcelInstance FirstFreeColumn=> FirstFreeColumn FirstFreeRow=> FirstFreeRow`,
-  `    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime`,
-  `    Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: $'''Processed %CurrentDateTime%''' Column: $'''A''' Row: FirstFreeRow`,
-  `    Excel.CloseExcel.CloseAndSave Instance: ExcelInstance`,
-  `END`,
-  `Display.ShowMessageDialog.ShowMessage Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Message: $'''Stamped %Files.Count% invoices''' Title: $'''Invoice roll-up''' ButtonPressed=> ButtonPressed`,
-];
-/* Designer rows: [[Var]] renders as a variable chip, {text} as a quoted literal */
-const ROWS = [
-  { ic: "files", t: "Get files in folder", d: "Retrieve the files in folder {C:\\Invoices} that match {*.xlsx} and store them into [[Files]]" },
-  { ic: "loop", t: "For each", d: "[[CurrentItem]] in [[Files]]", ctl: 1 },
-  { ic: "launch", t: "Launch Excel", d: "Open document [[CurrentItem]] in a new Excel process and store it into [[ExcelInstance]]", ind: 1 },
-  { ic: "grid", t: "Get first free column/row from Excel worksheet", d: "Store them into [[FirstFreeColumn]] and [[FirstFreeRow]]", ind: 1 },
-  { ic: "cal", t: "Get current date and time", d: "Store the current date and time into [[CurrentDateTime]]", ind: 1 },
-  { ic: "grid", t: "Write to Excel worksheet", d: "Write {Processed } [[CurrentDateTime]] into column {A}, row [[FirstFreeRow]]", ind: 1 },
-  { ic: "close", t: "Close Excel", d: "Save the document and close [[ExcelInstance]]", ind: 1 },
-  { ic: "flag", t: "End", ctl: 1 },
-  { ic: "msg", t: "Display message", d: "Show {Stamped } [[Files]]{.Count invoices} titled {Invoice roll-up}" },
-];
-const rich = s => esc(s).replace(/\[\[(\w+)\]\]/g, '<span class="v">$1</span>').replace(/\{([^}]*)\}/g, "<span class=\"q\">'$1'</span>");
-
-(function build() {
-  const rows = $("s5rows");
-  ROWS.forEach((r, i) => {
-    const n = document.createElement("div"); n.className = "ln"; n.textContent = i + 1;
-    const w = document.createElement("div"); w.className = "rowwrap";
-    const row = document.createElement("div");
-    row.className = "row" + (r.ctl ? " ctl" : "") + (r.ind ? " indent" : "");
-    row.innerHTML = r.ctl
-      ? `<div class="ic">${ICON[r.ic]}</div><div class="t">${r.t}${r.d ? " " + rich(r.d) : ""}</div><div class="dots">⋮</div>`
-      : `<div class="ic">${ICON[r.ic]}</div><div><div class="t">${r.t}</div><div class="d">${rich(r.d)}</div></div><div class="dots">⋮</div>`;
-    w.appendChild(row); rows.appendChild(n); rows.appendChild(w);
-    n.style.lineHeight = "1"; n.style.display = "grid"; n.style.placeItems = "center";
-  });
-})();
-
-/* ---------- scene timing (seconds) ---------- */
-const S = { s1: [0, 10], s2: [10, 16.5], s3: [16.5, 24], s4: [24, 35], s5: [35, 52], s5b: [52, 59], s6: [59, 66], s7: [66, 73] };
-const DURATION = 73;
-
-function scene(id, t) {
-  const [a, b] = S[id];
-  const o = easeOut(prog(t, a, a + .5)) * (1 - easeInOut(prog(t, b - .5, b)));
-  const el = $(id); el.style.opacity = o; el.style.display = o > 0 ? "block" : "none";
-  return t - a; // local time
-}
-
-window.render = function (t) {
-  $("prog").style.width = (t / DURATION * 100) + "%";
-  $("dots").style.transform = `translate(${-(t * 6) % 30}px, ${-(t * 3) % 30}px)`;
-  let flash = 0;
-
-  /* S1 */
-  let l = scene("s1", t);
-  enter("s1k", l, .1); enter("s1chat", l, .2, .7, 40); enter("s1win", l, .4, .7, 40);
-  renderCode($("s1code"), BAD, Math.floor(total(BAD) * prog(l, 1.0, 4.2)), l < 5.2 && Math.floor(l * 3) % 2 === 0, [0, 4]);
-  const kp = prog(l, 4.6, 5.0), kq = 1 - prog(l, 5.8, 6.2);
-  set("s1keys", Math.min(kp, kq), 0, 0, .7 + .3 * backOut(kp) - (l > 5.2 && l < 5.4 ? .06 : 0));
-  if (l > 5.3 && l < 5.6) flash = .1 * (1 - prog(l, 5.3, 5.6));
-  const shake = l > 5.6 && l < 6.2 ? Math.sin(l * 70) * 8 * (1 - prog(l, 5.6, 6.2)) : 0;
-  $("s1empty").style.transform = `translateX(${shake}px)`;
-  $("s1empty").style.color = l > 5.6 ? "var(--red)" : "";
-  enter("s1cap", l, 6.0, .6, 30);
-
-  /* S2 */
-  l = scene("s2", t);
-  enter("s2k", l, .2); enter("s2a", l, .4, .7, 40); enter("s2b", l, 1.6, .7, 30);
-
-  /* S3 */
-  l = scene("s3", t);
-  enter("s3k", l, .2); enter("s3t", l, .4, .8, 40); enter("s3s", l, 1.0, .7, 30);
-  [["st1", "n1", 988], ["st2", "n2", 45], ["st3", "n3", 44], ["st4", "n4", 0]].forEach(([s, n, v], i) => {
-    enter(s, l, 1.8 + i * .35, .6, 30);
-    $(n).textContent = Math.round(v * easeOut(prog(l, 1.8 + i * .35, 3.6 + i * .35))).toLocaleString("en-US");
-  });
-
-  /* S4 */
-  l = scene("s4", t);
-  enter("s4a", l, .4, .7, 40); enter("s4b", l, 1.2, .7, 40);
-  enter("s4gw", l, 3.0, .6, 14); enter("s4sw", l, 5.2, .6, 14);
-  enter("s4cap", l, 7.0, .6, 24);
-
-  /* S5 */
-  l = scene("s5", t);
-  enter("s5ed", l, .2, .7, 40); enter("s5win", l, .4, .7, 40);
-  renderCode($("s5code"), GOOD, Math.floor(total(GOOD) * easeInOut(prog(l, 1.0, 6.0))), l < 6.6 && Math.floor(l * 3) % 2 === 0);
-  const k2 = prog(l, 6.6, 7.0), k2q = 1 - prog(l, 7.6, 8.0);
-  set("s5keys", Math.min(k2, k2q), 0, 0, .7 + .3 * backOut(k2) - (l > 7.2 && l < 7.4 ? .06 : 0));
-  if (l > 7.3 && l < 7.6) flash = .1 * (1 - prog(l, 7.3, 7.6));
-  $("s5empty").style.opacity = l > 7.4 ? 0 : 1;
-  let shown = 0;
-  const kids = [...$("s5rows").children];
-  for (let i = 0; i < kids.length; i += 2) {
-    const a = 7.5 + (i / 2) * .28, p = easeOut(prog(l, a, a + .45));
-    if (p > 0) shown = i / 2 + 1;
-    kids[i].style.opacity = p;
-    kids[i + 1].style.opacity = p; kids[i + 1].style.transform = `translateX(${(1 - p) * -30}px)`;
-  }
-  $("s5cnt").textContent = `${shown} Actions`;
-  const okp = easeOut(prog(l, 10.6, 11.1));
-  set("s5ok", okp, 0, 0, .8 + .2 * backOut(okp));
-  enter("s5cap", l, 11.0, .6, 26);
-
-  /* S5b: real screenshot with a slow push-in */
-  l = scene("s5b", t);
-  enter("pk", l, .2); enter("ph", l, .4, .7, 30); enter("ps", l, 1.0, .7, 24);
-  const sp = easeOut(prog(l, .3, 1.1));
-  set("pshot", sp, 0, (1 - sp) * 40, 1 + .025 * prog(l, 1, 7));
-  $("pshot").style.transformOrigin = "60% 90%";
-  const rp = easeOut(prog(l, 2.4, 2.9));
-  set("pring", rp, 0, 0, 1.06 - .06 * rp);
-
-  /* S6 */
-  l = scene("s6", t);
-  enter("r1", l, .5, .6, 30); enter("a1", l, 1.3, .4, 10); enter("r2", l, 1.6, .6, 30); enter("a2", l, 2.4, .4, 10); enter("r3", l, 2.7, .6, 30);
-
-  /* S7 */
-  l = scene("s7", t);
-  enter("s7k", l, .2); enter("s7t", l, .4, .8, 40); enter("s7s", l, 1.2, .7, 24);
-  const up = easeOut(prog(l, 2.0, 2.7)); set("s7u", up, 0, (1 - up) * 24, .94 + .06 * backOut(up));
-  enter("s7f", l, 2.8, .7, 0);
-
-  $("flash").style.opacity = flash;
-};
-window.DURATION = DURATION;
-render(0);
+  // Template and golden example shown in the "how" shot: Excel.LaunchExcel.LaunchAndOpen from KB 3.1.3
+  window.KB_HOW = {
+    template: "Excel.LaunchExcel.LaunchAndOpen Path: `` Visible: True ReadOnly: False LoadAddInsAndMacros: False Instance=> ExcelInstance",
+    golden: "Excel.LaunchExcel.LaunchAndOpen Path: $'''C:\\temp\\test.xlsx''' Visible: True ReadOnly: False LoadAddInsAndMacros: False Instance=> ExcelInstance",
+  };
 </script>
+<script src="motion.js"></script>
+<script src="scenes.js"></script>
+<script src="engine.js"></script>
 </body>
 </html>

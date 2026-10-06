@@ -1,0 +1,4 @@
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateOnly CurrentDateTime=> CurrentDateTime
+Folder.GetFiles Folder: $'''C:\Downloads''' FileFilter: $'''*''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
+File.Copy Files: Files Destination: $'''D:\Backup\Downloads''' IfFileExists: File.IfExists.Overwrite CopiedFiles=> CopiedFiles
+Display.ShowMessageDialog.ShowMessage Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Message: $'''Backed up %CopiedFiles.Count% files on %CurrentDateTime%''' Title: $'''Downloads backup''' ButtonPressed=> ButtonPressed

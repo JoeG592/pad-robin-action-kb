@@ -1,0 +1,16 @@
+Outlook.Launch Instance=> OutlookInstance
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+Text.ConvertDateTimeToText.FromCustomDateTime CustomFormat: $'''yyyy-MM-dd''' DateTime: CurrentDateTime Result=> Today
+SET AttachmentFolder TO $'''C:\Attachments\\%Today%'''
+IF (Folder.IfFolderExists.DoesNotExist Path: AttachmentFolder) THEN
+    Folder.Create FolderPath: $'''C:\Attachments''' FolderName: Today Folder=> NewFolder
+END
+Outlook.RetrieveEmailMessages.RetrieveEmailsAndSaveAttachments ReadBodyAsHtml: False MarkAsRead: True MailFolder: $'''Inbox''' ToContains: $'''''' SubjectContains: $'''Invoice''' SaveAttachmentsInto: AttachmentFolder BodyContains: $'''''' Account: $'''you@example.com''' Instance: OutlookInstance FromContains: $'''''' EmailsToRetrieve: Outlook.RetrieveMessagesMode.Unread Messages=> RetrievedEmails
+SET EmailCount TO RetrievedEmails.Count
+IF EmailCount = 0 THEN
+    Display.ShowMessageDialog.ShowMessage Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Message: $'''No new invoice emails''' Title: $'''Invoice attachments''' ButtonPressed=> ButtonPressed
+ELSE
+    Folder.GetFiles Folder: AttachmentFolder FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
+    Display.ShowMessageDialog.ShowMessage Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False Message: $'''Saved %Files.Count% PDFs from %RetrievedEmails.Count% emails''' Title: $'''Invoice attachments''' ButtonPressed=> ButtonPressed
+END
+Outlook.Close Instance: OutlookInstance
