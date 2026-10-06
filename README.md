@@ -58,6 +58,10 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
 5. Blocks: `IF ... THEN` / `ELSE` / `END`, `LOOP FOREACH x IN list` / `END`, `SET x TO value`.
 6. When pasting into the Designer, do not include the file header lines (`@@ConnectionString`, `IMPORT`, `@SENSITIVE`). The Designer silently rejects a paste that contains them.
 7. A paste is all-or-nothing on syntax: one malformed line rejects the whole clipboard with no message. Semantic problems (unknown argument, undefined variable, wrong type) land on the canvas with an error and a line number.
+8. A backslash directly before a variable in a string rejects the whole paste. `$'''C:\Reports\%Month%'''` is rejected; double the backslash: `$'''C:\Reports\\%Month%'''`. A backslash after a variable is fine (`$'''%Folder%\Report.xlsx'''`).
+9. An `IF` condition can't use property access. `IF Files.Count = 0 THEN` rejects the whole paste, so assign the property first: `SET FileCount TO Files.Count`, then `IF FileCount = 0 THEN`. Property access works everywhere else: as an argument value, in `SET`, and in `LOOP FOREACH Order IN Orders.orders`.
+
+Rules 8 and 9 were found by paste probes on PAD 2.72 (2.72.00183.26250) in October 2026. Both are silent: the canvas stays empty and no error is shown.
 
 ## How it was validated
 

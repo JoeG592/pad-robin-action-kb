@@ -24,11 +24,13 @@ VALUE SYNTAX:
 - Numbers: bare
 - Variable produced by an earlier action: bare name (Instance: ExcelInstance)
 - Variable inside a string: %Name%
+- A backslash directly before a variable in a string must be doubled: $'''C:\Reports\\%Month%''' (a single backslash makes PAD reject the whole script). A backslash after a variable is fine: $'''%Folder%\Report.xlsx'''
 - Enums: fully qualified, exactly as the reference shows (Text.StandardDelimiter.NewLine)
 - Outputs: Name=> Variable; use the defaultVariable name from the reference unless the user needs another
 
 CONTROL FLOW (built into Robin, not in the reference):
 - IF condition THEN ... ELSE ... END
+- IF conditions compare plain variables and values only. Assign a property first: SET FileCount TO Files.Count, then IF FileCount = 0 THEN. (Property access such as Files.Count inside an IF makes PAD reject the whole script; it is fine in arguments, SET and LOOP FOREACH.)
 - LOOP FOREACH item IN collection ... END
 - LOOP index FROM 1 TO n STEP 1 ... END
 - SET Variable TO value
