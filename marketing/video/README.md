@@ -31,7 +31,7 @@ Two Robin rules came up while building them. Each makes PAD 2.72 reject the **wh
 
 ## Re-capturing
 
-Needs PAD Designer open on a flow named `PAD_Robin_test`, plus the paste validator from the maintainer's toolchain (`-Validator` parameter). Run it in a visible terminal and keep your hands off the mouse and keyboard while it works:
+Needs PAD Designer open on a flow named `PAD_Robin_test`, plus a paste validator script that defines `Find-Designer` and `Invoke-PasteValidate` (pass `-Validator <path>` or set `PAD_VALIDATOR`). Run it in a visible terminal and keep your hands off the mouse and keyboard while it works:
 
 ```powershell
 powershell.exe -ExecutionPolicy Bypass -File .\capture.ps1                                # all flows
