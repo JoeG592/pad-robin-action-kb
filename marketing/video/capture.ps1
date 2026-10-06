@@ -10,9 +10,10 @@ param(
     [string]$Flow = "",   # comma-separated flow names without .robin; empty = all flows in -FlowDir
     [string]$FlowDir = (Join-Path $PSScriptRoot "flows"),
     [string]$OutDir = (Join-Path $PSScriptRoot "captures"),
-    [string]$Validator = "C:\Claude Code Projects\singularity-dashboard\Scripts\Library\PAD-Robin-Validator-v3.ps1"
+    [string]$Validator = $env:PAD_VALIDATOR   # path to the paste validator (must define Find-Designer and Invoke-PasteValidate)
 )
 $ErrorActionPreference = "Stop"
+if (-not $Validator -or -not (Test-Path -LiteralPath $Validator)) { throw "Pass -Validator <path> or set PAD_VALIDATOR to the paste validator script" }
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
