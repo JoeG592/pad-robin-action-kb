@@ -1,10 +1,24 @@
 # Changelog
 
+## 3.1.4 (2026-10-06)
+
+- **Syntax rules rewritten from 563 probe pastes on PAD 2.72** (README "Syntax rules PAD enforces", PROMPT.md). Newly documented rules that make PAD reject the whole paste with no error:
+  - `%...%` outside a string (`SET X TO %N + 1%`, `IF %N% = 5`, `Text: %Msg%`). Write expressions bare; `%...%` belongs inside strings.
+  - an unescaped apostrophe inside `$'''...'''` (write `\'`), and a lone `%` (write `%%`)
+  - a backslash right before the closing quotes or between two variables (write `\\`). A UNC path needs `\\\\server`; with two backslashes it silently becomes `\server`.
+  - PAD keywords as variable or property names (`Mail.From`, `SET Error TO`). Write `Mail['From']`.
+  - `ELSE IF (Action ...) THEN`, an `IF` inside an error handler, `FUNCTION` definitions, an `@@` line not followed by an action, two statements on one line.
+
+  Also documented: error handlers accept only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Newly confirmed to work: `SWITCH` / `CASE`, `ELSE IF`, `LOOP WHILE`, condition functions, bare expressions, `ON ERROR REPEAT`, `ERROR => LastError`, `**REGION` and multi-line strings.
+- **Retraction:** rule 9 of the 3.1.3 documentation ("property access in an `IF` condition rejects the paste") was wrong. `IF Files.Count = 0 THEN` pastes fine in 17 variants; the form that fails is `%Files.Count%`.
+- **Parameter lists completed on 10 records** whose `input_params` left out arguments the action accepts: `SMTPServer` on `Email.SendEmail.Send`, `IMAPServer` on `Email.ProcessEmails.Move` and `Email.RetrieveEmails.Retrieve`, all six arguments of `FTP.OpenConnection`, `Instance` / `Account` and others on `Outlook.RetrieveEmailMessages.RetrieveEmails` and `Outlook.SendEmailThroughOutlook.SendEmail`, plus `Excel.LaunchExcel.LaunchAndOpen` and the Chrome, Edge and Firefox launch actions (25 inputs and 1 output in all). Six of these records use the missing arguments in their own golden examples, so a checker that trusted `input_params` rejected valid code. Golden examples unchanged. The release check now fails on any missing input or output.
+- **`marketing/video/tools/check-flows.js` rewritten** to enforce the new rules and to stop flagging valid constructs (property access in `IF`, `SWITCH`, `**REGION`, condition functions, `LOOP WHILE (A) < (B)`, multi-line strings). Scored against the probe pastes, it caught all 108 silent rejects.
+
 ## Documentation (2026-10-06)
 
 - Two syntax rules that make PAD 2.72 reject the **whole** paste with no error (README rules 8 and 9, and PROMPT.md):
   - A backslash directly before `%Variable%` in a string. Write `\\%Variable%`.
-  - Property access in an `IF` condition. `SET` it to a variable first.
+  - Property access in an `IF` condition. `SET` it to a variable first. (Retracted in 3.1.4: it does not reproduce.)
 
   Found by paste probes while building the example flows for the promo video. No data files changed.
 - Promo video v2 (`marketing/video/`): 80 s, 16:9 and 4:5, built from real PAD 2.72 captures of four example flows (4 to 61 actions), all pasted with 0 errors.
