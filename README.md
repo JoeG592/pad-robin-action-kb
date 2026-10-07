@@ -16,7 +16,7 @@ This repo is the missing reference.
 | `PAD_Robin_TypeReference_v3_1.json` | 44 parameter types with the exact syntax PAD accepts for each: strings, numbers, file paths, handle variables, lists, UI selectors, and the rule for enums. |
 | `PROMPT.md` | A system prompt that turns a model into a template filler over these two files. This is how the data is meant to be used. |
 
-Validated against PAD 2.72 (build 2.72.00183.26250), September 2026: all 988 golden examples were re-pasted exactly as published into the 2.72 Designer, with zero errors.
+Validated against PAD 2.72 (build 2.72.00183.26250), September 2026: all 988 golden examples were re-pasted exactly as published into the 2.72 Designer, with zero errors. The syntax rules below were probed on the same build in October 2026 with 563 test pastes, including 19 complex flows of up to 97 rows.
 
 ## The two-table idea
 
@@ -51,17 +51,71 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
 
 ## Syntax rules PAD enforces
 
-1. Strings are `$'''value'''`. Booleans are bare `True` / `False`. Numbers are bare.
-2. Variables produced by an earlier action are referenced by bare name (`Instance: ExcelInstance`). Inside a string, use `%Name%`.
-3. Enums are fully qualified, `Module.EnumType.Value`, and the module is the one that owns the type (`Text.StandardDelimiter.NewLine`).
-4. Outputs are `Name=> Variable`.
-5. Blocks: `IF ... THEN` / `ELSE` / `END`, `LOOP FOREACH x IN list` / `END`, `SET x TO value`.
-6. When pasting into the Designer, do not include the file header lines (`@@ConnectionString`, `IMPORT`, `@SENSITIVE`). The Designer silently rejects a paste that contains them.
-7. A paste is all-or-nothing on syntax: one malformed line rejects the whole clipboard with no message. Semantic problems (unknown argument, undefined variable, wrong type) land on the canvas with an error and a line number.
-8. A backslash directly before a variable in a string rejects the whole paste. `$'''C:\Reports\%Month%'''` is rejected; double the backslash: `$'''C:\Reports\\%Month%'''`. A backslash after a variable is fine (`$'''%Folder%\Report.xlsx'''`).
-9. An `IF` condition can't use property access. `IF Files.Count = 0 THEN` rejects the whole paste, so assign the property first: `SET FileCount TO Files.Count`, then `IF FileCount = 0 THEN`. Property access works everywhere else: as an argument value, in `SET`, and in `LOOP FOREACH Order IN Orders.orders`.
+Every rule below was confirmed by pasting into PAD 2.72 (2.72.00183.26250): 563 probe pastes in October 2026. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.
 
-Rules 8 and 9 were found by paste probes on PAD 2.72 (2.72.00183.26250) in October 2026. Both are silent: the canvas stays empty and no error is shown.
+**Values**
+
+1. Strings are `$'''value'''`. Booleans are bare `True` / `False`. Numbers are bare.
+2. A variable from an earlier action is referenced by its bare name (`Instance: ExcelInstance`). Expressions are bare too: `SET Total TO Price * Qty`, `IF Files.Count = 0 THEN`, `WAIT Attempt * 10`, `Items[Items.Count - 1]`, `Row['Amount']`.
+3. `%...%` belongs only inside strings: `$'''Saved %Count% files'''`, `$'''Total %Price * Qty%'''`. Anywhere else it rejects the whole paste, for example `SET X TO %N + 1%`, `IF %N% = 5` or `Text: %Msg%`.
+4. Enums are fully qualified, `Module.EnumType.Value`, and the module is the one that owns the type (`Text.StandardDelimiter.NewLine`).
+5. Outputs are `Name=> Variable`.
+
+**Inside strings**
+
+6. The backslash is an escape character: `\'` is an apostrophe and `\\` is one backslash.
+   - Escape every apostrophe: `$'''Joe\'s report'''`, `$'''WHERE Name = \'Joe\''''`. A bare `'` rejects the paste. It is easy to miss in SQL, XPath and JavaScript.
+   - Double a backslash that comes right before a variable or before the closing quotes: `$'''C:\Reports\\%Month%'''`, `$'''%Root%\\%Name%'''`, `$'''C:\Temp\\'''`. Before an ordinary letter a single backslash is kept as is (`$'''%Folder%\Report.xlsx'''`).
+   - A UNC path needs four backslashes at the start, `$'''\\\\server\share'''`. Two become one without any error.
+7. A literal percent sign is `%%`: `$'''100%% done'''`. A single `%` rejects the paste.
+8. Strings may span several lines.
+
+**Names**
+
+9. PAD keywords can't be used as variable names or property names: `From`, `To`, `Step`, `End`, `In`, `Then`, `If`, `Else`, `Loop`, `Foreach`, `While`, `Set`, `Wait`, `Next`, `Exit`, `Label`, `Goto`, `Call`, `Case`, `Default`, `Switch`, `Block`, `Error`, `On`, `Not`, `And`, `Or`, `Mod`, `True`, `False`, `Global`, `Disable`, `Function`, `Throw`. Mail properties are the usual trap: write `Mail['From']` and `Mail['To']`, not `Mail.From`. Variable names can't start with a digit.
+
+**Statements**
+
+10. One statement per line. Built-in statements:
+    - `SET x TO value`
+    - `IF condition THEN` / `ELSE IF condition THEN` / `ELSE` / `END`
+    - `SWITCH x` / `CASE = 1` / `CASE > 5` / `DEFAULT` / `END`
+    - `LOOP FOREACH item IN list` / `END`
+    - `LOOP i FROM 0 TO n - 1 STEP 1` / `END`
+    - `LOOP WHILE (A) < (B)` / `END`
+    - `EXIT LOOP`, `NEXT LOOP`, `LABEL Name` / `GOTO Name`, `WAIT 5`, `EXIT Code: 0`
+11. Conditions use `=`, `<>`, `>`, `<`, `>=`, `<=`, `AND`, `OR` and `NOT(...)`, plus `IsEmpty(x)`, `IsNotEmpty(x)`, `Contains(x, $'''y''', False)`, `NotContains`, `StartsWith` and `EndsWith`. `CASE` takes a comparison only.
+12. A condition action (kind `Condition`) is written `IF (Action ...) THEN`. `ELSE IF (Action ...) THEN` rejects the paste, so use `ELSE` with a nested `IF (Action ...) THEN ... END`.
+13. Error handling for a group of actions, and for a single action:
+
+    ```
+    BLOCK ReadFiles
+    ON BLOCK ERROR
+        SET Failed TO True
+    END
+        ...actions...
+    END
+
+    Text.ToNumber Text: Raw Number=> Amount
+    ON ERROR REPEAT 2 TIMES WAIT 5
+        SET Amount TO 0
+    END
+    ```
+
+    A handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other action gives "The statement isn't allowed inside exception handling", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `ERROR => LastError` reads the last error.
+14. Comments are `# text` or `/# ... #/`. Regions are `**REGION Name` / `**ENDREGION`, and a `DISABLE ` prefix disables a line.
+15. Don't paste the file header lines (`@@ConnectionString`, `IMPORT`, `@SENSITIVE`) or subflow definitions (`FUNCTION ... END FUNCTION`): both reject the paste. An `@@` metadata line must be followed directly by an action.
+16. Semantic problems (unknown argument, undefined variable, wrong type, an enum without its module) land on the canvas with an error and a line number. PAD is lenient about the case of keywords, action ids and variable names, about argument order, and about spacing around `:` and `=>`.
+
+The 3.1.3 documentation said property access in an `IF` condition rejects the paste. That was wrong: it does not reproduce, and the form that fails is `%...%` outside a string (rule 3).
+
+`marketing/video/tools/check-flows.js` checks a script against these rules and the KB before you paste it:
+
+```
+node marketing/video/tools/check-flows.js PAD_Robin_ActionKB_v3_1.json flow.robin
+```
+
+On the 563 probe pastes it flagged all 108 silent rejects. It passed every clean paste except two that use `\%`, which PAD accepts but silently drops the percent sign.
 
 ## How it was validated
 
@@ -81,7 +135,7 @@ PAD 2.72 exposes 236 further selector variants that are not included here: 200 n
 
 1. Give the model `PROMPT.md` as the system prompt.
 2. Include the Type Reference, and the KB records for the modules your task needs (the full KB is about 3 MB; filter by `module`).
-3. Ask for the flow. Paste the result into an empty flow in PAD Designer.
+3. Ask for the flow. Run it through `marketing/video/tools/check-flows.js`, then paste the result into an empty flow in PAD Designer.
 4. If the error pane lists anything, feed the messages back to the model with the same context.
 
 ## Maintenance

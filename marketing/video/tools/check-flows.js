@@ -1,58 +1,199 @@
 // marketing/video/tools/check-flows.js
-// Static check of Robin flow files against the public Action KB.
+// Static pre-paste check of Robin flow files against the public Action KB.
 // CLI: node tools/check-flows.js <kb.json> <flow.robin>... [--expect-fail <flow.robin>]
+//
+// Rules come from paste probes on PAD 2.72 (2026-10-06, 563 pastes). Most of them make the Designer
+// drop the WHOLE paste with an empty canvas and no error message, so they are worth catching first.
 const fs = require("fs");
 const path = require("path");
 
-// Built-in Robin statements (not KB actions). `WAIT <seconds>` is a delay; `WAIT (Action ...)` wraps a KB Wait action.
-const CONTROL = /^(SET |LOOP |END\b|ELSE\b|ELSE IF |IF (?!\()|WAIT (?!\()|NEXT LOOP|EXIT|CALL |FUNCTION |LABEL |GOTO |BLOCK |ON BLOCK ERROR|ON ERROR|THROW ERROR|DISABLE |#)/;
+// PAD keywords break as property or variable names (Mail.From, SET Error TO ...): use Mail['From'].
+const KEYWORDS = ["From", "To", "Step", "End", "In", "Then", "Loop", "If", "Set", "Else", "Not", "And", "Or", "Mod", "Wait", "Call",
+  "Exit", "Label", "Next", "Foreach", "Function", "Case", "Default", "Switch", "Block", "Error", "On", "True", "False", "Global",
+  "Disable", "While", "Goto", "Throw"];
+const KW = new RegExp(`^(${KEYWORDS.join("|")})$`, "i");
 
-function parseLine(line) {
-  let s = line.trim()
-    .replace(/^IF \((.*)\) THEN$/, "$1")
-    .replace(/^WAIT \((.*)\)$/, "$1")
-    .replace(/^LOOP WHILE \((.*)\)$/, "$1");
-  const id = s.split(" ")[0];
-  s = s.slice(id.length)
-    .replace(/\$'''[\s\S]*?'''/g, '""')
-    .replace(/\[[^\]]*\]/g, "[]")
-    .replace(/\{[^}]*\}/g, "{}");
-  const args = [...s.matchAll(/(?:^|\s)(\w+): /g)].map(m => m[1]);
-  const outs = [...s.matchAll(/(?:^|\s)(\w+)=> \w+/g)].map(m => m[1]);
+// Split the text into statements. Strings ($'''...''') may span lines; inside them a backslash escapes the
+// next character, %...% is an expression and %% is a literal percent sign.
+function scan(text) {
+  const errors = [];
+  const stmts = [];
+  let line = 1, i = 0;
+  let cur = null;                 // { line, bare, exprs: [] }
+  const err = (ln, msg) => errors.push({ line: ln, msg });
+  const start = () => (cur = cur || { line, bare: "", exprs: [] });
+  const finish = () => { if (cur && cur.bare.trim()) stmts.push({ ...cur, bare: cur.bare.trim() }); cur = null; };
+  const atLineStart = () => !cur || !cur.bare.trim();
+  while (i < text.length) {
+    const c = text[i];
+    if (c === "\r") { i++; continue; }
+    if (c === "\n") { finish(); line++; i++; continue; }
+    if (atLineStart()) {
+      const rest = text.slice(i).replace(/^[ \t]+/, "");
+      const skip = text.length - i - rest.length;
+      if (rest.startsWith("# [ControlRepository]")) break;                 // UI element JSON follows
+      if (rest.startsWith("/#")) {                                         // block comment
+        const end = text.indexOf("#/", i + skip + 2);
+        const stop = end < 0 ? text.length : end + 2;
+        stmts.push({ line, bare: "#", exprs: [], comment: true });
+        line += (text.slice(i, stop).match(/\n/g) || []).length;
+        i = stop; continue;
+      }
+      if (rest.startsWith("#")) {                                          // line comment
+        stmts.push({ line, bare: "#", exprs: [], comment: true });
+        const nl = text.indexOf("\n", i); i = nl < 0 ? text.length : nl; continue;
+      }
+    }
+    if (c === "#" && cur && /\s$/.test(cur.bare)) { const nl = text.indexOf("\n", i); i = nl < 0 ? text.length : nl; continue; } // trailing comment
+    if (text.startsWith("$'''", i)) {
+      start();
+      const sLine = line;
+      i += 4;
+      let closed = false;
+      while (i < text.length) {
+        const d = text[i];
+        if (d === "\n") { line++; i++; continue; }
+        if (d === "\\") {
+          if (text[i + 1] === "%") {
+            err(line, "backslash before % in a string (PAD drops the paste for \\%Var% and loses the % otherwise); write \\\\%Var% for a path, %% for a literal percent sign");
+            const v = text.slice(i + 2).match(/^[A-Za-z_][\w.\[\]']*%/);    // skip the rest of \%Var% so it is reported once
+            i += 2 + (v ? v[0].length : 0); continue;
+          }
+          i += 2; continue;
+        }
+        if (text.startsWith("''''", i)) { err(line, "a string can't end with an apostrophe; escape it as \\' (PAD drops the whole paste)"); i += 4; closed = true; break; }
+        if (text.startsWith("'''", i)) { i += 3; closed = true; break; }
+        if (d === "'") { err(line, "apostrophe inside $'''...''' drops the whole paste; escape it as \\'"); i++; continue; }
+        if (d === "%") {
+          if (text[i + 1] === "%") { i += 2; continue; }                  // %% = literal percent
+          let j = i + 1, q = false;
+          while (j < text.length && !(text[j] === "%" && !q) && !(!q && text.startsWith("'''", j))) { if (text[j] === "'") q = !q; j++; }
+          if (text[j] !== "%") { err(line, "lone % inside a string drops the whole paste; write %% for a literal percent sign"); i++; continue; }
+          cur.exprs.push({ line, expr: text.slice(i + 1, j) });
+          i = j + 1; continue;
+        }
+        i++;
+      }
+      if (!closed) err(sLine, "string never closes (a backslash right before ''' escapes the quote; write \\\\''' to end with a backslash)");
+      cur.bare += '""';
+      continue;
+    }
+    start();
+    cur.bare += c;
+    i++;
+  }
+  finish();
+  return { stmts, errors };
+}
+
+function parseAction(s) {
+  let t = s.replace(/^IF \((.*)\) THEN$/i, "$1").replace(/^WAIT \((.*)\)$/i, "$1").replace(/^LOOP WHILE \((.*)\)$/i, "$1");
+  const id = t.split(" ")[0];
+  t = t.slice(id.length).replace(/\[[^\]]*\]/g, "[]").replace(/\{[^}]*\}/g, "{}");
+  const args = [...t.matchAll(/(?:^|\s)(\w+)\s?:\s?(?=\S)/g)].map(m => m[1]);
+  const outs = [...t.matchAll(/(?:^|\s)(\w+)\s?=>\s?(\w+)/g)].map(m => ({ name: m[1], var: m[2] }));
   return { id, args, outs };
 }
 
 function checkRobin(text, kb) {
-  const byId = new Map(kb.actions.map(a => [a.actionId, a]));
-  const errors = [];
+  const byId = new Map(kb.actions.map(a => [a.actionId.toLowerCase(), a]));
+  const modules = new Set(kb.actions.map(a => a.actionId.split(".")[0].toLowerCase()));
+  const isActionCall = s => { const m = s.match(/^([A-Za-z]\w*)\.\w+/); return !!m && modules.has(m[1].toLowerCase()); };
+  const { stmts, errors: scanErrors } = scan(text);
+  const errors = scanErrors.map(e => `line ${e.line}: ${e.msg}`);
+  const E = (st, msg) => errors.push(`line ${st.line}: ${msg}`);
   let actionLines = 0;
-  text.split(/\r?\n/).forEach((raw, i) => {
-    const line = raw.trim();
-    if (!line) return;
-    // PAD 2.72 silently rejects the whole paste for these two (paste probes, 2026-10-06).
-    for (const m of line.matchAll(/\$'''([\s\S]*?)'''/g))
-      for (const v of m[1].matchAll(/(?<!\\)\\%(\w[\w.]*)%/g))
-        errors.push(`line ${i + 1}: backslash before %${v[1]}% in a string; write \\\\%${v[1]}% (PAD rejects the whole paste)`);
-    const cond = line.match(/^(?:ELSE )?IF (?!\()(.*) THEN$/);
-    if (cond) {
-      const prop = cond[1].replace(/\$'''[\s\S]*?'''/g, '""').match(/\b[A-Za-z_]\w*\.[A-Za-z_]\w*/);
-      if (prop) errors.push(`line ${i + 1}: property access ${prop[0]} in an IF condition; SET it to a variable first (PAD rejects the whole paste)`);
+  const stack = [];                                   // "handler" | "block" | "other"
+  let pendingHandler = false;                          // after BLOCK, the next ON BLOCK ERROR opens a handler
+
+  const reservedIn = (st, src, what) => {
+    // property access with a keyword name; skip enums (Module.Type.Value) and action ids
+    const cleaned = src.replace(/\b[A-Za-z]\w*\.[A-Za-z]\w*\.\w+/g, m => (modules.has(m.split(".")[0].toLowerCase()) ? "" : m));
+    for (const m of cleaned.matchAll(/\b([A-Za-z_]\w*(?:\[[^\]]*\])*)\.([A-Za-z_]\w*)/g))
+      if (KW.test(m[2])) E(st, `property ${m[1]}.${m[2]}${what}: ${m[2]} is a PAD keyword and drops the whole paste; write ${m[1]}['${m[2]}']`);
+  };
+  const varName = (st, name, where) => {
+    if (/^\d/.test(name)) E(st, `variable ${name} starts with a digit (PAD drops the whole paste)`);
+    else if (KW.test(name)) E(st, `${where} ${name} is a PAD keyword and drops the whole paste; pick another name`);
+  };
+
+  stmts.forEach((st, k) => {
+    if (st.comment) return;
+    let s = st.bare.replace(/^DISABLE\s+/i, "");
+    const U = s.toUpperCase();
+    for (const x of st.exprs) reservedIn(st, x.expr, " inside a string");
+    if (/\S\s+SET\s+\w+\s+TO\s/i.test(s)) E(st, "two statements on one line drop the whole paste; put each on its own line");
+    if (s.includes("%")) E(st,"%...% outside a string drops the whole paste; write the expression without percent signs (SET X TO N + 1, IF N = 5, Text: Msg)");
+
+    if (s.startsWith("@@")) {
+      if (!/^@@copilotGeneratedAction\b/i.test(s)) E(st, `${s.split(/[:\s]/)[0]} lines drop the whole paste (only @@copilotGeneratedAction is confirmed to paste)`);
+      const next = stmts[k + 1];
+      if (!next || next.comment || next.bare.startsWith("@@")) E(st, "an @@ line must be followed directly by an action (PAD drops the whole paste)");
+      return;
     }
-    const isAction = /^(IF|WAIT|LOOP WHILE) \(/.test(line) || !CONTROL.test(line);
-    if (!isAction) return;
+    if (/^\*\*(END)?REGION\b/i.test(s)) return;
+    if (/^(END )?REGION\b/i.test(s)) { E(st, "write **REGION Name / **ENDREGION; REGION / END REGION drops the whole paste"); return; }
+    if (/^FUNCTION\b/i.test(s) || /^END FUNCTION\b/i.test(s)) { E(st, "subflow definitions (FUNCTION ... END FUNCTION) can't be pasted; paste each subflow's body into its own subflow"); return; }
+    if (/^EXIT FUNCTION\b/i.test(s)) { E(st, "EXIT FUNCTION only works inside a subflow"); return; }
+
+    const inHandler = stack[stack.length - 1] === "handler";
+    if (inHandler && !/^(SET |CALL |GOTO |THROW ERROR\b|END\b)/i.test(s)) {
+      if (/^(IF|LOOP|SWITCH|BLOCK)\b/i.test(s)) E(st, "IF / LOOP / SWITCH inside an error handler drops the whole paste; set a flag here and test it after the block");
+      else E(st, "only SET, CALL, GOTO and THROW ERROR are allowed inside ON BLOCK ERROR / ON ERROR (\"The statement isn't allowed inside exception handling\")");
+    }
+
+    if (/^END\b/i.test(s)) { stack.pop(); return; }
+    if (/^ON BLOCK ERROR\b/i.test(s)) {
+      if (/REPEAT/i.test(s)) E(st, "ON BLOCK ERROR has no REPEAT option (REPEAT n TIMES WAIT n belongs to an action's ON ERROR)");
+      if (pendingHandler) { stack.push("handler"); pendingHandler = false; }
+      return;
+    }
+    if (/^ON ERROR\b/i.test(s)) {
+      if (/^ON ERROR\s+GOTO\b/i.test(s)) { E(st, "ON ERROR GOTO Label drops the whole paste; put GOTO Label inside ON ERROR ... END"); return; }
+      stack.push("handler"); return;
+    }
+    if (/^BLOCK\b/i.test(s)) { stack.push("block"); pendingHandler = true; return; }
+    pendingHandler = false;
+    if (/^ELSE IF\s*\(/i.test(s) && isActionCall(s.replace(/^ELSE IF\s*\(/i, ""))) { E(st, "ELSE IF (Action ...) THEN drops the whole paste; use ELSE with a nested IF (Action ...) THEN ... END"); return; }
+    if (/^(ELSE|ELSE IF .* THEN|DEFAULT|NEXT LOOP|EXIT LOOP|EXIT\b.*|THROW ERROR\b.*|LABEL \w+|GOTO \w+|CALL \w+.*|WAIT (?!\().*)$/i.test(s)) { reservedIn(st, s, ""); return; }
+    if (/^CASE\b/i.test(s)) {
+      if (!/^CASE\s*(=|<>|>=|<=|>|<)/i.test(s)) E(st, "CASE takes a comparison (CASE = x, <>, >, <, >=, <=); other forms drop the whole paste");
+      reservedIn(st, s, ""); return;
+    }
+    if (/^SWITCH\b/i.test(s)) { stack.push("other"); reservedIn(st, s, ""); return; }
+    let m;
+    if ((m = s.match(/^ERROR\s*=>\s*(\w+)/i))) { varName(st, m[1], "variable"); return; }
+    if ((m = s.match(/^SET\s+(\S+)\s+TO\b/i))) { varName(st, m[1], "variable"); reservedIn(st, s.replace(/^SET\s+\S+\s+TO/i, ""), ""); return; }
+    if ((m = s.match(/^LOOP\s+FOREACH\s+(\w+)\s+IN\b/i))) { stack.push("other"); varName(st, m[1], "loop variable"); reservedIn(st, s, ""); return; }
+    if ((m = s.match(/^LOOP\s+(\w+)\s+FROM\b/i))) { stack.push("other"); varName(st, m[1], "loop variable"); reservedIn(st, s, ""); return; }
+
+    const wrapped = s.match(/^(IF|WAIT|LOOP WHILE)\s*\((.*)\)(\s+THEN)?$/i);
+    const isAction = wrapped ? isActionCall(wrapped[2]) : !/^(IF|LOOP)\b/i.test(s);
+    if (/^(IF|LOOP)\b/i.test(s)) stack.push("other");
+    if (!isAction) { reservedIn(st, s, ""); return; }
+
     actionLines++;
-    const { id, args, outs } = parseLine(line);
-    const rec = byId.get(id);
-    if (!rec) { errors.push(`line ${i + 1}: unknown action ${id}`); return; }
+    const { id, args, outs } = parseAction(s);
+    const rec = byId.get(id.toLowerCase());
+    if (!rec) { E(st, `unknown action ${id}`); return; }
     const ins = new Set((rec.input_params || []).map(p => p.name.toLowerCase()));
     const os = new Set((rec.output_params || []).map(p => p.name.toLowerCase()));
-    for (const a of args) if (!ins.has(a.toLowerCase())) errors.push(`line ${i + 1}: ${id} has no argument ${a}`);
-    for (const o of outs) if (!os.has(o.toLowerCase())) errors.push(`line ${i + 1}: ${id} has no output ${o}`);
+    const seen = new Set();
+    for (const a of args) {
+      if (seen.has(a.toLowerCase())) E(st, `${id} sets argument ${a} twice`);
+      seen.add(a.toLowerCase());
+      if (!ins.has(a.toLowerCase())) E(st, `${id} has no argument ${a}`);
+    }
+    for (const o of outs) {
+      if (!os.has(o.name.toLowerCase())) E(st, `${id} has no output ${o.name}`);
+      varName(st, o.var, "output variable");
+    }
+    reservedIn(st, s.slice(id.length), "");
   });
   return { errors, actionLines };
 }
 
-module.exports = { checkRobin, parseLine };
+module.exports = { checkRobin, parseAction, scan };
 
 if (require.main === module) {
   const args = process.argv.slice(2);

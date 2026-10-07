@@ -7,13 +7,13 @@ const kb = { actions: [
   { actionId: "Folder.GetFiles", input_params: [{ name: "Folder" }, { name: "FileFilter" }], output_params: [{ name: "Files" }] },
   { actionId: "Folder.IfFolderExists.DoesNotExist", input_params: [{ name: "Path" }], output_params: [] },
   { actionId: "Display.ShowMessageDialog.ShowMessage", input_params: [{ name: "Message" }, { name: "Title" }], output_params: [{ name: "ButtonPressed" }] },
+  { actionId: "Clipboard.SetText", input_params: [{ name: "Text" }], output_params: [] },
+  { actionId: "Text.ToNumber", input_params: [{ name: "Text" }], output_params: [{ name: "Number" }] },
+  { actionId: "Logging.LogMessage", input_params: [{ name: "Message" }], output_params: [] },
 ] };
-
-test("WAIT <seconds> is a built-in delay, WAIT (...) is still checked as an action", () => {
-  const r = checkRobin("WAIT 5\nWAIT (Folder.NoSuchWait Path: $'''C:\\x''')", kb);
-  assert.deepStrictEqual(r.errors, ["line 2: unknown action Folder.NoSuchWait"]);
-  assert.strictEqual(r.actionLines, 1);
-});
+const errs = src => checkRobin(src, kb).errors;
+const ok = src => assert.deepStrictEqual(errs(src), []);
+const flags = (src, re) => { const e = errs(src); assert.ok(e.some(x => re.test(x)), "expected " + re + " in " + JSON.stringify(e)); };
 
 test("valid action line passes", () => {
   const r = checkRobin("Folder.GetFiles Folder: $'''C:\\x: y''' FileFilter: $'''*''' Files=> Files", kb);
@@ -21,37 +21,102 @@ test("valid action line passes", () => {
   assert.strictEqual(r.actionLines, 1);
 });
 
-test("unknown action id is an error", () => {
-  const r = checkRobin("Folder.GetAllFiles Folder: $'''C:\\x'''", kb);
-  assert.match(r.errors[0], /line 1: unknown action Folder\.GetAllFiles/);
-});
-
-test("unknown argument and output are errors, case-insensitive match is ok", () => {
-  const r = checkRobin("Folder.GetFiles folder: $'''C:\\x''' Recursive: True Files=> Files Count=> N", kb);
-  assert.deepStrictEqual(r.errors, [
+test("unknown action id, argument and output are errors; names are case-insensitive", () => {
+  flags("Folder.GetAllFiles Folder: $'''C:\\x'''", /unknown action Folder\.GetAllFiles/);
+  assert.deepStrictEqual(errs("Folder.GetFiles folder: $'''C:\\x''' Recursive: True Files=> Files Count=> N"), [
     "line 1: Folder.GetFiles has no argument Recursive",
     "line 1: Folder.GetFiles has no output Count",
   ]);
+  ok("clipboard.settext Text: $'''x'''");
 });
 
-// Found by paste probes on PAD 2.72 (2026-10-06): both make the Designer reject the WHOLE paste silently.
-test("backslash directly before a %variable% is an error, doubled backslash is fine", () => {
-  const bad = checkRobin("SET Folder TO $'''C:\\Reports\\%ReportDate%'''", kb);
-  assert.deepStrictEqual(bad.errors, ["line 1: backslash before %ReportDate% in a string; write \\\\%ReportDate% (PAD rejects the whole paste)"]);
-  assert.deepStrictEqual(checkRobin("SET Folder TO $'''C:\\Reports\\\\%ReportDate%'''", kb).errors, []);
-  assert.deepStrictEqual(checkRobin("SET Path TO $'''%Folder%\\Report.xlsx'''", kb).errors, []);
+test("WAIT <seconds> is a built-in delay, WAIT (...) is still checked as an action", () => {
+  const r = checkRobin("WAIT 5\nWAIT N * 2\nWAIT (Folder.NoSuchWait Path: $'''C:\\x''')", kb);
+  assert.deepStrictEqual(r.errors, ["line 3: unknown action Folder.NoSuchWait"]);
+  assert.strictEqual(r.actionLines, 1);
 });
 
-test("property access in an IF condition is an error", () => {
-  const r = checkRobin("IF Files.Count = 0 THEN\nEND\nIF Count = 0 THEN\nEND", kb);
-  assert.deepStrictEqual(r.errors, ["line 1: property access Files.Count in an IF condition; SET it to a variable first (PAD rejects the whole paste)"]);
+// Silent rejects found by paste probes on PAD 2.72 (2026-10-06): PAD drops the WHOLE paste.
+test("%...% outside a string is an error; bare expressions and %...% inside strings are fine", () => {
+  flags("SET N TO 5\nSET M TO %N + 1%", /outside a string/);
+  flags("IF %N% = 5 THEN\nEND", /outside a string/);
+  flags("Clipboard.SetText Text: %Msg%", /outside a string/);
+  ok("SET N TO 5\nSET M TO N + 1\nSET T TO S + 'b'\nIF N + 1 = 6 THEN\nEND\nWAIT N\nClipboard.SetText Text: $'''Total %N + 1%'''");
+});
+
+test("apostrophes inside strings must be escaped", () => {
+  flags("Clipboard.SetText Text: $'''Joe's report'''", /apostrophe/);
+  flags("Clipboard.SetText Text: $'''He said 'hi''''", /end with an apostrophe/);
+  ok("Clipboard.SetText Text: $'''Joe\\'s report'''");
+  ok("SET O TO {'name': 'Joe'}\nClipboard.SetText Text: $'''%O['name']%'''");
+});
+
+test("a lone percent sign in a string is an error; %% is a literal percent", () => {
+  flags("Clipboard.SetText Text: $'''100% done'''", /lone %/);
+  ok("Clipboard.SetText Text: $'''100%% done'''");
+  ok("SET N TO 5\nClipboard.SetText Text: $'''%N%%% done'''");
+});
+
+test("backslash escapes: before %Var%, before the closing quotes, and \\% are errors", () => {
+  assert.deepStrictEqual(errs("SET Folder TO $'''C:\\Reports\\%ReportDate%'''"),
+    ["line 1: backslash before % in a string (PAD drops the paste for \\%Var% and loses the % otherwise); write \\\\%Var% for a path, %% for a literal percent sign"]);
+  ok("SET Folder TO $'''C:\\Reports\\\\%ReportDate%'''");
+  ok("SET Path TO $'''%Folder%\\Report.xlsx'''");
+  flags("Clipboard.SetText Text: $'''C:\\Temp\\'''", /never closes/);
+  ok("Clipboard.SetText Text: $'''C:\\Temp\\\\'''");
+});
+
+test("multi-line strings are one statement", () => {
+  ok("SET Body TO $'''Line one\nEND\n# not a comment\nIF x THEN'''\nClipboard.SetText Text: Body");
+  flags("SET Body TO $'''Line one\nJoe's line'''", /line 2: apostrophe/);
+});
+
+test("PAD keywords as property or variable names are errors; bracket access is fine", () => {
+  flags("SET X TO Mail.From", /Mail\.From.*Mail\['From'\]/);
+  flags("Clipboard.SetText Text: $'''%Mail.To%'''", /Mail\.To inside a string/);
+  flags("SET Error TO 1", /variable Error is a PAD keyword/);
+  flags("Text.ToNumber Text: $'''1''' Number=> Next", /output variable Next/);
+  flags("SET 1abc TO 1", /starts with a digit/);
+  ok("SET X TO Mail['From']\nSET Y TO Mail.Subject\nSET C TO Files.Count");
+});
+
+test("property access in IF is fine (rule 9 of 3.1.3 retracted)", () => {
+  ok("IF Files.Count = 0 THEN\nEND\nIF 3 = L.Count THEN\nEND\nLOOP WHILE L.Count > N\nEND");
+});
+
+test("ELSE IF (Action) is an error; ELSE IF <condition> and a nested IF (Action) are fine", () => {
+  flags("IF A = 1 THEN\nELSE IF (Folder.IfFolderExists.DoesNotExist Path: $'''C:\\r''') THEN\nEND", /ELSE IF \(Action/);
+  ok("IF A = 1 THEN\nELSE IF A = 2 THEN\nELSE\n    IF (Folder.IfFolderExists.DoesNotExist Path: $'''C:\\r''') THEN\n    END\nEND");
+});
+
+test("error handlers only allow SET, CALL, GOTO and THROW ERROR", () => {
+  ok("BLOCK Work\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    Clipboard.SetText Text: $'''x'''\nEND");
+  flags("BLOCK Work\nON BLOCK ERROR\n    Logging.LogMessage Message: $'''x'''\nEND\nEND", /only SET, CALL, GOTO and THROW ERROR/);
+  flags("BLOCK Work\nON BLOCK ERROR\n    IF A = 1 THEN\n    END\nEND\nEND", /IF \/ LOOP \/ SWITCH inside an error handler/);
+  ok("Text.ToNumber Text: $'''x''' Number=> N\nON ERROR REPEAT 2 TIMES WAIT 5\n    SET N TO 0\n    THROW ERROR\nEND");
+  flags("Text.ToNumber Text: $'''x''' Number=> N\nON ERROR\n    Logging.LogMessage Message: $'''x'''\nEND", /only SET/);
+  flags("Text.ToNumber Text: $'''x''' Number=> N\nON ERROR GOTO Fallback\nEND", /ON ERROR GOTO/);
+  flags("BLOCK Work\nON BLOCK ERROR REPEAT 2 TIMES WAIT 2\nEND\nEND", /no REPEAT/);
+});
+
+test("structure: SWITCH, regions, comments, DISABLE, @@ and subflows", () => {
+  ok("SWITCH N\n    CASE = 1\n        SET A TO 1\n    CASE <= 3\n        SET A TO 2\n    DEFAULT\n        SET A TO 3\nEND");
+  flags("SWITCH S\n    CASE Contains $'''b'''\nEND", /CASE takes a comparison/);
+  ok("**REGION Setup\n/# block\ncomment #/\nSET A TO 1 # trailing note\nDISABLE Clipboard.SetText Text: $'''x'''\n**ENDREGION");
+  flags("REGION Setup\nSET A TO 1\nEND REGION", /\*\*REGION/);
+  ok("@@copilotGeneratedAction: 'False'\nSET A TO 1");
+  flags("@@copilotGeneratedAction: 'False'\n# comment\nSET A TO 1", /followed directly by an action/);
+  flags("FUNCTION Sub1 GLOBAL\n    SET X TO 1\nEND FUNCTION", /subflow definitions/);
+  flags("SET A TO 1 SET B TO 2", /two statements/);
+  ok("ERROR => LastError Reset: True\nLABEL Top\nGOTO Top\nEXIT Code: 1 ErrorMessage: $'''x'''\nLOOP WHILE (N) < (10)\n    EXIT LOOP\nEND");
 });
 
 test("control flow is skipped, conditions are checked", () => {
   const src = [
     "SET Count TO 0",
     "LOOP FOREACH Item IN Files",
-    "    IF Count = 0 THEN",
+    "    IF Contains(Item, $'''x''', False) AND Count = 0 THEN",
+    "        NEXT LOOP",
     "    END",
     "END",
     "IF (Folder.IfFolderExists.DoesNotExist Path: $'''C:\\r''') THEN",

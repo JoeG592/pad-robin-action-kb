@@ -23,11 +23,9 @@ The one edit to the captured pixels: the flow checker's notification badge in th
 
 All example flows are built only from the KB's golden examples. Each pasted with 0 errors, and the hook flow failed as intended; the results are in `captures/*.json`. The flows were paste-validated, not run.
 
-Two Robin rules came up while building them. Each makes PAD 2.72 reject the **whole** paste with no error message: the canvas just stays empty.
-- **A backslash directly before a `%variable%` in a string.** `$'''C:\Reports\%Month%'''` is rejected. Write `$'''C:\Reports\\%Month%'''`.
-- **Property access in an `IF` condition.** `IF Files.Count = 0 THEN` is rejected. `SET FileCount TO Files.Count` first, then `IF FileCount = 0 THEN`.
+A Robin rule came up while building them: a backslash directly before a `%variable%` in a string makes PAD 2.72 reject the **whole** paste with no error message, and the canvas just stays empty. `$'''C:\Reports\%Month%'''` is rejected; write `$'''C:\Reports\\%Month%'''`. A later probe of 563 pastes found more rules of this kind; they are listed in the main README under "Syntax rules PAD enforces". (An earlier version of this page also said property access in an `IF` condition is rejected. That does not reproduce.)
 
-`tools/check-flows.js` checks both, as well as the action ids and argument names.
+`tools/check-flows.js` checks a flow against all of those rules, as well as the action ids and argument names.
 
 ## Re-capturing
 
