@@ -12,9 +12,11 @@ This repo is the missing reference.
 
 | File | Contents |
 |---|---|
-| `PAD_Robin_ActionKB_v3_1.json` | 988 Robin actions across 45 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters, and the other selector forms of the same action. |
+| `PAD_Robin_ActionKB_v3_1.json` | 988 Robin actions across 45 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters (enum inputs list their allowed values), and the other selector forms of the same action. |
 | `PAD_Robin_TypeReference_v3_1.json` | 44 parameter types with the exact syntax PAD accepts for each: strings, numbers, file paths, handle variables, lists, UI selectors, and the rule for enums. |
 | `PROMPT.md` | A system prompt that turns a model into a template filler over these two files. This is how the data is meant to be used. |
+| `rules/robin-rules.json` | The syntax rules below, each with the probe pastes that prove it. README, PROMPT.md and other copies are rendered from this file. |
+| `rules/probe-corpus.json` | 443 probe pastes into PAD 2.72 with the outcome PAD gave: rejected silently, landed with errors, or clean. Rows include PAD's own description where it was captured. |
 
 Validated against PAD 2.72 (build 2.72.00183.26250), September 2026: all 988 golden examples were re-pasted exactly as published into the 2.72 Designer, with zero errors. The syntax rules below were probed on the same build in October 2026 with 563 test pastes, including 19 complex flows of up to 97 rows.
 
@@ -51,32 +53,36 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
 
 ## Syntax rules PAD enforces
 
-Every rule below was confirmed by pasting into PAD 2.72 (2.72.00183.26250): 563 probe pastes in October 2026. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.
+<!-- robin-rules:begin -->
+Every rule below was confirmed by pasting into PAD 2.72 (2.72.00183.26250): 443 probe pastes in October 2026, kept with their outcomes in `rules/probe-corpus.json`. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.
 
 **Values**
 
-1. Strings are `$'''value'''`. Booleans are bare `True` / `False`. Numbers are bare.
-2. A variable from an earlier action is referenced by its bare name (`Instance: ExcelInstance`). Expressions are bare too: `SET Total TO Price * Qty`, `IF Files.Count = 0 THEN`, `WAIT Attempt * 10`, `Items[Items.Count - 1]`, `Row['Amount']`.
-3. `%...%` belongs only inside strings: `$'''Saved %Count% files'''`, `$'''Total %Price * Qty%'''`. Anywhere else it rejects the whole paste, for example `SET X TO %N + 1%`, `IF %N% = 5` or `Text: %Msg%`.
-4. Enums are fully qualified, `Module.EnumType.Value`, and the module is the one that owns the type (`Text.StandardDelimiter.NewLine`).
+1. Strings are `$'''value'''`. Booleans are bare `True` / `False`. Numbers are bare. An empty string is `$''''''`. The backticks in templates mean "fill this in"; pasted as-is they give "Can't be empty".
+2. A variable from an earlier action is referenced by its bare name (`Instance: ExcelInstance`). Expressions are bare too: `SET Total TO Price * Qty`, `IF Files.Count = 0 THEN`, `WAIT Attempt * 10`, `Items[Items.Count - 1]`, `Items[-1]`, `Row['Amount']`, `Obj.a.b`.
+3. **`%...%` belongs only inside strings**: `$'''Saved %Count% files'''`, `$'''Total %Price * Qty%'''`. Anywhere else it rejects the whole paste, for example `SET X TO %N + 1%`, `IF %N% = 5`, `Text: %Msg%` or `WAIT %N%`.
+4. Enums are fully qualified, `Module.EnumType.Value`, using the module that owns the type (`Text.StandardDelimiter.NewLine`). The value must be one the KB lists in the input's `enumValues`: `File.IfExists`, for example, has only `DoNothing` and `Overwrite`. An enum without its module is an error.
 5. Outputs are `Name=> Variable`.
 
 **Inside strings**
 
-6. The backslash is an escape character: `\'` is an apostrophe and `\\` is one backslash.
-   - Escape every apostrophe: `$'''Joe\'s report'''`, `$'''WHERE Name = \'Joe\''''`. A bare `'` rejects the paste. It is easy to miss in SQL, XPath and JavaScript.
-   - Double a backslash that comes right before a variable or before the closing quotes: `$'''C:\Reports\\%Month%'''`, `$'''%Root%\\%Name%'''`, `$'''C:\Temp\\'''`. Before an ordinary letter a single backslash is kept as is (`$'''%Folder%\Report.xlsx'''`).
-   - A UNC path needs four backslashes at the start, `$'''\\\\server\share'''`. Two become one without any error.
-7. A literal percent sign is `%%`: `$'''100%% done'''`. A single `%` rejects the paste.
-8. Strings may span several lines.
+6. The backslash is an escape character inside strings: `\'` is an apostrophe and `\\` is one backslash. **Escape every apostrophe**: `$'''Joe\'s report'''`, `$'''WHERE Name = \'Joe\''''`. A bare `'` rejects the whole paste, so watch SQL, XPath and JavaScript. Apostrophes inside a `%...%` expression are fine (`$'''%Row['Name']%'''`).
+7. **Double a backslash that comes right before a variable or before the closing quotes**: `$'''C:\Reports\\%Month%'''`, `$'''%Root%\\%Name%'''`, `$'''C:\Temp\\'''`. A single backslash there rejects the whole paste. Before an ordinary letter one backslash is kept as is (`$'''%Folder%\Report.xlsx'''`). Don't write `\%`: PAD drops the percent sign.
+8. **A UNC path needs four backslashes**, `$'''\\\\server\share'''`. With two it pastes, but PAD reads `\server\share`.
+9. **A literal percent sign is `%%`**: `$'''100%% done'''`. A single `%` rejects the whole paste.
+10. Strings may span several lines, including blank lines and lines that start with `END`, `#` or `IF`.
 
 **Names**
 
-9. PAD keywords can't be used as variable names or property names: `From`, `To`, `Step`, `End`, `In`, `Then`, `If`, `Else`, `Loop`, `Foreach`, `While`, `Set`, `Wait`, `Next`, `Exit`, `Label`, `Goto`, `Call`, `Case`, `Default`, `Switch`, `Block`, `Error`, `On`, `Not`, `And`, `Or`, `Mod`, `True`, `False`, `Global`, `Disable`, `Function`, `Throw`. Mail properties are the usual trap: write `Mail['From']` and `Mail['To']`, not `Mail.From`. Variable names can't start with a digit.
+11. **PAD keywords can't be variable or property names**: `From`, `To`, `Step`, `End`, `In`, `Then`, `If`, `Else`, `Loop`, `Foreach`, `While`, `Set`, `Wait`, `Next`, `Exit`, `Label`, `Goto`, `Call`, `Case`, `Default`, `Switch`, `Block`, `Error`, `On`, `Not`, `And`, `Or`, `Mod`, `True`, `False`, `Global`, `Disable`, `Function`, `Throw`. Mail properties are the usual trap: write `Mail['From']` and `Mail['To']`, not `Mail.From`. `Subject`, `Count`, `Name`, `Text`, `Value` and `Body` are fine.
+12. Variable names start with a letter: `SET 1abc TO 1` rejects the whole paste. Unicode letters are fine (`SET Café TO 1`).
+13. A variable must be set somewhere in the flow, by `SET`, an action output, a loop, or an in-place list action such as `Variables.AddItemToList List:`. Otherwise the line shows "Variable 'X' doesn't exist".
+14. Variable names, keywords, action ids, enum values and argument names are all case-insensitive on paste.
 
 **Statements**
 
-10. One statement per line. Built-in statements:
+15. One statement per line; two on one line rejects the whole paste. Indentation is cosmetic, and a trailing `# note` becomes its own comment row.
+16. Built-in statements:
     - `SET x TO value`
     - `IF condition THEN` / `ELSE IF condition THEN` / `ELSE` / `END`
     - `SWITCH x` / `CASE = 1` / `CASE > 5` / `DEFAULT` / `END`
@@ -84,9 +90,10 @@ Every rule below was confirmed by pasting into PAD 2.72 (2.72.00183.26250): 563 
     - `LOOP i FROM 0 TO n - 1 STEP 1` / `END`
     - `LOOP WHILE (A) < (B)` / `END`
     - `EXIT LOOP`, `NEXT LOOP`, `LABEL Name` / `GOTO Name`, `WAIT 5`, `EXIT Code: 0`
-11. Conditions use `=`, `<>`, `>`, `<`, `>=`, `<=`, `AND`, `OR` and `NOT(...)`, plus `IsEmpty(x)`, `IsNotEmpty(x)`, `Contains(x, $'''y''', False)`, `NotContains`, `StartsWith` and `EndsWith`. `CASE` takes a comparison only.
-12. A condition action (kind `Condition`) is written `IF (Action ...) THEN`. `ELSE IF (Action ...) THEN` rejects the paste, so use `ELSE` with a nested `IF (Action ...) THEN ... END`.
-13. Error handling for a group of actions, and for a single action:
+17. Conditions use `=`, `<>`, `>`, `<`, `>=`, `<=`, `AND`, `OR` and `NOT(...)`, plus `IsEmpty(x)`, `IsNotEmpty(x)`, `Contains(x, $'''y''', False)`, `NotContains`, `StartsWith` and `EndsWith`.
+18. `CASE` takes a comparison only (`CASE = 1`, `CASE <> 3`, `CASE > 5`). `CASE Contains ...` rejects the whole paste.
+19. A condition action (kind `Condition`) is written `IF (Action ...) THEN`. `ELSE IF (Action ...) THEN` rejects the whole paste, so use `ELSE` with a nested `IF (Action ...) THEN ... END`.
+20. Error handling for a group of actions, and for a single action:
 
     ```
     BLOCK ReadFiles
@@ -102,12 +109,12 @@ Every rule below was confirmed by pasting into PAD 2.72 (2.72.00183.26250): 563 
     END
     ```
 
-    A handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other action gives "The statement isn't allowed inside exception handling", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `ERROR => LastError` reads the last error.
-14. Comments are `# text` or `/# ... #/`. Regions are `**REGION Name` / `**ENDREGION`, and a `DISABLE ` prefix disables a line.
-15. Don't paste the file header lines (`@@ConnectionString`, `IMPORT`, `@SENSITIVE`) or subflow definitions (`FUNCTION ... END FUNCTION`): both reject the paste. An `@@` metadata line must be followed directly by an action.
-16. Semantic problems (unknown argument, undefined variable, wrong type, an enum without its module) land on the canvas with an error and a line number. PAD is lenient about the case of keywords, action ids and variable names, about argument order, and about spacing around `:` and `=>`.
+    A handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other action gives "The statement isn't allowed inside exception handling", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `REPEAT` works only on an action's `ON ERROR`. `ERROR => LastError` reads the last error.
+21. Comments are `# text` or `/# ... #/`. Regions are `**REGION Name` / `**ENDREGION`; `REGION` / `END REGION` rejects the whole paste. A `DISABLE ` prefix disables a line.
+22. Don't paste the file header lines (`@@ConnectionString`, `IMPORT`, `@SENSITIVE`) or subflow definitions (`FUNCTION ... END FUNCTION`): both reject the whole paste. Create subflows in the Designer and paste each body into its own subflow. `@@copilotGeneratedAction: 'False'` works only directly before an action; other `@@` lines reject the paste.
+23. Ids removed in PAD 2.72 are rejected as "Unknown action": the bare `Database.Connect` (use `Database.Connect.Connect` or `.ConnectOracle`) and the bare `Scripting.RunPythonScript` (use `.RunPythonScript`, `.RunPythonScript34` or `.RunPythonScriptCPython`).
 
-The 3.1.3 documentation said property access in an `IF` condition rejects the paste. That was wrong: it does not reproduce, and the form that fails is `%...%` outside a string (rule 3).
+The 3.1.3 documentation said property access in an `IF` condition rejects the paste. That was wrong: it does not reproduce, and the form that fails is `%...%` outside a string.
 
 `marketing/video/tools/check-flows.js` checks a script against these rules and the KB before you paste it:
 
@@ -115,7 +122,8 @@ The 3.1.3 documentation said property access in an `IF` condition rejects the pa
 node marketing/video/tools/check-flows.js PAD_Robin_ActionKB_v3_1.json flow.robin
 ```
 
-On the 563 probe pastes it flagged all 108 silent rejects. It passed every clean paste except two that use `\%`, which PAD accepts but silently drops the percent sign.
+On the probe corpus it flags 105 of 105 silent rejects and 18 of 23 pastes that landed with errors, and passes 313 of 315 clean pastes. The 2 it flags use `\%`, which PAD accepts while silently dropping the percent sign.
+<!-- robin-rules:end -->
 
 ## How it was validated
 
@@ -141,6 +149,8 @@ PAD 2.72 exposes 236 further selector variants that are not included here: 200 n
 ## Maintenance
 
 PAD updates add and change actions. The KB carries the PAD build it was validated against, and the intent is to re-validate after each Designer release. Issues and pull requests are welcome; a report of a record that fails to paste on a newer build is the most useful kind.
+
+The syntax rules live in `rules/robin-rules.json`. To change one, edit that file and run `node rules/render-rules.js`, which updates this README and PROMPT.md. It refuses to render if a rule cites a probe that doesn't show what the rule claims. `node --test rules/*.test.js marketing/video/tools/*.test.js` checks the evidence, checks the checker against every rule's examples, and checks that the rendered copies are current.
 
 ## License
 

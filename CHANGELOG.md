@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.1.5 (2026-10-07)
+
+- **Enum values on every enum input.** The 139 enum inputs that had none, all inherited from v2.1, now list their allowed values in `enumValues`. All 536 enum inputs on published records carry them, so a script can be checked for values such as `File.IfExists.AddSequentialSuffix`, which doesn't exist (`File.IfExists` has only `DoNothing` and `Overwrite`). The release check now fails if a published enum input lacks the values the PAD DLLs define.
+- **One source for the syntax rules.** `rules/robin-rules.json` holds the 24 rules. Each one has its wording, examples the checker must flag and must pass, and the probe pastes that prove it. The README rules section and PROMPT.md are rendered from it by `rules/render-rules.js`. The renderer refuses if a rule cites a probe that doesn't show what the rule claims: a silent or error rule needs a failing probe and a clean one, and a value rule needs PAD's own description of the row.
+- **Probe corpus published.** `rules/probe-corpus.json` has 443 probe pastes into PAD 2.72 with their outcomes: 105 rejected silently, 23 landed with errors, 315 clean.
+- **Checker:** `check-flows.js` now also checks:
+  - enum values against `enumValues`, and enums written without their module
+  - variables that are used but never set, while handling Unicode names, CR-only line breaks and in-place list actions (`Variables.AddItemToList List:` creates the list), which PAD accepts
+
+  On the corpus it flags 105 of 105 silent rejects and 18 of 23 pastes with errors (up from 11), and passes 313 of 315 clean pastes. The 2 it flags use `\%`, which PAD accepts while dropping the percent sign.
+- Tests run on every push (GitHub Actions): rule evidence, the checker against each rule's examples, and up-to-date rendered copies.
+
 ## 3.1.4 (2026-10-06)
 
 - **Syntax rules rewritten from 563 probe pastes on PAD 2.72** (README "Syntax rules PAD enforces", PROMPT.md). Newly documented rules that make PAD reject the whole paste with no error:

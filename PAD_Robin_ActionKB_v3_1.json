@@ -1,7 +1,7 @@
 {
   "name": "PAD Robin Action Knowledge Base",
-  "version": "3.1.4",
-  "date": "2026-10-06",
+  "version": "3.1.5",
+  "date": "2026-10-07",
   "pad_build": "2.72.00183.26250",
   "license": "CC BY 4.0",
   "description": "Paste-validated reference of Power Automate Desktop (PAD) Robin actions: every record is a Robin action id with a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters, and the sibling selector forms of the same action. Built for use with AI assistants (Claude, Copilot, ChatGPT): give the model the golden example and the Type Reference, have it change values only.",
@@ -95,7 +95,11 @@
         {
           "name": "CloseMode",
           "type": "CloseAccessMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DoNotSave",
+            "Save"
+          ]
         }
       ],
       "output_params": [],
@@ -661,12 +665,21 @@
         {
           "name": "GroupScope",
           "type": "GroupScope",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "LocalScope",
+            "GlobalScope",
+            "UniversalScope"
+          ]
         },
         {
           "name": "GroupType",
           "type": "GroupType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Security",
+            "Distribution"
+          ]
         },
         {
           "name": "Location",
@@ -710,7 +723,11 @@
         {
           "name": "ObjectType",
           "type": "ObjectType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Computer",
+            "OrganizationalUnit"
+          ]
         },
         {
           "name": "ParentDirectoryEntry",
@@ -1396,7 +1413,258 @@
         {
           "name": "Country",
           "type": "Countries",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "None",
+            "Afghanistan",
+            "AlandIslands",
+            "Albania",
+            "Algeria",
+            "AmericanSamoa",
+            "Andorra",
+            "Angola",
+            "Anguilla",
+            "Antarctica",
+            "AntiguaandBarbuda",
+            "Argentina",
+            "Armenia",
+            "Aruba",
+            "Australia",
+            "Austria",
+            "Azerbaijan",
+            "Bahamas",
+            "Bahrain",
+            "Bangladesh",
+            "Barbados",
+            "Belarus",
+            "Belgium",
+            "Belize",
+            "Benin",
+            "Bermuda",
+            "Bhutan",
+            "BolivarianRepublicOfVenezuela",
+            "Bonaire",
+            "BosniaandHerzegovina",
+            "Botswana",
+            "BouvetIsland",
+            "Brazil",
+            "BritishIndianOceanTerritory",
+            "BruneiDarussalam",
+            "Bulgaria",
+            "BurkinaFaso",
+            "Burundi",
+            "CaboVerde",
+            "Cambodia",
+            "Cameroon",
+            "Canada",
+            "CaymanIslands",
+            "CentralAfricanRepublic",
+            "Chad",
+            "Chile",
+            "China",
+            "ChristmasIsland",
+            "CocosKeelingIslands",
+            "Colombia",
+            "Comoros",
+            "Congo",
+            "CookIslands",
+            "CostaRica",
+            "Croatia",
+            "Cuba",
+            "Curacao",
+            "Cyprus",
+            "CzechRepublic",
+            "IvoryCoast",
+            "DemocraticPeoplesRepublicOfKorea",
+            "DemocraticRepublicOftheCongo",
+            "Denmark",
+            "Djibouti",
+            "Dominica",
+            "DominicanRepublic",
+            "Ecuador",
+            "Egypt",
+            "ElSalvador",
+            "EquatorialGuinea",
+            "Eritrea",
+            "Estonia",
+            "Ethiopia",
+            "FalklandIslandsMalvinas",
+            "FaroeIslands",
+            "Fiji",
+            "Finland",
+            "France",
+            "FrenchGuiana",
+            "FrenchPolynesia",
+            "FrenchSouthernTerritories",
+            "Gabon",
+            "Gambia",
+            "Georgia",
+            "Germany",
+            "Ghana",
+            "Gibraltar",
+            "Greece",
+            "Greenland",
+            "Grenada",
+            "Guadeloupe",
+            "Guam",
+            "Guatemala",
+            "Guernsey",
+            "Guinea",
+            "GuineaBissau",
+            "Guyana",
+            "Haiti",
+            "HeardIslandandMcDonaldIslands",
+            "HolySee",
+            "Honduras",
+            "HongKong",
+            "Hungary",
+            "Iceland",
+            "India",
+            "Indonesia",
+            "Iraq",
+            "Ireland",
+            "IslamicRepublicOfIran",
+            "IsleOfMan",
+            "Israel",
+            "Italy",
+            "Jamaica",
+            "Japan",
+            "Jersey",
+            "Jordan",
+            "Kazakhstan",
+            "Kenya",
+            "Kiribati",
+            "Kuwait",
+            "Kyrgyzstan",
+            "LaoPeoplesDemocraticRepublic",
+            "Latvia",
+            "Lebanon",
+            "Lesotho",
+            "Liberia",
+            "Libya",
+            "Liechtenstein",
+            "Lithuania",
+            "Luxembourg",
+            "Macao",
+            "Madagascar",
+            "Malawi",
+            "Malaysia",
+            "Maldives",
+            "Mali",
+            "Malta",
+            "MarshallIslands",
+            "Martinique",
+            "Mauritania",
+            "Mauritius",
+            "Mayotte",
+            "Mexico",
+            "Micronesia",
+            "Moldova",
+            "Monaco",
+            "Mongolia",
+            "Montenegro",
+            "Montserrat",
+            "Morocco",
+            "Mozambique",
+            "Myanmar",
+            "Namibia",
+            "Nauru",
+            "Nepal",
+            "Netherlands",
+            "NewCaledonia",
+            "NewZealand",
+            "Nicaragua",
+            "Niger",
+            "Nigeria",
+            "Niue",
+            "NorfolkIsland",
+            "RepublicOfMacedoniatheformerYugoslav",
+            "NorthernMarianaIslands",
+            "Norway",
+            "Oman",
+            "Pakistan",
+            "Palau",
+            "Palestine",
+            "Panama",
+            "PapuaNewGuinea",
+            "Paraguay",
+            "Peru",
+            "Philippines",
+            "Pitcairn",
+            "Poland",
+            "Portugal",
+            "PuertoRico",
+            "Qatar",
+            "RepublicOfKorea",
+            "Reunion",
+            "Romania",
+            "Russia",
+            "Rwanda",
+            "SaintBarthelemy",
+            "SaintHelena",
+            "SaintKittsandNevis",
+            "SaintLucia",
+            "SaintMartinFrenchpart",
+            "SaintPierreandMiquelon",
+            "SaintVincentandtheGrenadines",
+            "Samoa",
+            "SanMarino",
+            "SaoTomeandPrincipe",
+            "SaudiArabia",
+            "Senegal",
+            "Serbia",
+            "Seychelles",
+            "SierraLeone",
+            "Singapore",
+            "SintMaartenDutchpart",
+            "Slovakia",
+            "Slovenia",
+            "SolomonIslands",
+            "Somalia",
+            "SouthAfrica",
+            "SouthGeorgiaandtheSouthSandwichIslands",
+            "SouthSudan",
+            "Spain",
+            "SriLanka",
+            "StateOfBoliviaPlurinational",
+            "Sudan",
+            "Suriname",
+            "SvalbardandJanMayen",
+            "Swaziland",
+            "Sweden",
+            "Switzerland",
+            "SyrianArabRepublic",
+            "Taiwan",
+            "Tajikistan",
+            "Tanzania",
+            "Thailand",
+            "TimorLeste",
+            "Togo",
+            "Tokelau",
+            "Tonga",
+            "TrinidadandTobago",
+            "Tunisia",
+            "Turkey",
+            "Turkmenistan",
+            "TurksandCaicosIslands",
+            "Tuvalu",
+            "Uganda",
+            "Ukraine",
+            "UnitedArabEmirates",
+            "UnitedKingdomOfGreatBritainandNorthernIreland",
+            "UnitedStatesMinorOutlyingIslands",
+            "UnitedStatesOfAmerica",
+            "Uruguay",
+            "Uzbekistan",
+            "Vanuatu",
+            "Vietnam",
+            "VirginIslandsBritish",
+            "VirginIslandsUS",
+            "WallisandFutuna",
+            "Yemen",
+            "Zambia",
+            "Zimbabwe"
+          ]
         },
         {
           "name": "DisplayName",
@@ -1674,7 +1942,14 @@
         {
           "name": "VolumeType",
           "type": "VolumeType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Gp2",
+            "Standard",
+            "Io1",
+            "Sc1",
+            "St1"
+          ]
         },
         {
           "name": "Ec2Client",
@@ -1865,7 +2140,17 @@
         {
           "name": "InstanceState",
           "type": "InstanceState",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Pending",
+            "All",
+            "Unknown",
+            "Running",
+            "ShuttingDown",
+            "Terminated",
+            "Stopping",
+            "Stopped"
+          ]
         },
         {
           "name": "Ec2Client",
@@ -2304,7 +2589,17 @@
         {
           "name": "InstanceState",
           "type": "InstanceState",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Pending",
+            "All",
+            "Unknown",
+            "Running",
+            "ShuttingDown",
+            "Terminated",
+            "Stopping",
+            "Stopped"
+          ]
         },
         {
           "name": "Ec2Client",
@@ -2570,7 +2865,11 @@
         {
           "name": "ResourceGroupCreateOption",
           "type": "ResourceGroupCreateOption",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "UseExisting",
+            "CreateNew"
+          ]
         },
         {
           "name": "SizeInGb",
@@ -2580,7 +2879,13 @@
         {
           "name": "StorageAccountType",
           "type": "StorageAccountType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Standard",
+            "Premium",
+            "StandardSSD",
+            "UltraSSD"
+          ]
         },
         {
           "name": "AzureClient",
@@ -2925,7 +3230,11 @@
         {
           "name": "ResourceGroupCreateOption",
           "type": "ResourceGroupCreateOption",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "UseExisting",
+            "CreateNew"
+          ]
         },
         {
           "name": "SnapshotName",
@@ -3065,7 +3374,17 @@
         {
           "name": "Status",
           "type": "VMStatus",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Running",
+            "Deallocating",
+            "Deallocated",
+            "Starting",
+            "Stopped",
+            "Stopping",
+            "Unknown",
+            "Any"
+          ]
         },
         {
           "name": "AzureClient",
@@ -3738,7 +4057,17 @@
         {
           "name": "Status",
           "type": "VMStatus",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Running",
+            "Deallocating",
+            "Deallocated",
+            "Starting",
+            "Stopped",
+            "Stopping",
+            "Unknown",
+            "Any"
+          ]
         },
         {
           "name": "AzureClient",
@@ -4407,7 +4736,13 @@
         {
           "name": "CompressionLevel",
           "type": "CompressionLevel",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "None",
+            "BestSpeed",
+            "BestBalanceOfSpeedAndCompression",
+            "BestCompression"
+          ]
         },
         {
           "name": "FilesOrFoldersToZip",
@@ -4451,17 +4786,36 @@
         {
           "name": "Encoding",
           "type": "EncryptionEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ANSI",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "KeySize",
           "type": "AESKeySize",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Bits128",
+            "Bits192",
+            "Bits256"
+          ]
         },
         {
           "name": "Padding",
           "type": "PaddingMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "None",
+            "PKCS7",
+            "Zeros",
+            "ANSIX923",
+            "ISO10126"
+          ]
         },
         {
           "name": "TextToDecrypt",
@@ -4822,22 +5176,46 @@
         {
           "name": "Encoding",
           "type": "EncryptionEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ANSI",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "IfFileExists",
           "type": "IfFileExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Overwrite",
+            "DoNotModifyFiles",
+            "AddSequentialSuffix"
+          ]
         },
         {
           "name": "KeySize",
           "type": "AESKeySize",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Bits128",
+            "Bits192",
+            "Bits256"
+          ]
         },
         {
           "name": "Padding",
           "type": "PaddingMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "None",
+            "PKCS7",
+            "Zeros",
+            "ANSIX923",
+            "ISO10126"
+          ]
         },
         {
           "name": "TextToDecrypt",
@@ -5243,7 +5621,14 @@
         {
           "name": "Encoding",
           "type": "EncryptionEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ANSI",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "EncryptionKey",
@@ -5258,12 +5643,24 @@
         {
           "name": "KeySize",
           "type": "AESKeySize",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Bits128",
+            "Bits192",
+            "Bits256"
+          ]
         },
         {
           "name": "PaddingMode",
           "type": "PaddingMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "None",
+            "PKCS7",
+            "Zeros",
+            "ANSIX923",
+            "ISO10126"
+          ]
         }
       ],
       "output_params": [
@@ -5605,7 +6002,14 @@
         {
           "name": "Encoding",
           "type": "EncryptionEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ANSI",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "EncryptionKey",
@@ -5615,12 +6019,24 @@
         {
           "name": "KeySize",
           "type": "AESKeySize",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Bits128",
+            "Bits192",
+            "Bits256"
+          ]
         },
         {
           "name": "PaddingMode",
           "type": "PaddingMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "None",
+            "PKCS7",
+            "Zeros",
+            "ANSIX923",
+            "ISO10126"
+          ]
         },
         {
           "name": "TextToEncrypt",
@@ -5967,7 +6383,14 @@
         {
           "name": "Encoding",
           "type": "EncryptionEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ANSI",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "File",
@@ -5977,7 +6400,12 @@
         {
           "name": "HashAlgorithm",
           "type": "HashAlgorithm",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SHA256",
+            "SHA384",
+            "SHA512"
+          ]
         }
       ],
       "output_params": [
@@ -6005,7 +6433,14 @@
         {
           "name": "Encoding",
           "type": "EncryptionEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ANSI",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "FileToHash",
@@ -6020,7 +6455,12 @@
         {
           "name": "KeyedHashAlgorithm",
           "type": "KeyedHashAlgorithm",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "HMACSHA256",
+            "HMACSHA384",
+            "HMACSHA512"
+          ]
         }
       ],
       "output_params": [
@@ -6049,12 +6489,24 @@
         {
           "name": "Encoding",
           "type": "EncryptionEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ANSI",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "HashAlgorithm",
           "type": "HashAlgorithm",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SHA256",
+            "SHA384",
+            "SHA512"
+          ]
         },
         {
           "name": "TextToHash",
@@ -6087,12 +6539,24 @@
         {
           "name": "Encoding",
           "type": "EncryptionEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ANSI",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "HashAlgorithm",
           "type": "KeyedHashAlgorithm",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "HMACSHA256",
+            "HMACSHA384",
+            "HMACSHA512"
+          ]
         },
         {
           "name": "HashKey",
@@ -6692,7 +7156,15 @@
         {
           "name": "TimeUnit",
           "type": "TimeUnit",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Seconds",
+            "Minutes",
+            "Hours",
+            "Days",
+            "Months",
+            "Years"
+          ]
         }
       ],
       "output_params": [
@@ -6864,7 +7336,11 @@
         {
           "name": "DateTimeFormat",
           "type": "DateTimeFormat",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DateAndTime",
+            "DateOnly"
+          ]
         }
       ],
       "output_params": [
@@ -7098,7 +7574,13 @@
         {
           "name": "TimeUnit",
           "type": "DifferenceTimeUnit",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Seconds",
+            "Minutes",
+            "Hours",
+            "Days"
+          ]
         }
       ],
       "output_params": [
@@ -7132,7 +7614,12 @@
         {
           "name": "InputType",
           "type": "InputType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SingleLine",
+            "Password",
+            "Multiline"
+          ]
         },
         {
           "name": "IsTopMost",
@@ -7177,7 +7664,11 @@
         {
           "name": "DateDialogFormat",
           "type": "DateDialogFormat",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DateOnly",
+            "DateAndTime"
+          ]
         },
         {
           "name": "DefaultValue",
@@ -7703,17 +8194,37 @@
         {
           "name": "Buttons",
           "type": "Buttons",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "OK",
+            "OKCancel",
+            "YesNo",
+            "YesNoCancel",
+            "AbortRetryIgnore",
+            "RetryCancel"
+          ]
         },
         {
           "name": "DefaultButton",
           "type": "DefaultButton",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Button1",
+            "Button2",
+            "Button3"
+          ]
         },
         {
           "name": "Icon",
           "type": "Icon",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "None",
+            "Information",
+            "Question",
+            "Warning",
+            "ErrorIcon"
+          ]
         },
         {
           "name": "IsTopMost",
@@ -7933,7 +8444,12 @@
         {
           "name": "MailsToRetrieve",
           "type": "RetrieveMessagesMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "All",
+            "Unread",
+            "Read"
+          ]
         },
         {
           "name": "MarkAsRead",
@@ -8469,7 +8985,11 @@
         {
           "name": "WorksheetPosition",
           "type": "WorksheetPosition",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "First",
+            "Last"
+          ]
         }
       ],
       "output_params": [],
@@ -9506,7 +10026,11 @@
         {
           "name": "PasteWorksheetPosition",
           "type": "WorksheetPosition",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "First",
+            "Last"
+          ]
         }
       ],
       "output_params": [],
@@ -9550,7 +10074,11 @@
         {
           "name": "ShiftCellsDirection",
           "type": "ShiftCellsDirection",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Left",
+            "Up"
+          ]
         }
       ],
       "output_params": [],
@@ -10709,7 +11237,11 @@
         {
           "name": "SearchBy",
           "type": "SearchOrder",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Rows",
+            "Columns"
+          ]
         },
         {
           "name": "TextToFind",
@@ -11219,7 +11751,11 @@
         {
           "name": "EmptyCellsSearchDirection",
           "type": "EmptyCellsSearchDirection",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Rows",
+            "Columns"
+          ]
         },
         {
           "name": "NamedCell",
@@ -12382,7 +12918,12 @@
         {
           "name": "GetCellContentsMode",
           "type": "GetCellContentsMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "TypedValues",
+            "PlainText",
+            "FormattedTextValues"
+          ]
         },
         {
           "name": "StartColumn",
@@ -14470,7 +15011,15 @@
         {
           "name": "ExchangeFolder",
           "type": "Folder",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Inbox",
+            "DeletedItems",
+            "Drafts",
+            "Outbox",
+            "SentItems",
+            "JunkEmail"
+          ]
         }
       ],
       "output_params": [],
@@ -14680,7 +15229,11 @@
         {
           "name": "IfFileExists",
           "type": "IfExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DoNothing",
+            "Overwrite"
+          ]
         }
       ],
       "output_params": [],
@@ -14714,7 +15267,11 @@
         {
           "name": "IfFileExists",
           "type": "IfExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DoNothing",
+            "Overwrite"
+          ]
         }
       ],
       "output_params": [],
@@ -14804,7 +15361,11 @@
         {
           "name": "IfFileExists",
           "type": "IfExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DoNothing",
+            "Overwrite"
+          ]
         }
       ],
       "output_params": [
@@ -14984,7 +15545,11 @@
         {
           "name": "IfFileExists",
           "type": "IfExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DoNothing",
+            "Overwrite"
+          ]
         }
       ],
       "output_params": [
@@ -15013,7 +15578,13 @@
         {
           "name": "ColumnsSeparator",
           "type": "CSVColumnsSeparator",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SystemDefault",
+            "Comma",
+            "Semicolon",
+            "Tab"
+          ]
         },
         {
           "name": "CSVFile",
@@ -15023,7 +15594,16 @@
         {
           "name": "Encoding",
           "type": "CSVEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SystemDefault",
+            "UTF8",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8NoBOM",
+            "UnicodeNoBOM",
+            "ASCII"
+          ]
         },
         {
           "name": "FirstLineContainsColumnNames",
@@ -15206,7 +15786,14 @@
         {
           "name": "Encoding",
           "type": "TextFileEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "UTF8",
+            "Unicode",
+            "BigEndianUnicode",
+            "ANSI"
+          ]
         },
         {
           "name": "File",
@@ -15404,7 +15991,11 @@
         {
           "name": "IfFileExists",
           "type": "IfExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DoNothing",
+            "Overwrite"
+          ]
         },
         {
           "name": "KeepExtension",
@@ -16044,7 +16635,16 @@
         {
           "name": "Encoding",
           "type": "FileEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "UTF8",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8NoBOM",
+            "UnicodeNoBOM",
+            "ANSI"
+          ]
         },
         {
           "name": "File",
@@ -16054,7 +16654,11 @@
         {
           "name": "IfFileExists",
           "type": "IfFileExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Overwrite",
+            "Append"
+          ]
         },
         {
           "name": "TextToWrite",
@@ -16082,7 +16686,13 @@
         {
           "name": "ColumnsSeparator",
           "type": "CSVColumnsSeparator",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SystemDefault",
+            "Comma",
+            "Semicolon",
+            "Tab"
+          ]
         },
         {
           "name": "CSVFile",
@@ -16092,12 +16702,25 @@
         {
           "name": "CsvFileEncoding",
           "type": "CSVEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SystemDefault",
+            "UTF8",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8NoBOM",
+            "UnicodeNoBOM",
+            "ASCII"
+          ]
         },
         {
           "name": "IfFileExists",
           "type": "IfFileExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Overwrite",
+            "Append"
+          ]
         },
         {
           "name": "IncludeColumnNames",
@@ -16267,7 +16890,11 @@
         {
           "name": "IfFolderExists",
           "type": "IfExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DoNothing",
+            "Overwrite"
+          ]
         }
       ],
       "output_params": [
@@ -16396,17 +17023,71 @@
         {
           "name": "SortBy1",
           "type": "SortBy",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "NoSort",
+            "FullName",
+            "RootPath",
+            "Directory",
+            "Name",
+            "NameWithoutExtension",
+            "Extension",
+            "Size",
+            "CreationTime",
+            "LastAccessed",
+            "LastModified",
+            "IsHidden",
+            "IsSystem",
+            "IsReadOnly",
+            "IsArchive",
+            "Exists"
+          ]
         },
         {
           "name": "SortBy2",
           "type": "SortBy",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "NoSort",
+            "FullName",
+            "RootPath",
+            "Directory",
+            "Name",
+            "NameWithoutExtension",
+            "Extension",
+            "Size",
+            "CreationTime",
+            "LastAccessed",
+            "LastModified",
+            "IsHidden",
+            "IsSystem",
+            "IsReadOnly",
+            "IsArchive",
+            "Exists"
+          ]
         },
         {
           "name": "SortBy3",
           "type": "SortBy",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "NoSort",
+            "FullName",
+            "RootPath",
+            "Directory",
+            "Name",
+            "NameWithoutExtension",
+            "Extension",
+            "Size",
+            "CreationTime",
+            "LastAccessed",
+            "LastModified",
+            "IsHidden",
+            "IsSystem",
+            "IsReadOnly",
+            "IsArchive",
+            "Exists"
+          ]
         },
         {
           "name": "SortDescending1",
@@ -16449,7 +17130,29 @@
         {
           "name": "SpecialFolder",
           "type": "SpecialFolder",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Programs",
+            "Personal",
+            "Favorites",
+            "Startup",
+            "Recent",
+            "SendTo",
+            "StartMenu",
+            "MyMusic",
+            "DesktopDirectory",
+            "Templates",
+            "ApplicationData",
+            "LocalApplicationData",
+            "InternetCache",
+            "Cookies",
+            "History",
+            "CommonApplicationData",
+            "System",
+            "ProgramFiles",
+            "MyPictures",
+            "CommonProgramFiles"
+          ]
         }
       ],
       "output_params": [
@@ -16495,17 +17198,71 @@
         {
           "name": "SortBy1",
           "type": "SortBy",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "NoSort",
+            "FullName",
+            "RootPath",
+            "Directory",
+            "Name",
+            "NameWithoutExtension",
+            "Extension",
+            "Size",
+            "CreationTime",
+            "LastAccessed",
+            "LastModified",
+            "IsHidden",
+            "IsSystem",
+            "IsReadOnly",
+            "IsArchive",
+            "Exists"
+          ]
         },
         {
           "name": "SortBy2",
           "type": "SortBy",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "NoSort",
+            "FullName",
+            "RootPath",
+            "Directory",
+            "Name",
+            "NameWithoutExtension",
+            "Extension",
+            "Size",
+            "CreationTime",
+            "LastAccessed",
+            "LastModified",
+            "IsHidden",
+            "IsSystem",
+            "IsReadOnly",
+            "IsArchive",
+            "Exists"
+          ]
         },
         {
           "name": "SortBy3",
           "type": "SortBy",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "NoSort",
+            "FullName",
+            "RootPath",
+            "Directory",
+            "Name",
+            "NameWithoutExtension",
+            "Extension",
+            "Size",
+            "CreationTime",
+            "LastAccessed",
+            "LastModified",
+            "IsHidden",
+            "IsSystem",
+            "IsReadOnly",
+            "IsArchive",
+            "Exists"
+          ]
         },
         {
           "name": "SortDescending1",
@@ -16814,7 +17571,12 @@
         {
           "name": "IfFileExists",
           "type": "IfFtpFileExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Overwrite",
+            "Skip",
+            "TransferWithUniqueName"
+          ]
         },
         {
           "name": "RemoteFilePaths",
@@ -16824,7 +17586,12 @@
         {
           "name": "TransferType",
           "type": "FtpTransferType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Auto",
+            "Binary",
+            "Ascii"
+          ]
         },
         {
           "name": "Connection",
@@ -17486,7 +18253,12 @@
         {
           "name": "IfFileExists",
           "type": "IfFtpFileExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Overwrite",
+            "Skip",
+            "TransferWithUniqueName"
+          ]
         },
         {
           "name": "RemoteLocation",
@@ -17496,7 +18268,12 @@
         {
           "name": "TransferType",
           "type": "FtpTransferType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Auto",
+            "Binary",
+            "Ascii"
+          ]
         },
         {
           "name": "Connection",
@@ -17565,7 +18342,11 @@
         {
           "name": "DocumentType",
           "type": "DocumentType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "PlainText",
+            "Html"
+          ]
         },
         {
           "name": "FilePath",
@@ -17690,7 +18471,11 @@
         {
           "name": "DocumentType",
           "type": "DocumentType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "PlainText",
+            "Html"
+          ]
         },
         {
           "name": "FilePath",
@@ -17815,7 +18600,11 @@
         {
           "name": "DocumentType",
           "type": "DocumentType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "PlainText",
+            "Html"
+          ]
         },
         {
           "name": "FilePath",
@@ -18631,7 +19420,12 @@
         {
           "name": "ContentType",
           "type": "ContentType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "TextPlain",
+            "TextHtml",
+            "ApplicationJson"
+          ]
         },
         {
           "name": "InstanceId",
@@ -18641,7 +19435,16 @@
         {
           "name": "Location",
           "type": "ToneAnalyzerServiceLocation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "UsSouth",
+            "UsEast",
+            "Europe",
+            "Australia",
+            "Japan",
+            "Uk",
+            "Korea"
+          ]
         },
         {
           "name": "Sentences",
@@ -18729,7 +19532,12 @@
         {
           "name": "Location",
           "type": "ImageClassificationServiceLocation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "UsSouth",
+            "Europe",
+            "Korea"
+          ]
         },
         {
           "name": "Owners",
@@ -18896,7 +19704,14 @@
         {
           "name": "MimeType",
           "type": "MimeType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "TextHtml",
+            "TextXhtmlXml",
+            "ApplicationPdf",
+            "ApplicationMsWord",
+            "ApplicationVndOpenXmlFormatsOfficeDocumentWordProcessingmlDocument"
+          ]
         },
         {
           "name": "Password",
@@ -19126,7 +19941,16 @@
         {
           "name": "Location",
           "type": "LanguageTranslatorServiceLocation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "UsSouth",
+            "UsEast",
+            "Europe",
+            "Australia",
+            "Japan",
+            "Uk",
+            "Korea"
+          ]
         },
         {
           "name": "Text",
@@ -19185,7 +20009,16 @@
         {
           "name": "Location",
           "type": "LanguageTranslatorServiceLocation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "UsSouth",
+            "UsEast",
+            "Europe",
+            "Australia",
+            "Japan",
+            "Uk",
+            "Korea"
+          ]
         },
         {
           "name": "ModelId",
@@ -19443,7 +20276,12 @@
         {
           "name": "LogLevel",
           "type": "LogLevel",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "InfoLevel",
+            "WarningLevel",
+            "ErrorLevel"
+          ]
         }
       ],
       "output_params": [],
@@ -19481,7 +20319,25 @@
         {
           "name": "ServerLocation",
           "type": "MicrosoftServerLocation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "WestUS",
+            "WestUS2",
+            "EastUS",
+            "EastUS2",
+            "WestCentralUS",
+            "SouthCentralUS",
+            "WestEurope",
+            "NorthEurope",
+            "SoutheastAsia",
+            "EastAsia",
+            "AustraliaEast",
+            "BrazilSouth",
+            "CanadaCentral",
+            "CentralIndia",
+            "UKSouth",
+            "JapanEast"
+          ]
         },
         {
           "name": "SubscriptionKey",
@@ -19637,7 +20493,25 @@
         {
           "name": "ServerLocation",
           "type": "MicrosoftServerLocation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "WestUS",
+            "WestUS2",
+            "EastUS",
+            "EastUS2",
+            "WestCentralUS",
+            "SouthCentralUS",
+            "WestEurope",
+            "NorthEurope",
+            "SoutheastAsia",
+            "EastAsia",
+            "AustraliaEast",
+            "BrazilSouth",
+            "CanadaCentral",
+            "CentralIndia",
+            "UKSouth",
+            "JapanEast"
+          ]
         },
         {
           "name": "SubscriptionKey",
@@ -19781,7 +20655,25 @@
         {
           "name": "ServerLocation",
           "type": "MicrosoftServerLocation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "WestUS",
+            "WestUS2",
+            "EastUS",
+            "EastUS2",
+            "WestCentralUS",
+            "SouthCentralUS",
+            "WestEurope",
+            "NorthEurope",
+            "SoutheastAsia",
+            "EastAsia",
+            "AustraliaEast",
+            "BrazilSouth",
+            "CanadaCentral",
+            "CentralIndia",
+            "UKSouth",
+            "JapanEast"
+          ]
         },
         {
           "name": "SubscriptionKey",
@@ -19974,7 +20866,25 @@
         {
           "name": "ServerLocation",
           "type": "MicrosoftServerLocation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "WestUS",
+            "WestUS2",
+            "EastUS",
+            "EastUS2",
+            "WestCentralUS",
+            "SouthCentralUS",
+            "WestEurope",
+            "NorthEurope",
+            "SoutheastAsia",
+            "EastAsia",
+            "AustraliaEast",
+            "BrazilSouth",
+            "CanadaCentral",
+            "CentralIndia",
+            "UKSouth",
+            "JapanEast"
+          ]
         },
         {
           "name": "SubscriptionKey",
@@ -20138,7 +21048,11 @@
         {
           "name": "RelativeTo",
           "type": "MousePositionRelativeTo",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Screen",
+            "ForegroundWindow"
+          ]
         }
       ],
       "output_params": [
@@ -20168,12 +21082,23 @@
         {
           "name": "MovementStyle",
           "type": "MovementStyle",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Instant",
+            "AnimateSlow",
+            "AnimateNormal",
+            "AnimateFast"
+          ]
         },
         {
           "name": "RelativeTo",
           "type": "PositionRelativeTo",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Screen",
+            "ActiveWindow",
+            "CurrentMousePosition"
+          ]
         },
         {
           "name": "X",
@@ -20222,12 +21147,22 @@
         {
           "name": "SearchForTextOn",
           "type": "SearchTarget",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "EntireScreen",
+            "ForegroundWindow"
+          ]
         },
         {
           "name": "MovementStyle",
           "type": "MovementStyle",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Instant",
+            "AnimateSlow",
+            "AnimateNormal",
+            "AnimateFast"
+          ]
         },
         {
           "name": "Timeout",
@@ -20237,7 +21172,18 @@
         {
           "name": "PositionRelativeToText",
           "type": "PositionOnImage",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "TopLeft",
+            "TopCenter",
+            "TopRight",
+            "MiddleLeft",
+            "MiddleCenter",
+            "MiddleRight",
+            "BottomLeft",
+            "BottomCenter",
+            "BottomRight"
+          ]
         },
         {
           "name": "OffsetX",
@@ -20262,7 +21208,34 @@
         {
           "name": "WindowsOcrLanguage",
           "type": "WindowsOcrLanguage",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "ChineseSimplified",
+            "ChineseTraditional",
+            "Czech",
+            "Danish",
+            "Dutch",
+            "English",
+            "Finnish",
+            "French",
+            "German",
+            "Greek",
+            "Hungarian",
+            "Italian",
+            "Japanese",
+            "Korean",
+            "Norwegian",
+            "Polish",
+            "Portuguese",
+            "Romanian",
+            "Russian",
+            "SerbianCyrillic",
+            "SerbianLatin",
+            "Slovak",
+            "Spanish",
+            "Swedish",
+            "Turkish"
+          ]
         }
       ],
       "output_params": [
@@ -20589,7 +21562,17 @@
         {
           "name": "ClickType",
           "type": "MouseClickType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "LeftClick",
+            "RightClick",
+            "DoubleClick",
+            "LeftButtonDown",
+            "LeftButtonUp",
+            "RightButtonDown",
+            "RightButtonUp",
+            "MiddleClick"
+          ]
         },
         {
           "name": "MillisecondsDelay",
@@ -20724,12 +21707,21 @@
         {
           "name": "Key",
           "type": "MultiStateKey",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "CapsLock",
+            "NumLock",
+            "ScrollLock"
+          ]
         },
         {
           "name": "State",
           "type": "KeyState",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "ModeOff",
+            "ModeOn"
+          ]
         }
       ],
       "output_params": [],
@@ -23436,7 +24428,34 @@
         {
           "name": "WindowsOcrLanguage",
           "type": "WindowsOcrLanguage",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "ChineseSimplified",
+            "ChineseTraditional",
+            "Czech",
+            "Danish",
+            "Dutch",
+            "English",
+            "Finnish",
+            "French",
+            "German",
+            "Greek",
+            "Hungarian",
+            "Italian",
+            "Japanese",
+            "Korean",
+            "Norwegian",
+            "Polish",
+            "Portuguese",
+            "Romanian",
+            "Russian",
+            "SerbianCyrillic",
+            "SerbianLatin",
+            "Slovak",
+            "Spanish",
+            "Swedish",
+            "Turkish"
+          ]
         }
       ],
       "output_params": [
@@ -27524,7 +28543,12 @@
         {
           "name": "EmailsToRetrieve",
           "type": "RetrieveMessagesMode",
-          "required": true
+          "required": true,
+          "enumValues": [
+            "All",
+            "Unread",
+            "Read"
+          ]
         }
       ],
       "output_params": [
@@ -27679,7 +28703,15 @@
         {
           "name": "SaveFormat",
           "type": "MessageType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "TextOnly",
+            "OutlookTemplate",
+            "OutlookMessageFormat",
+            "OutlookMessageFormatUnicode",
+            "Html",
+            "MhtFiles"
+          ]
         }
       ],
       "output_params": [
@@ -28108,7 +29140,12 @@
         {
           "name": "IfFileExists",
           "type": "IfFileExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Overwrite",
+            "DoNotModifyFiles",
+            "AddSequentialSuffix"
+          ]
         },
         {
           "name": "PageSelection",
@@ -28482,7 +29519,12 @@
         {
           "name": "IfFileExists",
           "type": "IfFileExists",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Overwrite",
+            "DoNotModifyFiles",
+            "AddSequentialSuffix"
+          ]
         },
         {
           "name": "MergedPDFPath",
@@ -30115,7 +31157,11 @@
         {
           "name": "PopulateTextFieldMode",
           "type": "PopulateTextFieldMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Replace",
+            "Append"
+          ]
         }
       ],
       "output_params": [],
@@ -31583,7 +32629,11 @@
         {
           "name": "Language",
           "type": "DotNetActionLanguageType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "CSharp",
+            "VisualBasic"
+          ]
         }
       ],
       "output_params": [],
@@ -32316,7 +33366,11 @@
         {
           "name": "Type",
           "type": "EnvironmentVariableType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "User",
+            "System"
+          ]
         }
       ],
       "output_params": [],
@@ -32790,7 +33844,11 @@
         {
           "name": "Type",
           "type": "EnvironmentVariableType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "User",
+            "System"
+          ]
         },
         {
           "name": "Value",
@@ -33607,7 +34665,314 @@
         {
           "name": "ControlKey",
           "type": "ControlKey",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Transmit",
+            "AltCursor",
+            "Attention",
+            "BackSpace",
+            "BackTab",
+            "BlockToggle",
+            "Break",
+            "Cancel",
+            "Center",
+            "Clear",
+            "ClearComm",
+            "ClearDisplay",
+            "ClearLine",
+            "ClearPage",
+            "ClearPartition",
+            "Comma",
+            "CommandLine",
+            "CommandWindow",
+            "Compose",
+            "CtrlF1",
+            "CtrlF2",
+            "CtrlF3",
+            "CtrlF4",
+            "CtrlF5",
+            "CtrlF6",
+            "CtrlF7",
+            "CtrlF8",
+            "CtrlF9",
+            "CtrlF10",
+            "CtrlF11",
+            "CtrlF12",
+            "CtrlShiftF1",
+            "CtrlShiftF2",
+            "CtrlShiftF3",
+            "CtrlShiftF4",
+            "CtrlShiftF5",
+            "CtrlShiftF6",
+            "CtrlShiftF7",
+            "CtrlShiftF8",
+            "CtrlShiftF9",
+            "CtrlShiftF10",
+            "CtrlShiftF11",
+            "CtrlShiftF12",
+            "CursorBlink",
+            "CursorSelect",
+            "Decimal",
+            "Delete",
+            "DeleteChar",
+            "DeleteLine",
+            "DeleteWord",
+            "DestructiveBackSpace",
+            "Disconnect",
+            "DoKey",
+            "Down",
+            "DownDouble",
+            "Dup",
+            "Duplicate",
+            "EditScript",
+            "KeyEnd",
+            "EndOfField",
+            "Erase_Eof",
+            "EraseEOL",
+            "EraseEOP",
+            "EraseInput",
+            "Escape",
+            "ExtGr",
+            "F1",
+            "F2",
+            "F3",
+            "F4",
+            "F5",
+            "F6",
+            "F7",
+            "F8",
+            "F9",
+            "F10",
+            "F11",
+            "F12",
+            "F13",
+            "F14",
+            "F15",
+            "F16",
+            "F17",
+            "F18",
+            "F19",
+            "F20",
+            "F21",
+            "F22",
+            "F23",
+            "F24",
+            "F25",
+            "F26",
+            "F27",
+            "F28",
+            "F29",
+            "F30",
+            "F31",
+            "F32",
+            "F33",
+            "F34",
+            "F35",
+            "F36",
+            "F37",
+            "F38",
+            "F39",
+            "F40",
+            "F41",
+            "F42",
+            "F43",
+            "F44",
+            "F45",
+            "F46",
+            "F47",
+            "F48",
+            "FieldDelimiter",
+            "FieldExit",
+            "FieldMark",
+            "FieldMinus",
+            "FieldPlus",
+            "Find",
+            "HardReset",
+            "Help",
+            "Hex",
+            "Hex00",
+            "Hex01",
+            "Hex02",
+            "Hex03",
+            "Hex04",
+            "Hex05",
+            "Hex06",
+            "Hex07",
+            "Hex08",
+            "Hex09",
+            "Hex0A",
+            "Hex0B",
+            "Hex0C",
+            "Hex0D",
+            "Hex0E",
+            "Hex0F",
+            "Hex10",
+            "Hex11",
+            "Hex12",
+            "Hex13",
+            "Hex14",
+            "Hex15",
+            "Hex16",
+            "Hex17",
+            "Hex18",
+            "Hex19",
+            "Hex1A",
+            "Hex1B",
+            "Hex1C",
+            "Hex1D",
+            "Hex1E",
+            "Hex1F",
+            "Hex7F",
+            "Hold",
+            "HoldClear",
+            "HoldSet",
+            "Home",
+            "HomeDown",
+            "HomeUp",
+            "Insert",
+            "InsertChar",
+            "InsertHere",
+            "InsertLine",
+            "InsertMode",
+            "InvalidKey",
+            "KeyPad0",
+            "KeyPad1",
+            "KeyPad2",
+            "KeyPad3",
+            "KeyPad4",
+            "KeyPad5",
+            "KeyPad6",
+            "KeyPad7",
+            "KeyPad8",
+            "KeyPad9",
+            "Left",
+            "LeftDouble",
+            "LineFeed",
+            "Minus",
+            "MonitorToggle",
+            "NewLine",
+            "NextPage",
+            "NextScreen",
+            "NextWord",
+            "Nul",
+            "NumLock",
+            "PA1",
+            "PA2",
+            "PA3",
+            "Page",
+            "PageDown",
+            "PageUp",
+            "PanLeft",
+            "PanRight",
+            "PartitionJump",
+            "PF1",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PlusCr",
+            "PreviousWord",
+            "PrevPage",
+            "PrevScreen",
+            "Print",
+            "PrintLine",
+            "PrintMsg",
+            "PrintScreen",
+            "Remove",
+            "Replace",
+            "Reset",
+            "Return",
+            "ReverseField",
+            "Right",
+            "RightDouble",
+            "RollDown",
+            "RollUp",
+            "RuleLine",
+            "RunScript",
+            "ScrollDown",
+            "ScrollLeft",
+            "ScrollRight",
+            "ScrollUp",
+            "Select",
+            "Send",
+            "SendAnswerBack",
+            "SendDelete",
+            "SendLine",
+            "SendMsg",
+            "ShiftBackspace",
+            "ShiftDelete",
+            "ShiftDown",
+            "ShiftF1",
+            "ShiftF2",
+            "ShiftF3",
+            "ShiftF4",
+            "ShiftF5",
+            "ShiftF6",
+            "ShiftF7",
+            "ShiftF8",
+            "ShiftF9",
+            "ShiftF10",
+            "ShiftF11",
+            "ShiftF12",
+            "ShiftF13",
+            "ShiftF14",
+            "ShiftF15",
+            "ShiftF16",
+            "ShiftF17",
+            "ShiftF18",
+            "ShiftF19",
+            "ShiftF20",
+            "ShiftHome",
+            "ShiftInsert",
+            "ShiftLeft",
+            "ShiftPrintScreen",
+            "ShiftRight",
+            "ShiftUp",
+            "SoftReset",
+            "SystemRequest",
+            "Tab",
+            "TekZoom",
+            "TermNextPage",
+            "TermPrevPage",
+            "Test",
+            "TextAssistBeginBold",
+            "TextAssistBeginOfLine",
+            "TextAssistBeginUnderline",
+            "TextAssistBottomOfPage",
+            "TextAssistCarrierReturn",
+            "TextAssistCenter",
+            "TextAssistEndBold",
+            "TextAssistEndOfLine",
+            "TextAssistHalfIndexDown",
+            "TextAssistHalfIndexUp",
+            "TextAssistInsertSymbols",
+            "TextAssistNextStop",
+            "TextAssistNextTextColumn",
+            "TextAssistPageEnd",
+            "TextAssistRequiredSpace",
+            "TextAssistRequiredTab",
+            "TextAssistStop",
+            "TextAssistTextTabAdvance",
+            "TextAssistTopOfPage",
+            "TextAssistWordUnderline",
+            "TraceToggle",
+            "Udk10",
+            "Udk6",
+            "Udk7",
+            "Udk8",
+            "Udk9",
+            "Udk11",
+            "Udk12",
+            "Udk13",
+            "Udk14",
+            "Udk15",
+            "Udk16",
+            "Udk17",
+            "Udk18",
+            "Udk19",
+            "Udk20",
+            "Up",
+            "UpDouble"
+          ]
         },
         {
           "name": "Session",
@@ -34108,7 +35473,13 @@
         {
           "name": "NewCase",
           "type": "CaseOption",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "UpperCase",
+            "LowerCase",
+            "TitleCase",
+            "SentenceCase"
+          ]
         },
         {
           "name": "Text",
@@ -34183,7 +35554,18 @@
         {
           "name": "StandardFormat",
           "type": "WellKnownDateTimeFormat",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "ShortDate",
+            "LongDate",
+            "ShortTime",
+            "LongTime",
+            "FullDateTimeShortTime",
+            "FullDateTimeLongTime",
+            "GeneralDateTimeShortTime",
+            "GeneralDateTimeLongTime",
+            "SortableDateTime"
+          ]
         }
       ],
       "output_params": [
@@ -34836,7 +36218,11 @@
         {
           "name": "PadPosition",
           "type": "PadPosition",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Left",
+            "Right"
+          ]
         },
         {
           "name": "Text",
@@ -35152,12 +36538,46 @@
         {
           "name": "Language",
           "type": "RecognizerLanguage",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "English",
+            "Chinese",
+            "Spanish",
+            "SpanishMexican",
+            "Portuguese",
+            "French",
+            "German",
+            "Italian",
+            "Japanese",
+            "Dutch",
+            "Korean",
+            "Swedish",
+            "Turkish",
+            "Hindi"
+          ]
         },
         {
           "name": "Mode",
           "type": "RecognizerMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DateTime",
+            "Dimension",
+            "Temperature",
+            "Currency",
+            "NumberRange",
+            "Number",
+            "Ordinal",
+            "Percentage",
+            "PhoneNumber",
+            "Email",
+            "IpAddress",
+            "Mention",
+            "Hashtag",
+            "Url",
+            "Guid",
+            "QuotedText"
+          ]
         },
         {
           "name": "Text",
@@ -35195,7 +36615,11 @@
         {
           "name": "ComparisonType",
           "type": "TextComparisonType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "CultureSensitive",
+            "Ordinal"
+          ]
         },
         {
           "name": "IgnoreCase",
@@ -35341,7 +36765,12 @@
         {
           "name": "StandardDelimiter",
           "type": "StandardDelimiter",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Space",
+            "Tab",
+            "NewLine"
+          ]
         },
         {
           "name": "Text",
@@ -35499,7 +36928,12 @@
         {
           "name": "TrimOption",
           "type": "TrimOption",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "FromStart",
+            "ToEnd",
+            "Both"
+          ]
         }
       ],
       "output_params": [
@@ -35677,7 +37111,11 @@
         {
           "name": "Operation",
           "type": "TreeNodeOperation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Expand",
+            "Collapse"
+          ]
         },
         {
           "name": "UseRegex",
@@ -35916,7 +37354,11 @@
         {
           "name": "Mode",
           "type": "CheckRemoteDesktopAvailabilityMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "IsAvailable",
+            "IsNotAvailable"
+          ]
         },
         {
           "name": "Control",
@@ -36736,7 +38178,12 @@
         {
           "name": "ClickType",
           "type": "DesktopClickType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "LeftClick",
+            "RightClick",
+            "DoubleClick"
+          ]
         },
         {
           "name": "LaunchNewApplication",
@@ -36769,7 +38216,11 @@
         {
           "name": "Mode",
           "type": "CheckRemoteDesktopAvailabilityMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "IsAvailable",
+            "IsNotAvailable"
+          ]
         },
         {
           "name": "Control",
@@ -37397,7 +38848,13 @@
         {
           "name": "ColumnsSeparator",
           "type": "CSVColumnsSeparator",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SystemDefault",
+            "Comma",
+            "Semicolon",
+            "Tab"
+          ]
         }
       ],
       "output_params": [
@@ -38497,7 +39954,13 @@
         {
           "name": "ColumnsSeparator",
           "type": "CSVColumnsSeparator",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "SystemDefault",
+            "Comma",
+            "Semicolon",
+            "Tab"
+          ]
         }
       ],
       "output_params": [
@@ -38658,7 +40121,12 @@
         {
           "name": "JoinOperation",
           "type": "JoinOperationType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Inner",
+            "Left",
+            "Full"
+          ]
         },
         {
           "name": "JoinParameters",
@@ -38703,7 +40171,12 @@
         {
           "name": "MergeMode",
           "type": "MergeMode",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "AddExtraColumns",
+            "IgnoreExtraColumns",
+            "ErrorOnExtraColumns"
+          ]
         }
       ],
       "output_params": [],
@@ -39027,7 +40500,11 @@
         {
           "name": "Order",
           "type": "SortDirection",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Ascending",
+            "Descending"
+          ]
         }
       ],
       "output_params": [],
@@ -56304,7 +57781,15 @@
         {
           "name": "DetailsType",
           "type": "DetailsType",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Description",
+            "MetaKeywords",
+            "Title",
+            "Text",
+            "Source",
+            "URLAddress"
+          ]
         }
       ],
       "output_params": [
@@ -57566,7 +59051,12 @@
         {
           "name": "WindowState",
           "type": "BrowserWindowState",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Normal",
+            "Maximized",
+            "Minimized"
+          ]
         },
         {
           "name": "TargetDesktop",
@@ -57576,7 +59066,12 @@
         {
           "name": "PiPUserDataFolderMode",
           "type": "PiPUserDataFolderModeEnum",
-          "required": true
+          "required": true,
+          "enumValues": [
+            "AutomaticProfile",
+            "DefaultProfile",
+            "CustomProfile"
+          ]
         }
       ],
       "output_params": [
@@ -59481,7 +60976,12 @@
         {
           "name": "WindowState",
           "type": "BrowserWindowState",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Normal",
+            "Maximized",
+            "Minimized"
+          ]
         },
         {
           "name": "TargetDesktop",
@@ -59491,7 +60991,12 @@
         {
           "name": "PiPUserDataFolderMode",
           "type": "PiPUserDataFolderModeEnum",
-          "required": true
+          "required": true,
+          "enumValues": [
+            "AutomaticProfile",
+            "DefaultProfile",
+            "CustomProfile"
+          ]
         }
       ],
       "output_params": [
@@ -61396,7 +62901,12 @@
         {
           "name": "WindowState",
           "type": "BrowserWindowState",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Normal",
+            "Maximized",
+            "Minimized"
+          ]
         },
         {
           "name": "TargetDesktop",
@@ -61406,7 +62916,12 @@
         {
           "name": "PiPUserDataFolderMode",
           "type": "PiPUserDataFolderModeEnum",
-          "required": true
+          "required": true,
+          "enumValues": [
+            "AutomaticProfile",
+            "DefaultProfile",
+            "CustomProfile"
+          ]
         }
       ],
       "output_params": [
@@ -65887,7 +67402,15 @@
         {
           "name": "Status",
           "type": "WorkQueueItemStatus",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Unchanged",
+            "Processed",
+            "GenericException",
+            "ITException",
+            "BusinessException",
+            "ProcessingTimeout"
+          ]
         },
         {
           "name": "InputValue",
@@ -65922,7 +67445,13 @@
         {
           "name": "ScreenSaverAction",
           "type": "ScreenSaverAction",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Enable",
+            "Disabled",
+            "Start",
+            "Stop"
+          ]
         }
       ],
       "output_params": [],
@@ -66187,7 +67716,11 @@
         {
           "name": "DesktopOperation",
           "type": "DesktopOperation",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "Show",
+            "Hide"
+          ]
         }
       ],
       "output_params": [],
@@ -66975,7 +68508,14 @@
         {
           "name": "Encoding",
           "type": "FileEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ASCII",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "File",
@@ -67192,7 +68732,14 @@
         {
           "name": "Encoding",
           "type": "FileEncoding",
-          "required": false
+          "required": false,
+          "enumValues": [
+            "DefaultEncoding",
+            "ASCII",
+            "Unicode",
+            "BigEndianUnicode",
+            "UTF8"
+          ]
         },
         {
           "name": "File",
