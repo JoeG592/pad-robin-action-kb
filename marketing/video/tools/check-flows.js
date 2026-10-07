@@ -26,8 +26,8 @@ function scan(text) {
   const atLineStart = () => !cur || !cur.bare.trim();
   while (i < text.length) {
     const c = text[i];
-    if (c === "\r") { i++; continue; }
-    if (c === "\n") { finish(); line++; i++; continue; }
+    if (c === "\r" && text[i + 1] === "\n") { i++; continue; }
+    if (c === "\n" || c === "\r") { finish(); line++; i++; continue; }          // PAD also accepts CR-only line breaks
     if (atLineStart()) {
       const rest = text.slice(i).replace(/^[ \t]+/, "");
       const skip = text.length - i - rest.length;
@@ -86,16 +86,22 @@ function scan(text) {
   return { stmts, errors };
 }
 
+// Action id, arguments (with their value text) and outputs of one action statement (strings already "").
 function parseAction(s) {
   let t = s.replace(/^IF \((.*)\) THEN$/i, "$1").replace(/^WAIT \((.*)\)$/i, "$1").replace(/^LOOP WHILE \((.*)\)$/i, "$1");
   const id = t.split(" ")[0];
-  t = t.slice(id.length).replace(/\[[^\]]*\]/g, "[]").replace(/\{[^}]*\}/g, "{}");
-  const args = [...t.matchAll(/(?:^|\s)(\w+)\s?:\s?(?=\S)/g)].map(m => m[1]);
+  t = t.slice(id.length);
   const outs = [...t.matchAll(/(?:^|\s)(\w+)\s?=>\s?(\w+)/g)].map(m => ({ name: m[1], var: m[2] }));
-  return { id, args, outs };
+  const noOut = t.replace(/(?:^|\s)\w+\s?=>\s?\w+/g, " ");
+  const marks = [...noOut.matchAll(/(?:^|\s)(\w+)\s?:\s?(?=\S)/g)];
+  const argList = marks.map((m, i) => ({ name: m[1], value: noOut.slice(m.index + m[0].length, i + 1 < marks.length ? marks[i + 1].index : noOut.length).trim() }));
+  return { id, args: argList.map(a => a.name), argList, outs };
 }
 
-function checkRobin(text, kb) {
+// Words in an expression that are not variables.
+const NOT_VARS = /^(AND|OR|NOT|mod|True|False|appmask|imgrepo|_)$/i;
+
+function checkRobin(text, kb, opts = {}) {
   const byId = new Map(kb.actions.map(a => [a.actionId.toLowerCase(), a]));
   const modules = new Set(kb.actions.map(a => a.actionId.split(".")[0].toLowerCase()));
   const isActionCall = s => { const m = s.match(/^([A-Za-z]\w*)\.\w+/); return !!m && modules.has(m[1].toLowerCase()); };
@@ -117,11 +123,44 @@ function checkRobin(text, kb) {
     else if (KW.test(name)) E(st, `${where} ${name} is a PAD keyword and drops the whole paste; pick another name`);
   };
 
+  // Variables set anywhere in the script (PAD variables are flow-wide and case-insensitive), plus any the
+  // caller knows exist already (flow inputs). A use of anything else is "Variable 'X' doesn't exist".
+  const ID = "[\\p{L}_][\\p{L}\\p{N}_]*";                                          // PAD accepts Unicode names (SET Café TO 1)
+  const defined = new Set((opts.knownVars || []).map(v => v.toLowerCase()));
+  for (const st of stmts) {
+    if (st.comment) continue;
+    const s = st.bare.replace(/^DISABLE\s+/i, "");
+    let m;
+    if ((m = s.match(new RegExp(`^SET\\s+(${ID})\\s+TO\\b`, "iu"))) || (m = s.match(new RegExp(`^LOOP\\s+FOREACH\\s+(${ID})\\s+IN\\b`, "iu"))) || (m = s.match(new RegExp(`^LOOP\\s+(${ID})\\s+FROM\\b`, "iu"))))
+      defined.add(m[1].toLowerCase());
+    for (const o of s.matchAll(new RegExp(`=>\\s?(${ID})`, "gu"))) defined.add(o[1].toLowerCase());
+    // In-place Variables actions (AddItemToList List:, IncreaseVariable Value:, ...) create the variable they
+    // modify: PAD 2.72 accepts them with an undefined variable.
+    const rec = byId.get(s.split(" ")[0].toLowerCase());
+    if (rec && /^Variables\./i.test(rec.actionId) && !(rec.output_params || []).length)
+      for (const a of parseAction(s).argList) {
+        const p = (rec.input_params || []).find(x => x.name.toLowerCase() === a.name.toLowerCase());
+        if (p && (/^(List`1|DataTable)/.test(p.type) || /^(Increase|Decrease)Variable$/.test(rec.actionId.split(".")[1]) && p.name === "Value") && new RegExp(`^${ID}$`, "u").test(a.value))
+          defined.add(a.value.toLowerCase());
+      }
+  }
+  const reported = new Set();
+  const usesIn = (st, src) => {
+    let t = src.replace(/'[^']*'/g, "''");                                         // expression string literals
+    t = t.replace(/\b[A-Za-z]\w*\.[A-Za-z]\w*\.\w+/g, x => (modules.has(x.split(".")[0].toLowerCase()) ? " " : x)); // enums
+    for (const m of t.matchAll(/(^|[^.\p{L}\p{N}_])([\p{L}_][\p{L}\p{N}_]*)(?![\p{L}\p{N}_])(?!\s*\()/gu)) {
+      const name = m[2];
+      if (NOT_VARS.test(name) || defined.has(name.toLowerCase()) || reported.has(name.toLowerCase())) continue;
+      reported.add(name.toLowerCase());
+      E(st, `variable ${name} is used but never set in this script (PAD: "Variable '${name}' doesn't exist")`);
+    }
+  };
+
   stmts.forEach((st, k) => {
     if (st.comment) return;
     let s = st.bare.replace(/^DISABLE\s+/i, "");
     const U = s.toUpperCase();
-    for (const x of st.exprs) reservedIn(st, x.expr, " inside a string");
+    for (const x of st.exprs) { reservedIn(st, x.expr, " inside a string"); usesIn(st, x.expr); }
     if (/\S\s+SET\s+\w+\s+TO\s/i.test(s)) E(st, "two statements on one line drop the whole paste; put each on its own line");
     if (s.includes("%")) E(st,"%...% outside a string drops the whole paste; write the expression without percent signs (SET X TO N + 1, IF N = 5, Text: Msg)");
 
@@ -155,25 +194,30 @@ function checkRobin(text, kb) {
     if (/^BLOCK\b/i.test(s)) { stack.push("block"); pendingHandler = true; return; }
     pendingHandler = false;
     if (/^ELSE IF\s*\(/i.test(s) && isActionCall(s.replace(/^ELSE IF\s*\(/i, ""))) { E(st, "ELSE IF (Action ...) THEN drops the whole paste; use ELSE with a nested IF (Action ...) THEN ... END"); return; }
-    if (/^(ELSE|ELSE IF .* THEN|DEFAULT|NEXT LOOP|EXIT LOOP|EXIT\b.*|THROW ERROR\b.*|LABEL \w+|GOTO \w+|CALL \w+.*|WAIT (?!\().*)$/i.test(s)) { reservedIn(st, s, ""); return; }
+    if (/^(ELSE|ELSE IF .* THEN|DEFAULT|NEXT LOOP|EXIT LOOP|EXIT\b.*|THROW ERROR\b.*|LABEL \w+|GOTO \w+|CALL \w+.*|WAIT (?!\().*)$/i.test(s)) {
+      reservedIn(st, s, "");
+      const c = s.match(/^ELSE IF (.*) THEN$/i) || s.match(/^WAIT (.*)$/i);
+      if (c) usesIn(st, c[1]);
+      return;
+    }
     if (/^CASE\b/i.test(s)) {
       if (!/^CASE\s*(=|<>|>=|<=|>|<)/i.test(s)) E(st, "CASE takes a comparison (CASE = x, <>, >, <, >=, <=); other forms drop the whole paste");
-      reservedIn(st, s, ""); return;
+      reservedIn(st, s, ""); usesIn(st, s.replace(/^CASE\s*(=|<>|>=|<=|>|<)?/i, "")); return;
     }
-    if (/^SWITCH\b/i.test(s)) { stack.push("other"); reservedIn(st, s, ""); return; }
+    if (/^SWITCH\b/i.test(s)) { stack.push("other"); reservedIn(st, s, ""); usesIn(st, s.replace(/^SWITCH/i, "")); return; }
     let m;
     if ((m = s.match(/^ERROR\s*=>\s*(\w+)/i))) { varName(st, m[1], "variable"); return; }
-    if ((m = s.match(/^SET\s+(\S+)\s+TO\b/i))) { varName(st, m[1], "variable"); reservedIn(st, s.replace(/^SET\s+\S+\s+TO/i, ""), ""); return; }
-    if ((m = s.match(/^LOOP\s+FOREACH\s+(\w+)\s+IN\b/i))) { stack.push("other"); varName(st, m[1], "loop variable"); reservedIn(st, s, ""); return; }
-    if ((m = s.match(/^LOOP\s+(\w+)\s+FROM\b/i))) { stack.push("other"); varName(st, m[1], "loop variable"); reservedIn(st, s, ""); return; }
+    if ((m = s.match(/^SET\s+(\S+)\s+TO\b/i))) { varName(st, m[1], "variable"); const v = s.replace(/^SET\s+\S+\s+TO/i, ""); reservedIn(st, v, ""); usesIn(st, v); return; }
+    if ((m = s.match(/^LOOP\s+FOREACH\s+(\w+)\s+IN\b/i))) { stack.push("other"); varName(st, m[1], "loop variable"); reservedIn(st, s, ""); usesIn(st, s.replace(/^LOOP\s+FOREACH\s+\w+\s+IN/i, "")); return; }
+    if ((m = s.match(/^LOOP\s+(\w+)\s+FROM\b/i))) { stack.push("other"); varName(st, m[1], "loop variable"); reservedIn(st, s, ""); usesIn(st, s.replace(/^LOOP\s+\w+\s+FROM/i, "").replace(/\b(TO|STEP)\b/gi, " ")); return; }
 
     const wrapped = s.match(/^(IF|WAIT|LOOP WHILE)\s*\((.*)\)(\s+THEN)?$/i);
     const isAction = wrapped ? isActionCall(wrapped[2]) : !/^(IF|LOOP)\b/i.test(s);
     if (/^(IF|LOOP)\b/i.test(s)) stack.push("other");
-    if (!isAction) { reservedIn(st, s, ""); return; }
+    if (!isAction) { reservedIn(st, s, ""); usesIn(st, s.replace(/^(IF|LOOP WHILE)\b/i, "").replace(/\bTHEN$/i, "")); return; }
 
     actionLines++;
-    const { id, args, outs } = parseAction(s);
+    const { id, args, argList, outs } = parseAction(s);
     const rec = byId.get(id.toLowerCase());
     if (!rec) { E(st, `unknown action ${id}`); return; }
     const ins = new Set((rec.input_params || []).map(p => p.name.toLowerCase()));
@@ -184,6 +228,23 @@ function checkRobin(text, kb) {
       seen.add(a.toLowerCase());
       if (!ins.has(a.toLowerCase())) E(st, `${id} has no argument ${a}`);
     }
+    // Enum arguments: the value must be one the KB lists for that input (KB 3.1.5 carries enumValues).
+    for (const a of argList) {
+      const p = (rec.input_params || []).find(x => x.name.toLowerCase() === a.name.toLowerCase());
+      const ev = p && p.enumValues;
+      let e;
+      if (ev && (e = a.value.match(/^([A-Za-z]\w*)\.([A-Za-z]\w*)\.(\w+)$/))) {
+        if (!ev.some(v => v.toLowerCase() === e[3].toLowerCase()))
+          E(st, `${id} ${a.name}: ${e[3]} is not a value of ${e[1]}.${e[2]} (${ev.slice(0, 8).join(", ")}${ev.length > 8 ? ", ..." : ""})`);
+        continue;
+      }
+      if (ev && /^[A-Za-z_]\w*$/.test(a.value) && !defined.has(a.value.toLowerCase()) && ev.some(v => v.toLowerCase() === a.value.toLowerCase())) {
+        reported.add(a.value.toLowerCase());
+        E(st, `${id} ${a.name}: an enum value needs its module and type, e.g. Module.${p.type}.${a.value}; copy the form from the golden example`);
+        continue;
+      }
+      usesIn(st, a.value);
+    }
     for (const o of outs) {
       if (!os.has(o.name.toLowerCase())) E(st, `${id} has no output ${o.name}`);
       varName(st, o.var, "output variable");
@@ -193,7 +254,7 @@ function checkRobin(text, kb) {
   return { errors, actionLines };
 }
 
-module.exports = { checkRobin, parseAction, scan };
+module.exports = { checkRobin, parseAction, scan, KEYWORDS };
 
 if (require.main === module) {
   const args = process.argv.slice(2);

@@ -1,0 +1,16 @@
+name: test
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Rules evidence, checker and rendered copies
+        run: node --test rules/*.test.js marketing/video/tools/check-flows.test.js
+      - name: Rendered copies are current
+        run: node rules/render-rules.js --check

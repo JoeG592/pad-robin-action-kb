@@ -1,0 +1,253 @@
+{
+  "name": "PAD Robin syntax rules",
+  "pad_build": "2.72.00183.26250",
+  "date": "2026-10-07",
+  "description": "Single source for the Robin syntax rules. tools render them into README.md, PROMPT.md and other copies such as a skill or an app prompt (rules/render-rules.js), and test the checker against them (rules/rules.test.js). A silent or error rule must cite probes from probe-corpus.json that show both the failure and the fix.",
+  "fields": {
+    "kind": "silent = PAD drops the whole paste with no error; error = the row lands with an error; value = pastes but PAD reads a different value; works = confirmed to paste; lenient = PAD accepts variations; rule = basic syntax; usage = how to use the KB (prompt only)",
+    "doc": "markdown for README / skill (one numbered item); omitted = not shown there",
+    "prompt": "plain-text lines for PROMPT.md and app prompts; omitted = not shown there",
+    "bad": "Robin the checker must flag",
+    "good": "Robin the checker must pass",
+    "evidence": "probe ids in probe-corpus.json with the outcome they must have, and optionally a substring of a row description (value check)",
+    "evidence_note": "evidence outside the corpus (earlier probes)"
+  },
+  "sections": [
+    { "id": "values", "title": "Values", "prompt": "VALUE SYNTAX:" },
+    { "id": "strings", "title": "Inside strings", "prompt": "VALUE SYNTAX:" },
+    { "id": "names", "title": "Names", "prompt": "NAMES:" },
+    { "id": "statements", "title": "Statements", "prompt": "CONTROL FLOW (built into Robin, not in the reference), one statement per line:" }
+  ],
+  "rules": [
+    {
+      "id": "basic-values", "section": "values", "kind": "rule",
+      "doc": "Strings are `$'''value'''`. Booleans are bare `True` / `False`. Numbers are bare. An empty string is `$''''''`. The backticks in templates mean \"fill this in\"; pasted as-is they give \"Can't be empty\".",
+      "prompt": ["- Strings: $'''value''' (an empty string is $''''''); booleans True / False and numbers bare"],
+      "good": ["SET A TO $''''''\nSET B TO True\nSET C TO -1.5"],
+      "evidence": [{ "probe": "A00-control", "outcome": "clean" }, { "probe": "V35-negative", "outcome": "clean" }]
+    },
+    {
+      "id": "bare-expressions", "section": "values", "kind": "works",
+      "doc": "A variable from an earlier action is referenced by its bare name (`Instance: ExcelInstance`). Expressions are bare too: `SET Total TO Price * Qty`, `IF Files.Count = 0 THEN`, `WAIT Attempt * 10`, `Items[Items.Count - 1]`, `Items[-1]`, `Row['Amount']`, `Obj.a.b`.",
+      "prompt": ["- Variables and expressions are bare: Instance: ExcelInstance, SET Total TO Price * Qty, IF Files.Count = 0 THEN, Row['Amount'], Items[Items.Count - 1]"],
+      "good": ["SET Price TO 2\nSET Qty TO 3\nSET Total TO Price * Qty\nSET Items TO [1, 2]\nSET Last TO Items[Items.Count - 1]\nIF Items.Count = 0 THEN\nEND\nWAIT Qty * 2"],
+      "evidence": [
+        { "probe": "V01-expr-bare", "outcome": "clean" }, { "probe": "EX4-parens-bare", "outcome": "clean" },
+        { "probe": "EX9-wait-expr", "outcome": "clean" }, { "probe": "EX12-index-expr", "outcome": "clean" },
+        { "probe": "R9-01-files-count-eq0", "outcome": "clean" }, { "probe": "V62-prop-2level", "outcome": "clean" }
+      ]
+    },
+    {
+      "id": "pct-outside-string", "section": "values", "kind": "silent",
+      "doc": "**`%...%` belongs only inside strings**: `$'''Saved %Count% files'''`, `$'''Total %Price * Qty%'''`. Anywhere else it rejects the whole paste, for example `SET X TO %N + 1%`, `IF %N% = 5`, `Text: %Msg%` or `WAIT %N%`.",
+      "prompt": ["- %...% ONLY inside a string ($'''Total %Price * Qty%'''). Outside a string (SET X TO %N + 1%, IF %N% = 5, Text: %Msg%) PAD rejects the whole script."],
+      "bad": ["SET N TO 5\nSET M TO %N + 1%", "SET N TO 5\nIF %N% = 5 THEN\nEND", "SET Msg TO $'''x'''\nClipboard.SetText Text: %Msg%"],
+      "good": ["SET N TO 5\nSET M TO N + 1\nClipboard.SetText Text: $'''Total %N + 1%'''"],
+      "evidence": [
+        { "probe": "V02-expr-pct", "outcome": "rejected" }, { "probe": "C21-pct-var", "outcome": "rejected" },
+        { "probe": "R01-pct-unquoted", "outcome": "rejected" }, { "probe": "B03-wait-pct", "outcome": "rejected" },
+        { "probe": "V01-expr-bare", "outcome": "clean" }, { "probe": "V49-str-expr", "outcome": "clean" }
+      ]
+    },
+    {
+      "id": "enums", "section": "values", "kind": "error",
+      "doc": "Enums are fully qualified, `Module.EnumType.Value`, using the module that owns the type (`Text.StandardDelimiter.NewLine`). The value must be one the KB lists in the input's `enumValues`: `File.IfExists`, for example, has only `DoNothing` and `Overwrite`. An enum without its module is an error.",
+      "prompt": ["- Enums: fully qualified, exactly as the reference shows (Text.StandardDelimiter.NewLine), and only values listed in the input's enumValues"],
+      "bad": ["SET S TO $'''abc'''\nText.ChangeCase Text: S NewCase: UpperCase Result=> Upper", "SET Files TO [$'''C:\\temp\\a.txt''']\nFile.Move Files: Files Destination: $'''C:\\temp\\b''' IfFileExists: File.IfExists.AddSequentialSuffix MovedFiles=> Moved"],
+      "good": ["SET S TO $'''abc'''\nText.ChangeCase Text: S NewCase: Text.CaseOption.UpperCase Result=> Upper"],
+      "evidence": [{ "probe": "R10-enum-short", "outcome": "errors" }, { "probe": "R09-enum-lowercase", "outcome": "clean" }]
+    },
+    {
+      "id": "outputs", "section": "values", "kind": "rule",
+      "doc": "Outputs are `Name=> Variable`.",
+      "prompt": ["- Outputs: Name=> Variable; use the defaultVariable from the reference unless the flow needs another name"],
+      "good": ["Clipboard.GetText Text=> ClipboardText"],
+      "evidence": [{ "probe": "R15-arrow-nospace", "outcome": "clean" }]
+    },
+    {
+      "id": "escape-apostrophe", "section": "strings", "kind": "silent",
+      "doc": "The backslash is an escape character inside strings: `\\'` is an apostrophe and `\\\\` is one backslash. **Escape every apostrophe**: `$'''Joe\\'s report'''`, `$'''WHERE Name = \\'Joe\\''''`. A bare `'` rejects the whole paste, so watch SQL, XPath and JavaScript. Apostrophes inside a `%...%` expression are fine (`$'''%Row['Name']%'''`).",
+      "prompt": ["- Inside a string the backslash escapes the next character. Write every apostrophe as \\': $'''Joe\\'s report''', $'''WHERE Name = \\'Joe\\''''"],
+      "bad": ["Clipboard.SetText Text: $'''Joe's report'''", "Clipboard.SetText Text: $'''SELECT * FROM T WHERE Name = 'Joe''''"],
+      "good": ["Clipboard.SetText Text: $'''Joe\\'s report'''", "SET Row TO {'Name': 'Joe'}\nClipboard.SetText Text: $'''%Row['Name']%'''"],
+      "evidence": [
+        { "probe": "S05-apostrophe", "outcome": "rejected" }, { "probe": "S24-sql-quotes", "outcome": "rejected" },
+        { "probe": "Q1-esc-apos", "outcome": "clean", "detail": "'Joe's report'" }, { "probe": "Q2-esc-sql", "outcome": "clean" },
+        { "probe": "Q7-apos-in-expr", "outcome": "clean" }
+      ]
+    },
+    {
+      "id": "double-backslash", "section": "strings", "kind": "silent",
+      "doc": "**Double a backslash that comes right before a variable or before the closing quotes**: `$'''C:\\Reports\\\\%Month%'''`, `$'''%Root%\\\\%Name%'''`, `$'''C:\\Temp\\\\'''`. A single backslash there rejects the whole paste. Before an ordinary letter one backslash is kept as is (`$'''%Folder%\\Report.xlsx'''`). Don't write `\\%`: PAD drops the percent sign.",
+      "prompt": ["- A backslash right before a variable or before the closing quotes must be doubled: $'''C:\\Reports\\\\%Month%''', $'''C:\\Temp\\\\'''. Before an ordinary letter one backslash is fine: $'''%Folder%\\Report.xlsx'''"],
+      "bad": ["SET M TO $'''Jan'''\nClipboard.SetText Text: $'''C:\\Reports\\%M%'''", "Clipboard.SetText Text: $'''C:\\Temp\\'''", "SET A TO 1\nSET B TO 2\nClipboard.SetText Text: $'''%A%\\%B%'''"],
+      "good": ["SET M TO $'''Jan'''\nClipboard.SetText Text: $'''C:\\Reports\\\\%M%'''", "Clipboard.SetText Text: $'''C:\\Temp\\\\'''", "SET F TO $'''C:\\x'''\nClipboard.SetText Text: $'''%F%\\Report.xlsx'''"],
+      "evidence": [
+        { "probe": "S12-bs-end", "outcome": "rejected" }, { "probe": "S31-bs-var-var", "outcome": "rejected" },
+        { "probe": "D-S30-bs-var-double", "outcome": "clean", "detail": "'C:\\Reports\\'" },
+        { "probe": "Q9-esc-bs-end", "outcome": "clean", "detail": "'C:\\Temp\\'" },
+        { "probe": "ES3-bs-pct-literal", "outcome": "clean", "detail": "'a''b c'" }
+      ]
+    },
+    {
+      "id": "unc-paths", "section": "strings", "kind": "value",
+      "doc": "**A UNC path needs four backslashes**, `$'''\\\\\\\\server\\share'''`. With two it pastes, but PAD reads `\\server\\share`.",
+      "prompt": ["- A UNC path starts with four backslashes: $'''\\\\\\\\server\\share'''"],
+      "good": ["Clipboard.SetText Text: $'''\\\\\\\\server\\share\\f.txt'''"],
+      "evidence": [
+        { "probe": "ES1-unc-quad", "outcome": "clean", "detail": "'\\\\server\\share\\f.txt'" },
+        { "probe": "ES2-unc-double", "outcome": "clean", "detail": "'\\server\\share\\f.txt'" }
+      ]
+    },
+    {
+      "id": "literal-percent", "section": "strings", "kind": "silent",
+      "doc": "**A literal percent sign is `%%`**: `$'''100%% done'''`. A single `%` rejects the whole paste.",
+      "prompt": ["- A literal percent sign is %%: $'''100%% done'''. A single % rejects the whole script."],
+      "bad": ["Clipboard.SetText Text: $'''100% done'''"],
+      "good": ["Clipboard.SetText Text: $'''100%% done'''", "SET N TO 5\nClipboard.SetText Text: $'''%N%%% done'''"],
+      "evidence": [
+        { "probe": "S01-pct-literal", "outcome": "rejected" }, { "probe": "S22-pct-alone", "outcome": "rejected" },
+        { "probe": "D-S02-pct-double", "outcome": "clean", "detail": "'100''%'' done'" }, { "probe": "ES10-var-then-pctpct", "outcome": "clean" }
+      ]
+    },
+    {
+      "id": "multiline-strings", "section": "strings", "kind": "works",
+      "doc": "Strings may span several lines, including blank lines and lines that start with `END`, `#` or `IF`.",
+      "prompt": ["- Strings may span several lines"],
+      "good": ["SET Body TO $'''Line one\n\nEND\n# not a comment\nLine five'''\nClipboard.SetText Text: Body"],
+      "evidence": [{ "probe": "S09-multiline-end", "outcome": "clean" }, { "probe": "S10-multiline-hash", "outcome": "clean" }, { "probe": "ES12-multiline-blank", "outcome": "clean" }]
+    },
+    {
+      "id": "keywords-as-names", "section": "names", "kind": "silent",
+      "keywords": ["From", "To", "Step", "End", "In", "Then", "If", "Else", "Loop", "Foreach", "While", "Set", "Wait", "Next", "Exit", "Label", "Goto", "Call", "Case", "Default", "Switch", "Block", "Error", "On", "Not", "And", "Or", "Mod", "True", "False", "Global", "Disable", "Function", "Throw"],
+      "doc": "**PAD keywords can't be variable or property names**: {keywords}. Mail properties are the usual trap: write `Mail['From']` and `Mail['To']`, not `Mail.From`. `Subject`, `Count`, `Name`, `Text`, `Value` and `Body` are fine.",
+      "prompt": ["- Never use a PAD keyword as a variable name or a property name ({keywords}); it rejects the whole script. Use bracket access: Mail['From'], Mail['To']."],
+      "bad": ["SET O TO {'From': 'a'}\nSET X TO O.From", "SET Error TO 1", "SET O TO {'To': 'a'}\nClipboard.SetText Text: $'''%O.To%'''"],
+      "good": ["SET O TO {'From': 'a', 'Subject': 'b'}\nSET X TO O['From']\nSET Y TO O.Subject"],
+      "evidence": [
+        { "probe": "KW-prop-From", "outcome": "rejected" }, { "probe": "KW-prop-To", "outcome": "rejected" },
+        { "probe": "KV-Error", "outcome": "rejected" }, { "probe": "KP-Loop", "outcome": "rejected" },
+        { "probe": "KW-bracket-From", "outcome": "clean" }, { "probe": "KW-prop-Subject", "outcome": "clean" }, { "probe": "KP-Count", "outcome": "clean" }
+      ]
+    },
+    {
+      "id": "digit-names", "section": "names", "kind": "silent",
+      "doc": "Variable names start with a letter: `SET 1abc TO 1` rejects the whole paste. Unicode letters are fine (`SET Café TO 1`).",
+      "prompt": ["- Variable names start with a letter"],
+      "bad": ["SET 1abc TO 1"],
+      "good": ["SET my_var TO 1\nSET Café TO 2"],
+      "evidence": [{ "probe": "V40-var-digit", "outcome": "rejected" }, { "probe": "V41-var-underscore", "outcome": "clean" }, { "probe": "U2-unicode-var", "outcome": "clean" }]
+    },
+    {
+      "id": "undefined-variables", "section": "names", "kind": "error",
+      "doc": "A variable must be set somewhere in the flow, by `SET`, an action output, a loop, or an in-place list action such as `Variables.AddItemToList List:`. Otherwise the line shows \"Variable 'X' doesn't exist\".",
+      "prompt": ["- Every variable must come from a SET, an action output or a loop"],
+      "bad": ["Clipboard.SetText Text: NotDefinedAnywhere"],
+      "good": ["SET A TO 1\nClipboard.SetText Text: A", "Variables.AddItemToList Item: $'''x''' List: Errors\nClipboard.SetText Text: Errors"],
+      "evidence": [{ "probe": "R26-undefined-var", "outcome": "errors" }, { "probe": "A00-control", "outcome": "clean" }]
+    },
+    {
+      "id": "case-insensitive", "section": "names", "kind": "lenient",
+      "doc": "Variable names, keywords, action ids, enum values and argument names are all case-insensitive on paste.",
+      "good": ["SET MyVar TO 1\nif myvar = 1 then\n    clipboard.settext text: MYVAR\nend"],
+      "evidence": [{ "probe": "V39-var-case", "outcome": "clean" }, { "probe": "C26-lowercase", "outcome": "clean" }, { "probe": "R11-id-lowercase", "outcome": "clean" }]
+    },
+    {
+      "id": "one-per-line", "section": "statements", "kind": "silent",
+      "doc": "One statement per line; two on one line rejects the whole paste. Indentation is cosmetic, and a trailing `# note` becomes its own comment row.",
+      "bad": ["SET A TO 1 SET B TO 2"],
+      "good": ["SET A TO 1\nSET B TO 2 # note"],
+      "evidence": [{ "probe": "R16-two-per-line", "outcome": "rejected" }, { "probe": "E23-inline-comment", "outcome": "clean" }]
+    },
+    {
+      "id": "control-flow", "section": "statements", "kind": "works",
+      "doc": "Built-in statements:\n- `SET x TO value`\n- `IF condition THEN` / `ELSE IF condition THEN` / `ELSE` / `END`\n- `SWITCH x` / `CASE = 1` / `CASE > 5` / `DEFAULT` / `END`\n- `LOOP FOREACH item IN list` / `END`\n- `LOOP i FROM 0 TO n - 1 STEP 1` / `END`\n- `LOOP WHILE (A) < (B)` / `END`\n- `EXIT LOOP`, `NEXT LOOP`, `LABEL Name` / `GOTO Name`, `WAIT 5`, `EXIT Code: 0`",
+      "prompt": [
+        "- SET Variable TO value",
+        "- IF condition THEN ... ELSE IF condition THEN ... ELSE ... END",
+        "- SWITCH x ... CASE = 1 ... CASE > 5 ... DEFAULT ... END",
+        "- LOOP FOREACH item IN collection ... END",
+        "- LOOP index FROM 0 TO n - 1 STEP 1 ... END",
+        "- LOOP WHILE (Counter) < (Limit) ... END",
+        "- EXIT LOOP, NEXT LOOP, LABEL Name, GOTO Name, WAIT 5, EXIT Code: 0"
+      ],
+      "good": ["SET N TO 0\nLOOP WHILE (N) < (3)\n    Variables.IncreaseVariable Value: N IncrementValue: 1\nEND\nSWITCH N\n    CASE = 3\n        SET R TO 1\n    DEFAULT\n        SET R TO 2\nEND\nLOOP i FROM 0 TO N - 1 STEP 1\n    IF i = 1 THEN\n        NEXT LOOP\n    ELSE IF i = 2 THEN\n        EXIT LOOP\n    END\nEND"],
+      "evidence": [
+        { "probe": "C10-elseif", "outcome": "clean" }, { "probe": "W01-switch-num", "outcome": "clean" },
+        { "probe": "L01-while-parens", "outcome": "clean" }, { "probe": "L09-exit-loop", "outcome": "clean" },
+        { "probe": "E08-label-goto", "outcome": "clean" }, { "probe": "E09-exit-code", "outcome": "clean" }
+      ]
+    },
+    {
+      "id": "conditions", "section": "statements", "kind": "works",
+      "doc": "Conditions use `=`, `<>`, `>`, `<`, `>=`, `<=`, `AND`, `OR` and `NOT(...)`, plus `IsEmpty(x)`, `IsNotEmpty(x)`, `Contains(x, $'''y''', False)`, `NotContains`, `StartsWith` and `EndsWith`.",
+      "prompt": ["- Conditions: = <> > < >= <=, AND, OR, NOT(...), IsEmpty(x), IsNotEmpty(x), Contains(x, $'''y''', False), NotContains, StartsWith, EndsWith"],
+      "good": ["SET S TO $'''abc'''\nSET N TO 5\nIF (N > 3 AND IsNotEmpty(S)) OR Contains(S, $'''b''', False) THEN\nEND\nIF NOT(N = 5) THEN\nEND"],
+      "evidence": [
+        { "probe": "C08-grouped", "outcome": "clean" }, { "probe": "C09-not", "outcome": "clean" },
+        { "probe": "C11-isempty", "outcome": "clean" }, { "probe": "C13-contains-dollar", "outcome": "clean" }, { "probe": "C16-startswith", "outcome": "clean" }
+      ]
+    },
+    {
+      "id": "case-comparison", "section": "statements", "kind": "silent",
+      "doc": "`CASE` takes a comparison only (`CASE = 1`, `CASE <> 3`, `CASE > 5`). `CASE Contains ...` rejects the whole paste.",
+      "prompt": ["- CASE takes a comparison only: CASE = x, CASE <> x, CASE > x"],
+      "bad": ["SET S TO $'''abc'''\nSWITCH S\n    CASE Contains $'''b'''\nEND"],
+      "good": ["SET N TO 5\nSWITCH N\n    CASE > 3\n        SET A TO 1\nEND"],
+      "evidence": [{ "probe": "W07-case-contains", "outcome": "rejected" }, { "probe": "W04-case-gt", "outcome": "clean" }]
+    },
+    {
+      "id": "else-if-action", "section": "statements", "kind": "silent",
+      "doc": "A condition action (kind `Condition`) is written `IF (Action ...) THEN`. `ELSE IF (Action ...) THEN` rejects the whole paste, so use `ELSE` with a nested `IF (Action ...) THEN ... END`.",
+      "prompt": ["- Never write ELSE IF (Action ...) THEN; write ELSE, then IF (Action ...) THEN ... END inside it."],
+      "bad": ["SET A TO 1\nIF A = 2 THEN\nELSE IF (Folder.IfFolderExists.Exists Path: $'''C:\\temp''') THEN\nEND"],
+      "good": ["SET A TO 1\nIF A = 2 THEN\nELSE\n    IF (Folder.IfFolderExists.Exists Path: $'''C:\\temp''') THEN\n    END\nEND"],
+      "evidence": [{ "probe": "C32-elseif-action", "outcome": "rejected" }, { "probe": "EI1-elseif-action-alone", "outcome": "rejected" }, { "probe": "EI2-if-action-in-else", "outcome": "clean" }]
+    },
+    {
+      "id": "error-handlers", "section": "statements", "kind": "error",
+      "doc": "Error handling for a group of actions, and for a single action:\n\n```\nBLOCK ReadFiles\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    ...actions...\nEND\n\nText.ToNumber Text: Raw Number=> Amount\nON ERROR REPEAT 2 TIMES WAIT 5\n    SET Amount TO 0\nEND\n```\n\nA handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other action gives \"The statement isn't allowed inside exception handling\", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `REPEAT` works only on an action's `ON ERROR`. `ERROR => LastError` reads the last error.",
+      "prompt": [
+        "- Error handling: BLOCK Name / ON BLOCK ERROR / SET Failed TO True / END / ...actions... / END. For one action: ON ERROR ... END (or ON ERROR REPEAT 2 TIMES WAIT 5 ... END) on the lines after it.",
+        "- An error handler may contain ONLY SET, CALL, GOTO and THROW ERROR, never IF or other actions. Set a flag there and act on it after the block. ERROR => LastError reads the last error."
+      ],
+      "bad": ["BLOCK Work\nON BLOCK ERROR\n    Logging.LogMessage Message: $'''x''' LogLevel: Logging.LogLevel.ErrorLevel\nEND\n    WAIT 1\nEND", "SET A TO 1\nBLOCK Work\nON BLOCK ERROR\n    IF A = 1 THEN\n    END\nEND\nEND"],
+      "good": ["SET Failed TO False\nBLOCK Work\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    WAIT 1\nEND\nIF Failed = True THEN\n    Logging.LogMessage Message: $'''x''' LogLevel: Logging.LogLevel.ErrorLevel\nEND"],
+      "evidence": [
+        { "probe": "OB2-log", "outcome": "errors" }, { "probe": "OB1-additem", "outcome": "errors" }, { "probe": "OB9-block-ifinside", "outcome": "rejected" },
+        { "probe": "OB4-set", "outcome": "clean" }, { "probe": "ES7-onerror-goto-inside", "outcome": "clean" }, { "probe": "ES8-onerror-throw-set", "outcome": "clean" },
+        { "probe": "D-E05-onerror-repeat", "outcome": "clean" }, { "probe": "E02-block-repeat", "outcome": "errors" }
+      ]
+    },
+    {
+      "id": "comments-regions", "section": "statements", "kind": "silent",
+      "doc": "Comments are `# text` or `/# ... #/`. Regions are `**REGION Name` / `**ENDREGION`; `REGION` / `END REGION` rejects the whole paste. A `DISABLE ` prefix disables a line.",
+      "prompt": ["- Comments: # text"],
+      "bad": ["REGION Setup\nSET A TO 1\nEND REGION"],
+      "good": ["**REGION Setup\n/# block\ncomment #/\nSET A TO 1\nDISABLE SET B TO 2\n**ENDREGION"],
+      "evidence": [{ "probe": "E20-region-word", "outcome": "rejected" }, { "probe": "E19-region-star", "outcome": "clean" }, { "probe": "E15-block-comment", "outcome": "clean" }, { "probe": "E17-disable-set", "outcome": "clean" }]
+    },
+    {
+      "id": "headers-subflows", "section": "statements", "kind": "silent",
+      "doc": "Don't paste the file header lines (`@@ConnectionString`, `IMPORT`, `@SENSITIVE`) or subflow definitions (`FUNCTION ... END FUNCTION`): both reject the whole paste. Create subflows in the Designer and paste each body into its own subflow. `@@copilotGeneratedAction: 'False'` works only directly before an action; other `@@` lines reject the paste.",
+      "prompt": ["- Never write FUNCTION definitions, and no @@ lines in the script body."],
+      "bad": ["FUNCTION Sub1 GLOBAL\n    SET X TO 1\nEND FUNCTION", "@@copilotGeneratedAction: 'False'\n# comment\nSET A TO 1", "@@statistics_TextBox: 1\nSET A TO 1"],
+      "good": ["@@copilotGeneratedAction: 'False'\nSET A TO 1"],
+      "evidence": [
+        { "probe": "F01-function", "outcome": "rejected" }, { "probe": "E22-meta-other", "outcome": "rejected" },
+        { "probe": "V-full", "outcome": "rejected" }, { "probe": "V-no-meta", "outcome": "clean" }, { "probe": "E21-meta-copilot", "outcome": "clean" }
+      ]
+    },
+    {
+      "id": "removed-ids", "section": "statements", "kind": "error",
+      "doc": "Ids removed in PAD 2.72 are rejected as \"Unknown action\": the bare `Database.Connect` (use `Database.Connect.Connect` or `.ConnectOracle`) and the bare `Scripting.RunPythonScript` (use `.RunPythonScript`, `.RunPythonScript34` or `.RunPythonScriptCPython`).",
+      "bad": ["Database.Connect ConnectionString: $'''x''' Connection=> SQLConnection"],
+      "good": ["Database.Connect.Connect ConnectionString: $'''x''' Connection=> SQLConnection"],
+      "evidence_note": "Probed on PAD 2.72 on 2026-09-24 (5 single-test batches; see CHANGELOG 3.1.2). Not in this corpus."
+    },
+    {
+      "id": "record-kinds", "section": "statements", "kind": "usage",
+      "prompt": ["- Records with kind Condition are written IF (...) THEN and need END. kind Wait is WAIT (...). kind While is LOOP WHILE (...) with END."]
+    }
+  ]
+}

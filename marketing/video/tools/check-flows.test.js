@@ -10,13 +10,17 @@ const kb = { actions: [
   { actionId: "Clipboard.SetText", input_params: [{ name: "Text" }], output_params: [] },
   { actionId: "Text.ToNumber", input_params: [{ name: "Text" }], output_params: [{ name: "Number" }] },
   { actionId: "Logging.LogMessage", input_params: [{ name: "Message" }], output_params: [] },
+  { actionId: "File.Move", input_params: [{ name: "Files" }, { name: "Destination" }, { name: "IfFileExists", type: "IfExists", enumValues: ["DoNothing", "Overwrite"] }], output_params: [{ name: "MovedFiles" }] },
+  { actionId: "Variables.AddItemToList", input_params: [{ name: "Item" }, { name: "List", type: "List`1" }], output_params: [] },
 ] };
-const errs = src => checkRobin(src, kb).errors;
+// Variables the snippets below assume already exist (flow inputs, for the purpose of these tests).
+const KNOWN = ["N", "S", "L", "A", "Files", "Mail", "ReportDate", "Folder", "Root", "Name", "Raw", "Owner"];
+const errs = src => checkRobin(src, kb, { knownVars: KNOWN }).errors;
 const ok = src => assert.deepStrictEqual(errs(src), []);
 const flags = (src, re) => { const e = errs(src); assert.ok(e.some(x => re.test(x)), "expected " + re + " in " + JSON.stringify(e)); };
 
 test("valid action line passes", () => {
-  const r = checkRobin("Folder.GetFiles Folder: $'''C:\\x: y''' FileFilter: $'''*''' Files=> Files", kb);
+  const r = checkRobin("Folder.GetFiles Folder: $'''C:\\x: y''' FileFilter: $'''*''' Files=> Files", kb, { knownVars: KNOWN });
   assert.deepStrictEqual(r.errors, []);
   assert.strictEqual(r.actionLines, 1);
 });
@@ -31,7 +35,7 @@ test("unknown action id, argument and output are errors; names are case-insensit
 });
 
 test("WAIT <seconds> is a built-in delay, WAIT (...) is still checked as an action", () => {
-  const r = checkRobin("WAIT 5\nWAIT N * 2\nWAIT (Folder.NoSuchWait Path: $'''C:\\x''')", kb);
+  const r = checkRobin("WAIT 5\nWAIT N * 2\nWAIT (Folder.NoSuchWait Path: $'''C:\\x''')", kb, { knownVars: KNOWN });
   assert.deepStrictEqual(r.errors, ["line 3: unknown action Folder.NoSuchWait"]);
   assert.strictEqual(r.actionLines, 1);
 });
@@ -123,7 +127,24 @@ test("control flow is skipped, conditions are checked", () => {
     "ELSE",
     "END",
   ].join("\n");
-  const r = checkRobin(src, kb);
+  const r = checkRobin(src, kb, { knownVars: KNOWN });
   assert.deepStrictEqual(r.errors, []);
   assert.strictEqual(r.actionLines, 1);
+});
+
+test("undefined variables are errors; SET, outputs, loop variables and in-place list arguments define them", () => {
+  assert.deepStrictEqual(checkRobin("Clipboard.SetText Text: Missing", kb).errors,
+    ["line 1: variable Missing is used but never set in this script (PAD: \"Variable 'Missing' doesn't exist\")"]);
+  assert.deepStrictEqual(checkRobin("SET A TO 1\nIF a + 1 = 2 THEN\nEND\nLOOP i FROM 0 TO A STEP 1\n    Clipboard.SetText Text: $'''%i%'''\nEND", kb).errors, []);
+  assert.deepStrictEqual(checkRobin("Variables.AddItemToList Item: $'''x''' List: Errors\nClipboard.SetText Text: Errors", kb).errors, []);
+  assert.deepStrictEqual(checkRobin("SET Café TO 1\rClipboard.SetText Text: Café", kb).errors, []);
+  assert.deepStrictEqual(checkRobin("Clipboard.SetText Text: Flow", kb, { knownVars: ["Flow"] }).errors, []);
+});
+
+test("enum argument values are checked against the KB enumValues", () => {
+  const ok = "File.Move Files: Files IfFileExists: File.IfExists.Overwrite MovedFiles=> Moved";
+  assert.deepStrictEqual(checkRobin(ok, kb, { knownVars: KNOWN }).errors, []);
+  assert.deepStrictEqual(checkRobin(ok.replace("Overwrite", "AddSequentialSuffix"), kb, { knownVars: KNOWN }).errors,
+    ["line 1: File.Move IfFileExists: AddSequentialSuffix is not a value of File.IfExists (DoNothing, Overwrite)"]);
+  assert.match(checkRobin(ok.replace("File.IfExists.Overwrite", "Overwrite"), kb, { knownVars: KNOWN }).errors[0], /needs its module and type/);
 });
