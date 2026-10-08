@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.2.0 (2026-10-08)
+
+Updated for PAD 2.73 (2.73.00155.26278). 989 records across 46 modules. The KB file is now `PAD_Robin_ActionKB_v3_2.json`; the Type Reference is unchanged (`PAD_Robin_TypeReference_v3_1.json`).
+
+- **New in PAD 2.73:** the `ComputerUse` module with `ComputerUse.InvokeComputerUse` (prompt, endpoint, provider `AzureAI` or `OpenAI`, model, interaction mode `AutomationFramework` or `PureVision`). Paste-validated on 2.73.
+- **Changed in PAD 2.73:** `LLM.InvokeLLM` gained an optional `ToolBindings` argument (MCP tool bindings). It must be a literal configuration: `ToolBindings: $'''[]'''` pastes clean, while free text or an empty value lands with "MCP tool bindings must be a literal configuration, not a variable or expression" / "Parameter 'Tools': Can't be empty". The golden example now includes `ToolBindings: $'''[]'''`. The 2.72 example without `ToolBindings` still pastes clean.
+- **Nothing removed.** Every published 2.72 id still exists in 2.73.
+- **Full regression on PAD 2.73:** all 987 golden examples carried over from 3.1.5 re-pasted exactly as published (83 batches, 1,110 canvas rows), zero errors. The `validation` field on each record says so.
+- **Syntax regression on PAD 2.73:** all 443 probes in `rules/probe-corpus.json` re-pasted and gave the same outcomes as on 2.72 (one probe came back empty on the first pass and pasted clean when re-run; no rule changed). The corpus itself still records the 2.72 outcomes.
+- DLL consistency check against the 2.73 modules: zero errors; the same 14 warnings as on 2.72.
+
 ## 3.1.5 (2026-10-07)
 
 - **Enum values on every enum input.** The 139 enum inputs that had none, all inherited from v2.1, now list their allowed values in `enumValues`. All 536 enum inputs on published records carry them, so a script can be checked for values such as `File.IfExists.AddSequentialSuffix`, which doesn't exist (`File.IfExists` has only `DoNothing` and `Overwrite`). The release check now fails if a published enum input lacks the values the PAD DLLs define.
