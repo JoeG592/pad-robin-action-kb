@@ -7,7 +7,7 @@ const path = require("path");
 const rules = require("./robin-rules.json");
 const { verify, targets, scoreChecker } = require("./render-rules.js");
 const { checkRobin, KEYWORDS } = require("../marketing/video/tools/check-flows.js");
-const kb = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "PAD_Robin_ActionKB_v3_2.json"), "utf8"));
+const kb = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "PAD_Robin_ActionKB_v3_3.json"), "utf8"));
 
 test("every rule's evidence holds in the probe corpus", () => {
   assert.deepStrictEqual(verify(), []);

@@ -64,7 +64,7 @@ function renderDoc(score) {
     "`marketing/video/tools/check-flows.js` checks a script against these rules and the KB before you paste it:",
     "",
     "```",
-    "node marketing/video/tools/check-flows.js PAD_Robin_ActionKB_v3_2.json flow.robin",
+    "node marketing/video/tools/check-flows.js PAD_Robin_ActionKB_v3_3.json flow.robin",
     "```",
     "",
     `On the probe corpus it flags ${score.rejectedCaught} of ${score.rejected} silent rejects and ${score.errorsCaught} of ${score.errors} pastes that landed with errors, and passes ${score.cleanPassed} of ${score.clean} clean pastes. The ${score.clean - score.cleanPassed} it flags use \`\\%\`, which PAD accepts while silently dropping the percent sign.`);
@@ -87,7 +87,7 @@ function renderPrompt() {
 // Score the checker on the corpus (needs the public KB in the repo root).
 function scoreChecker() {
   const { checkRobin } = require("../marketing/video/tools/check-flows.js");
-  const kb = JSON.parse(fs.readFileSync(path.join(ROOT, "PAD_Robin_ActionKB_v3_2.json"), "utf8"));
+  const kb = JSON.parse(fs.readFileSync(path.join(ROOT, "PAD_Robin_ActionKB_v3_3.json"), "utf8"));
   const s = { rejected: 0, rejectedCaught: 0, errors: 0, errorsCaught: 0, clean: 0, cleanPassed: 0, missed: [], falsePositives: [] };
   for (const p of corpus.probes) {
     const flagged = checkRobin(p.robin, kb).errors.length > 0;

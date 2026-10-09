@@ -141,6 +141,14 @@ test("undefined variables are errors; SET, outputs, loop variables and in-place 
   assert.deepStrictEqual(checkRobin("Clipboard.SetText Text: Flow", kb, { knownVars: ["Flow"] }).errors, []);
 });
 
+test("recorded UI element references: the words inside appmask['Window \\'X\\''] are not variables", () => {
+  assert.deepStrictEqual(checkRobin("Clipboard.SetText Text: appmask['Window \\'KB Test Window\\'']['Button \\'OK\\'']", kb).errors, []);
+  assert.deepStrictEqual(checkRobin("Clipboard.SetText Text: imgrepo['Images']['Login button']", kb).errors, []);
+  // an escaped quote must not end the literal early, but a real variable after it is still checked
+  assert.deepStrictEqual(checkRobin("Clipboard.SetText Text: appmask['Window \\'A B\\''] + Missing", kb).errors,
+    ["line 1: variable Missing is used but never set in this script (PAD: \"Variable 'Missing' doesn't exist\")"]);
+});
+
 test("enum argument values are checked against the KB enumValues", () => {
   const ok = "File.Move Files: Files IfFileExists: File.IfExists.Overwrite MovedFiles=> Moved";
   assert.deepStrictEqual(checkRobin(ok, kb, { knownVars: KNOWN }).errors, []);

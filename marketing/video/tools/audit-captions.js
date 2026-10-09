@@ -1,5 +1,5 @@
 // marketing/video/tools/audit-captions.js
-// CLI: node tools/audit-captions.js   (reads ../scenes.js, ../captures/*.json, ../../../PAD_Robin_ActionKB_v3_2.json)
+// CLI: node tools/audit-captions.js   (reads ../scenes.js, ../captures/*.json, ../../../PAD_Robin_ActionKB_v3_3.json)
 const fs = require("fs");
 const path = require("path");
 
@@ -20,7 +20,7 @@ module.exports = { audit };
 if (require.main === module) {
   const here = path.join(__dirname, "..");
   const S = require(path.join(here, "scenes.js"));
-  const kb = JSON.parse(fs.readFileSync(path.join(here, "..", "..", "PAD_Robin_ActionKB_v3_2.json"), "utf8"));
+  const kb = JSON.parse(fs.readFileSync(path.join(here, "..", "..", "PAD_Robin_ActionKB_v3_3.json"), "utf8"));
   const tr = JSON.parse(fs.readFileSync(path.join(here, "..", "..", "PAD_Robin_TypeReference_v3_1.json"), "utf8"));
   // step labels 1-4, "CC BY 4.0", the PAD build, and the KB counts
   const allowed = new Set([String(kb.counts.total), String(kb.counts.modules), String(tr.types.length), "0", "2.72", "4.0", "1", "2", "3", "4"]);

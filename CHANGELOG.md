@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.3.0 (2026-10-09)
+
+1,086 records across 46 modules (989 in 3.2.0), validated on PAD 2.73 (2.73.00155.26278). The KB file is now `PAD_Robin_ActionKB_v3_3.json`; the Type Reference is unchanged.
+
+- **97 UI-element records added** (50 desktop: `UIAutomation`, `MouseAndKeyboard`; 47 web: `WebAutomation`): every record whose input is a recorded UI element (`UIControl` / `WebControl`) and not an image. Their examples refer to placeholder elements, `appmask['Window \'KB Test Window\'']['Button \'OK\'']` and `appmask['Web Page \'KB Test Page\'']['Button \'Submit\'']`, and their `validation` field says so. Swap in the names of elements you record in the Designer.
+- **How they were validated:** the test flow's UI element repository was filled with the placeholder elements, then the examples were pasted into the Designer as usual (21 batches, zero errors). Pasting checks the reference: a control paste with an element the flow doesn't have was rejected with "UI element '...' wasn't found", so a clean paste means the action, its arguments and the element reference are all valid.
+- **Checker fix:** `check-flows.js` read the words inside `appmask['Window \'X\'']` as undefined variables, because it ended the quoted name at the escaped `\'`. Any script with a recorded element got false "variable ... is used but never set" errors. It now handles `\'` in quoted names; new test included.
+- Not included: 139 variants (was 236). 103 need a recorded image or an element the placeholders don't cover (mostly image-based mouse and OCR actions), 25 need a live mail or work-queue context, 11 are deprecated.
+
 ## 3.2.0 (2026-10-08)
 
 Updated for PAD 2.73 (2.73.00155.26278). 989 records across 46 modules. The KB file is now `PAD_Robin_ActionKB_v3_2.json`; the Type Reference is unchanged (`PAD_Robin_TypeReference_v3_1.json`).

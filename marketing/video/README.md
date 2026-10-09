@@ -41,7 +41,7 @@ node tools/build-capture-index.js
 
 ```sh
 node --test "tools/*.test.js" motion.test.js
-node tools/check-flows.js ../../PAD_Robin_ActionKB_v3_2.json flows/00-hook-kb.robin flows/01-backup-downloads.robin flows/02-outlook-attachments.robin flows/03-monthly-invoice-report.robin flows/04-sales-api-report.robin --expect-fail flows/00-hook-memory.robin
+node tools/check-flows.js ../../PAD_Robin_ActionKB_v3_3.json flows/00-hook-kb.robin flows/01-backup-downloads.robin flows/02-outlook-attachments.robin flows/03-monthly-invoice-report.robin flows/04-sales-api-report.robin --expect-fail flows/00-hook-memory.robin
 node tools/audit-captions.js
 ```
 
