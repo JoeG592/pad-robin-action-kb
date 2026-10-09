@@ -12,13 +12,13 @@ This repo is the missing reference.
 
 | File | Contents |
 |---|---|
-| `PAD_Robin_ActionKB_v3_2.json` | 989 Robin actions across 46 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters (enum inputs list their allowed values), and the other selector forms of the same action. |
+| `PAD_Robin_ActionKB_v3_3.json` | 1,086 Robin actions across 46 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters (enum inputs list their allowed values), and the other selector forms of the same action. |
 | `PAD_Robin_TypeReference_v3_1.json` | 44 parameter types with the exact syntax PAD accepts for each: strings, numbers, file paths, handle variables, lists, UI selectors, and the rule for enums. |
 | `PROMPT.md` | A system prompt that turns a model into a template filler over these two files. This is how the data is meant to be used. |
 | `rules/robin-rules.json` | The syntax rules below, each with the probe pastes that prove it. README, PROMPT.md and other copies are rendered from this file. |
 | `rules/probe-corpus.json` | 443 probe pastes into PAD 2.72 with the outcome PAD gave: rejected silently, landed with errors, or clean. Rows include PAD's own description where it was captured. |
 
-Validated against PAD 2.73 (build 2.73.00155.26278), October 2026: all 987 golden examples carried over from the 2.72 release were re-pasted exactly as published into the 2.73 Designer, with zero errors, and the two records that are new or changed in 2.73 (`ComputerUse.InvokeComputerUse`, `LLM.InvokeLLM`) were paste-validated on the same build. The syntax rules below were probed on PAD 2.72 in October 2026 with 563 test pastes, including 19 complex flows of up to 97 rows, and all 443 published probes were re-pasted on 2.73 with the same outcomes.
+Validated against PAD 2.73 (build 2.73.00155.26278), October 2026: all 987 golden examples carried over from the 2.72 release were re-pasted exactly as published into the 2.73 Designer, with zero errors, and the two records that are new or changed in 2.73 (`ComputerUse.InvokeComputerUse`, `LLM.InvokeLLM`) were paste-validated on the same build. 3.3 adds 97 records that act on a recorded UI element (50 desktop, 47 web), paste-validated on 2.73 against placeholder elements; see `needs_ui_selector` below. The syntax rules below were probed on PAD 2.72 in October 2026 with 563 test pastes, including 19 complex flows of up to 97 rows, and all 443 published probes were re-pasted on 2.73 with the same outcomes.
 
 ## The two-table idea
 
@@ -49,7 +49,9 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
 - **input_params** names are the Robin argument names. Some differ from PAD's internal property names, for example `Element` rather than `Control`, so always use these.
 - **sibling_selectors** is the field that matters most for non-trivial scripts. `Text.JoinText.Join` takes only a list. If you need a delimiter, the argument does not exist on that form; it lives on `JoinWithDelimiter`. Adding an argument from one form to another gives "Unknown argument". Inventing a selector name gives an empty canvas.
 - **constraints** are the properties a selector fixes, which is why they are absent from its arguments.
-- **needs_ui_selector** marks 17 records whose input is a recorded UI element, web element, or image. Their examples use a placeholder and will not run as written; the shape is still correct.
+- **needs_ui_selector** marks 114 records whose input is a recorded UI element, web element, or image. Their examples will not run as written; the shape is still correct.
+  - 97 refer to placeholder elements: `appmask['Window \'KB Test Window\'']['Button \'OK\'']`, `appmask['Web Page \'KB Test Page\'']['Button \'Submit\'']`. Record your own element in the Designer (UI elements pane) and put its names in the same `appmask['<screen>']['<element>']` form; the apostrophes inside the names are escaped as `\'`. These were validated by pasting into a flow whose UI element repository held the placeholders. The paste checks the reference: an element the flow doesn't have gives "UI element '...' wasn't found".
+  - 17 were validated before 3.3: 14 use the text placeholder `Control: $'''body'''` (replace it the same way) and 3 are Windows OCR actions whose screen region is a placeholder.
 
 ## Syntax rules PAD enforces
 
@@ -119,7 +121,7 @@ The 3.1.3 documentation said property access in an `IF` condition rejects the pa
 `marketing/video/tools/check-flows.js` checks a script against these rules and the KB before you paste it:
 
 ```
-node marketing/video/tools/check-flows.js PAD_Robin_ActionKB_v3_2.json flow.robin
+node marketing/video/tools/check-flows.js PAD_Robin_ActionKB_v3_3.json flow.robin
 ```
 
 On the probe corpus it flags 105 of 105 silent rejects and 18 of 23 pastes that landed with errors, and passes 313 of 315 clean pastes. The 2 it flags use `\%`, which PAD accepts while silently dropping the percent sign.
@@ -137,7 +139,7 @@ Validation means the Designer accepts the line. It does not mean the placeholder
 
 ## What is not in this release
 
-PAD 2.73 exposes 236 further selector variants that are not included here: 200 need a recorded UI element or image and cannot be validated from text, 25 need a live mail or work-queue connection to validate, and 11 are deprecated, removed, or unknown to the Designer. They may follow in a later release.
+PAD 2.73 exposes 139 further selector variants that are not included here: 103 need a recorded image or UI element that the placeholder elements don't cover (mostly image-based mouse and OCR actions), 25 need a live mail or work-queue connection to validate, and 11 are deprecated, removed, or unknown to the Designer. They may follow in a later release.
 
 ## Using it with an AI assistant
 

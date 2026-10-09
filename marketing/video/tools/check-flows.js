@@ -146,7 +146,7 @@ function checkRobin(text, kb, opts = {}) {
   }
   const reported = new Set();
   const usesIn = (st, src) => {
-    let t = src.replace(/'[^']*'/g, "''");                                         // expression string literals
+    let t = src.replace(/'(?:\\.|[^'\\])*'/g, "''");                               // expression string literals; \' is escaped (appmask['Window \'X\''])
     t = t.replace(/\b[A-Za-z]\w*\.[A-Za-z]\w*\.\w+/g, x => (modules.has(x.split(".")[0].toLowerCase()) ? " " : x)); // enums
     for (const m of t.matchAll(/(^|[^.\p{L}\p{N}_])([\p{L}_][\p{L}\p{N}_]*)(?![\p{L}\p{N}_])(?!\s*\()/gu)) {
       const name = m[2];
