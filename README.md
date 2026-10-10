@@ -127,6 +127,10 @@ node marketing/video/tools/check-flows.js PAD_Robin_ActionKB_v3_3.json flow.robi
 On the probe corpus it flags 105 of 105 silent rejects and 18 of 23 pastes that landed with errors, and passes 313 of 315 clean pastes. The 2 it flags use `\%`, which PAD accepts while silently dropping the percent sign.
 <!-- robin-rules:end -->
 
+## Troubleshooting
+
+- **"Can't edit flow: Failed to deserialize Flow."** when opening a flow in the Designer means the flow's saved Robin doesn't parse. It's the same syntax a paste silently drops, so the silent-reject rules above are the usual cause (for example `%...%` outside a string, or an unescaped apostrophe). A flow in this state also fails to run ("Load failed."). The Designer can't open it to fix it, so check the script where it came from with `check-flows.js`, fix it, and paste it into a new flow (or restore an earlier version of the flow, if your environment keeps version history). The dialog's error details only give a correlation id; PAD's local Designer log records the parser error under that id (`RobinScriptParsingError`), with the grammar rule but no line number.
+
 ## How it was validated
 
 Every golden example was pasted into PAD Designer through UI automation and accepted with zero errors in the error pane. The March 2026 set (369 records) was additionally run through producer-to-consumer chains, so that, for example, an Excel action was validated with a real `ExcelInstance` from a launch action before it. The September 2026 sets were validated the same way in batches, with each action's error flag read back from the canvas individually: 578 records on PAD 2.67, and 46 records on PAD 2.72 (the new PowerPoint, PGP, LLM, Triggers and environment actions, plus records whose arguments changed in 2.72).
