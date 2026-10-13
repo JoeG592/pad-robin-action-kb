@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.3.1 (2026-10-13)
+
+File names only; the data is the same as 3.3.0 (the files still say `"version": "3.3.0"` inside).
+
+- **Stable file names:** `PAD_Robin_ActionKB.json` and `PAD_Robin_TypeReference.json`. From now on the names stay the same between releases, so a raw link on `main` always gets the latest KB. The version is inside each file and in the release tags; link a tag (`.../v3.3.1/PAD_Robin_ActionKB.json`) to stay on one version. Suggested by a user on Reddit.
+- **Old names kept for one release:** `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` are still here with the same content, so existing links keep working. They will be removed in the next release.
+- README, PROMPT.md, LICENSE, the rules renderer and the marketing tools now use the new names.
+
 ## 3.3.0 (2026-10-09)
 
 1,086 records across 46 modules (989 in 3.2.0), validated on PAD 2.73 (2.73.00155.26278). The KB file is now `PAD_Robin_ActionKB_v3_3.json`; the Type Reference is unchanged.
