@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.1 (2026-10-13)
+
+Correction to the Power Fx notes. Power Fx edition 1.0.1; the classic files are unchanged.
+
+- **Power Fx flows do run from the cloud.** 3.4.0 said cloud-triggered runs of Power Fx flows fail on PAD 2.73 with "incompatible PowerFx version". They don't: a clean Power Fx flow ran through an HTTP-triggered cloud flow with the same results as from the Console. The error we saw came from a mistake in our test flow (a record inside text). PAD reports any error it finds while loading a Power Fx flow with that same message, even when the flow's and the installed Power Fx versions match, so the message points at the wrong cause. The real error is in PAD's RobinEngine log (`robin.project.validate.flowcontainserror`).
+- Updated in `power_fx.run_time_traps` (`PAD_Robin_ActionKB_PowerFx.json`), the README and `PROMPT_PowerFx.md`.
+
 ## 3.4.0 (2026-10-13)
 
 Adds the Power Fx edition. The classic files are unchanged (still `"version": "3.3.0"` inside).
