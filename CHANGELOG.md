@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.4.0 (2026-10-13)
+
+Adds the Power Fx edition. The classic files are unchanged (still `"version": "3.3.0"` inside).
+
+- **New: `PAD_Robin_ActionKB_PowerFx.json`** (Power Fx edition 1.0.0) for desktop flows created with Power Fx enabled. Same 1,086 records, ids, arguments and enums as the classic KB; the values in templates and golden examples are written in Power Fx (`$fx'text'`, `$fx'=expression'`, `${...}` interpolation). Every golden example was pasted into a Power Fx-enabled flow on PAD 2.73 (2.73.00155.26278): 90 batches, zero errors. Two data table literals keep the classic `{ ... }` form, which pasted clean. Suggested by a user on Reddit.
+- **New: `PAD_Robin_TypeReference_PowerFx.json`** (1.0.0), the Type Reference written for Power Fx flows, and **`PROMPT_PowerFx.md`**, the system prompt for them.
+- **Run-time traps:** in a Power Fx flow a clean paste doesn't guarantee the flow runs. Classic list access (`L.Count`, `L[0]`) pastes clean and fails at run time, and `ON ERROR` / `ON BLOCK ERROR` don't catch it; index arguments of list and data table actions are 1-based; files and errors are records in text (`${File.FullName}`, `${E.Message}`). The KB's `power_fx` block lists these, and the README has a classic vs Power Fx table. They come from running KB actions with real values in a classic and a Power Fx flow on PAD 2.73.
+- `check-flows.js` still checks classic Robin only; it reports false errors on `$fx'...'` values.
+- **Old names still kept:** `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` stay in this release too, because 3.3.1 came out the same day. They will be removed in a later release.
+
 ## 3.3.1 (2026-10-13)
 
 File names only; the data is the same as 3.3.0 (the files still say `"version": "3.3.0"` inside).

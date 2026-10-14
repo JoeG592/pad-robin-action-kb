@@ -15,13 +15,17 @@ This repo is the missing reference.
 | `PAD_Robin_ActionKB.json` | 1,086 Robin actions across 46 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters (enum inputs list their allowed values), and the other selector forms of the same action. |
 | `PAD_Robin_TypeReference.json` | 44 parameter types with the exact syntax PAD accepts for each: strings, numbers, file paths, handle variables, lists, UI selectors, and the rule for enums. |
 | `PROMPT.md` | A system prompt that turns a model into a template filler over these two files. This is how the data is meant to be used. |
+| `PAD_Robin_ActionKB_PowerFx.json` | The **Power Fx edition** (new in 3.4.0): the same 1,086 records with their values written for desktop flows created with Power Fx enabled (`$fx'...'`). Every golden example pasted into a Power Fx-enabled flow with zero errors. See [Power Fx flows](#power-fx-flows). |
+| `PAD_Robin_TypeReference_PowerFx.json` | The Type Reference for Power Fx flows. |
+| `PROMPT_PowerFx.md` | The system prompt for Power Fx flows. |
 | `rules/robin-rules.json` | The syntax rules below, each with the probe pastes that prove it. README, PROMPT.md and other copies are rendered from this file. |
 | `rules/probe-corpus.json` | 443 probe pastes into PAD 2.72 with the outcome PAD gave: rejected silently, landed with errors, or clean. Rows include PAD's own description where it was captured. |
 
 **File names stay the same between releases** (since 3.3.1), so a link to the raw file on `main` always gets the latest KB:
 `https://raw.githubusercontent.com/JoeG592/pad-robin-action-kb/main/PAD_Robin_ActionKB.json`.
-The version is inside each file (`version`, `pad_build`) and in the release tags. To stay on one version, link the file at its tag instead of `main`, for example `.../pad-robin-action-kb/v3.3.1/PAD_Robin_ActionKB.json`.
-The old names `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` are kept, with the same content, for this release only; they will be removed in the next one.
+The Power Fx edition works the same way: `.../main/PAD_Robin_ActionKB_PowerFx.json`.
+The version is inside each file (`version`, `pad_build`) and in the release tags. To stay on one version, link the file at its tag instead of `main`, for example `.../pad-robin-action-kb/v3.4.0/PAD_Robin_ActionKB.json`.
+The old names `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` are still kept, with the same content as the stable-name files, in 3.4.0; they will be removed in a later release.
 
 Validated against PAD 2.73 (build 2.73.00155.26278), October 2026: all 987 golden examples carried over from the 2.72 release were re-pasted exactly as published into the 2.73 Designer, with zero errors, and the two records that are new or changed in 2.73 (`ComputerUse.InvokeComputerUse`, `LLM.InvokeLLM`) were paste-validated on the same build. 3.3 adds 97 records that act on a recorded UI element (50 desktop, 47 web), paste-validated on 2.73 against placeholder elements; see `needs_ui_selector` below. The syntax rules below were probed on PAD 2.72 in October 2026 with 563 test pastes, including 19 complex flows of up to 97 rows, and all 443 published probes were re-pasted on 2.73 with the same outcomes.
 
@@ -156,6 +160,33 @@ PAD 2.73 exposes 139 further selector variants that are not included here: 103 n
 2. Include the Type Reference, and the KB records for the modules your task needs (the full KB is about 3 MB; filter by `module`).
 3. Ask for the flow. Run it through `marketing/video/tools/check-flows.js`, then paste the result into an empty flow in PAD Designer.
 4. If the error pane lists anything, feed the messages back to the model with the same context.
+
+For a flow created with Power Fx enabled, use the Power Fx files and `PROMPT_PowerFx.md` instead (next section).
+
+## Power Fx flows
+
+A desktop flow can be created with Power Fx enabled. Its Robin is the same (same action ids, argument names, enums, outputs and statements), but its values are written differently: text is `$fx'...'`, expressions start with `=`, and interpolation is `${...}`. The Power Fx edition has every record of the classic KB with its template and golden example converted to that form, and every golden example was pasted into a Power Fx-enabled flow on PAD 2.73 with zero errors (1,086 records, 90 batches).
+
+**Which edition do I need?** Look at a text value in the flow: `$fx'...'` is a Power Fx flow, `$'''...'''` is classic. (In the flow's stored definition, a Power Fx flow has `PowerFxEnabled: true`.)
+
+| | Classic | Power Fx |
+|---|---|---|
+| Text | `$'''Hello'''` | `$fx'Hello'` |
+| Expression | `SET Total TO Price * Qty` | `SET Total TO $fx'=Price * Qty'` |
+| Variable in text | `$'''Total %Total%'''` | `$fx'Total ${Total}'` |
+| Literal percent sign | `$'''100%% done'''` | `$fx'100% done'` |
+| Apostrophe | `$'''Joe\'s'''` | `$fx'Joe\'s'` |
+| List item / count | `L[0]`, `L.Count` | `Index(L, 1).Value`, `CountRows(L)` |
+| Index arguments (`RowIndex`, `ItemIndex`, ...) | 0-based | 1-based |
+| A file in text | `%File%` | `${File.FullName}` |
+
+**A clean paste is not the whole check.** In a classic flow, a script that pastes with zero errors runs. In a Power Fx flow some expressions paste clean and fail only when the flow runs: classic list access (`L.Count`, `L[0]`) is the main case, and `ON ERROR` / `ON BLOCK ERROR` do not catch it. The KB's `power_fx` block lists the value rules and these run-time traps. Run a new Power Fx flow once with real values in a test flow before you rely on it.
+
+Two more things we saw on PAD 2.73: cloud-triggered runs of Power Fx flows failed with "incompatible PowerFx version" while the same flows ran from the PAD Console, and `ON ERROR` on an action that can't raise an error makes a cloud-triggered run reject the flow when it loads (seen with classic flows, since the Power Fx ones didn't start from the cloud at all).
+
+The checker, `check-flows.js`, is for classic Robin only. It doesn't understand `$fx'...'` values yet and reports false errors on Power Fx scripts.
+
+Two data table literals (`Variables.CreateNewDatatable`, `Excel.SortCellsFromExcel.SortWorksheet`) keep the classic `{ ... }` form, which pasted clean in the Power Fx flow.
 
 ## Maintenance
 
