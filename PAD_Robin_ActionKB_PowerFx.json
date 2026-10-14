@@ -6,7 +6,7 @@
     "version": "3.3.0",
     "file": "PAD_Robin_ActionKB.json"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "date": "2026-10-13",
   "pad_build": "2.73.00155.26278",
   "license": "CC BY 4.0",
@@ -28,7 +28,7 @@
       "Classic list access pastes clean in a Power Fx flow but fails at run time (TrailerExpressionError, not caught by ON BLOCK ERROR): L.Count and L[0]. Use CountRows(L) and Index(L, 1).",
       "Variable names are case-sensitive: a wrong-case reference is a paste error (\"Name isn't valid. 'ABC' isn't recognized.\").",
       "List and data table index arguments of actions are 1-based in Power Fx flows (RowIndex, ColumnIndex, ItemIndex: 0 fails; the first row is 1). Text positions (GetSubtext CharacterPosition, ParseText results) stay 0-based. Excel row, column and worksheet indexes are 1-based in both editions. (KB run test, PAD 2.73.)",
-      "ON ERROR only on actions that declare errors: on any other action the flow still pastes and runs from the Console, but cloud-triggered runs reject it at load. Cloud-triggered runs of Power Fx flows failed on PAD 2.73 (\"incompatible PowerFx version\"); run from the Console."
+      "ON ERROR only on actions that declare errors: on any other action the flow still pastes and runs from the Console, but cloud-triggered runs reject it at load. In a Power Fx flow a cloud-triggered run reports this, and any other error found when the flow loads, as \"This flow contains an incompatible PowerFx version\" (seen on PAD 2.73 with matching versions); the real error is in the PAD logs (RobinEngine log, robin.project.validate.flowcontainserror). Power Fx flows without such errors run from the cloud."
     ],
     "kept_classic": {
       "data_table_literals": [

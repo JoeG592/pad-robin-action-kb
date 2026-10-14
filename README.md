@@ -182,7 +182,10 @@ A desktop flow can be created with Power Fx enabled. Its Robin is the same (same
 
 **A clean paste is not the whole check.** In a classic flow, a script that pastes with zero errors runs. In a Power Fx flow some expressions paste clean and fail only when the flow runs: classic list access (`L.Count`, `L[0]`) is the main case, and `ON ERROR` / `ON BLOCK ERROR` do not catch it. The KB's `power_fx` block lists the value rules and these run-time traps. Run a new Power Fx flow once with real values in a test flow before you rely on it.
 
-Two more things we saw on PAD 2.73: cloud-triggered runs of Power Fx flows failed with "incompatible PowerFx version" while the same flows ran from the PAD Console, and `ON ERROR` on an action that can't raise an error makes a cloud-triggered run reject the flow when it loads (seen with classic flows, since the Power Fx ones didn't start from the cloud at all).
+Power Fx flows run from the cloud ("Run a flow built with Power Automate for desktop") as well as from the PAD Console. Two things to know about cloud-triggered runs on PAD 2.73:
+
+- `ON ERROR` on an action that can't raise an error makes a cloud-triggered run reject the flow when it loads, in either edition. The same flow runs from the Console.
+- In a Power Fx flow, PAD reports *any* error it finds while loading the flow as "This flow contains an incompatible PowerFx version", even when the versions match. It is not a version problem: the real error is in PAD's logs (`C:ProgramDataMicrosoftPower AutomateLogs`, the RobinEngine log, event `robin.project.validate.flowcontainserror`), for example a record such as a file or an error placed inside text. 3.4.0 said Power Fx flows don't run from the cloud; that was this message, not a real limit.
 
 The checker, `check-flows.js`, is for classic Robin only. It doesn't understand `$fx'...'` values yet and reports false errors on Power Fx scripts.
 
