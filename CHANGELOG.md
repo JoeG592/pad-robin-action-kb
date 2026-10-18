@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.5.0 (2026-10-17)
+
+Adds `error_handling` to every record, in both editions: can the action take an `ON ERROR` handler, and under which error names. Classic KB 3.4.0, Power Fx edition 1.1.0; the Type References are unchanged. Prompted by a question on Reddit about error handling in the KB.
+
+- **New field `error_handling: { on_error, errors }`.** 1,016 records take `ON ERROR` and list the error names their action declares, for `ON ERROR <Name>` cases (`File.ReadTextFromFile.ReadText` declares `FileNotFoundError`, `DirectoryNotFoundError` and `ReadFromFileError`). 70 don't, for example `Text.ChangeCase`, `Variables.CreateNewList` and `File.IfFile`: `ON ERROR` on them lands with "Exception handling isn't supported for this statement" in the Designer, and a cloud-triggered run ("Run a flow built with Power Automate for desktop") rejects the whole flow when it loads. Only a flow written outside the Designer gets past the paste, and it still runs from the Console. Guard those actions with `BLOCK ... ON BLOCK ERROR`.
+- **Tested on the cloud path, both editions, PAD 2.73.** Every published golden example was written into a test flow, behind an `IF` that is never true so nothing ran, and the flow was started from the cloud: the `on_error: true` records in 90 batches with `ON ERROR <Name>` for each listed error plus a default `ON ERROR` (2,769 named cases), which all loaded; each `on_error: false` record on its own with a plain `ON ERROR`, which was rejected. 334 runs, the same result in the classic and the Power Fx flow. A made-up error name was rejected, so the names are checked.
+- **`WAIT` takes `ON ERROR` even when its action declares no errors** (`File.WaitForFile.Created` and `.Deleted`, both `MouseAndKeyboard.WaitForMouse` forms): the wait itself can time out. A real run caught a `WAIT (...) FOR 2` timeout ("Timeout has expired.") with `ON ERROR`. Conditions follow their action. The error names come from PAD's module DLLs; these 4 are the only records where the cloud loader disagreed with the DLLs, and `on_error` follows the loader.
+- **Rule 20, error handlers:** `ON ERROR REPEAT n TIMES WAIT n` first (it also takes `RetryType: RetryType.Exponential MinInterval: 1 MaxInterval: 10`), then `ON ERROR <Name>` cases, then the plain `ON ERROR`, and one `END` closes them all. A named case after the plain `ON ERROR`, or a second `ON ERROR ... END` after the first, drops the whole paste. `NEXT ACTION` is not allowed in a handler. A named `ON BLOCK ERROR` case is for custom error codes (`ON BLOCK ERROR MyErr IsUserDefinedErrorCode: True` catches `FlowControl.ThrowCustomError CustomErrorCode: $'''MyErr'''`); an action's error name there is an error. Real runs confirmed the routing: a named case caught its error ahead of the default, and another custom code fell through to the default.
+- **New rule 21:** `ON ERROR` only where `error_handling.on_error` is true, with names from `error_handling.errors`.
+- **Probe corpus:** 13 new paste probes on PAD 2.73 (round 7) back rules 20 and 21; 456 probes in all.
+- **`check-flows.js`** flags `ON ERROR` on an action with `on_error: false`, an error name the action doesn't declare, a named case after the default, a handler that doesn't follow its action, and a named `ON BLOCK ERROR` case without `IsUserDefinedErrorCode: True`. It now understands several cases sharing one `END` and the `WAIT (...) FOR <seconds>` timeout form. On the corpus: 107/107 silent rejects, 22/27 pastes with errors, 320/322 clean.
+- **Correction:** 3.4.x said `ON ERROR` on an action that can't raise errors "pastes and runs from the Console". It runs from the Console only when the flow was written outside the Designer; a paste shows the error.
+- `PROMPT.md` and `PROMPT_PowerFx.md` tell the model to use `error_handling`. README: fixed the PAD log path in the Power Fx notes (`C:\ProgramData\Microsoft\Power Automate\Logs`).
+- The old file names `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` stay frozen at 3.3.0, without `error_handling`.
+
 ## 3.4.1 (2026-10-13)
 
 Correction to the Power Fx notes. Power Fx edition 1.0.1; the classic files are unchanged.
