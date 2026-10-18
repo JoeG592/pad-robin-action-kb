@@ -88,7 +88,7 @@ function scan(text) {
 
 // Action id, arguments (with their value text) and outputs of one action statement (strings already "").
 function parseAction(s) {
-  let t = s.replace(/^IF \((.*)\) THEN$/i, "$1").replace(/^WAIT \((.*)\)$/i, "$1").replace(/^LOOP WHILE \((.*)\)$/i, "$1");
+  let t = s.replace(/^IF \((.*)\) THEN$/i, "$1").replace(/^WAIT \((.*)\)(?:\s+FOR\s+.+)?$/i, "$1").replace(/^LOOP WHILE \((.*)\)$/i, "$1");
   const id = t.split(" ")[0];
   t = t.slice(id.length);
   const outs = [...t.matchAll(/(?:^|\s)(\w+)\s?=>\s?(\w+)/g)].map(m => ({ name: m[1], var: m[2] }));
@@ -111,6 +111,8 @@ function checkRobin(text, kb, opts = {}) {
   let actionLines = 0;
   const stack = [];                                   // "handler" | "block" | "other"
   let pendingHandler = false;                          // after BLOCK, the next ON BLOCK ERROR opens a handler
+  let lastAction = null;                               // the action record on the previous statement (ON ERROR attaches to it)
+  let group = null;                                    // the open ON ERROR group: { rec, sawDefault }; one END closes all its cases
 
   const reservedIn = (st, src, what) => {
     // property access with a keyword name; skip enums (Module.Type.Value) and action ids
@@ -175,21 +177,48 @@ function checkRobin(text, kb, opts = {}) {
     if (/^FUNCTION\b/i.test(s) || /^END FUNCTION\b/i.test(s)) { E(st, "subflow definitions (FUNCTION ... END FUNCTION) can't be pasted; paste each subflow's body into its own subflow"); return; }
     if (/^EXIT FUNCTION\b/i.test(s)) { E(st, "EXIT FUNCTION only works inside a subflow"); return; }
 
+    const prevAction = lastAction;
+    lastAction = null;
     const inHandler = stack[stack.length - 1] === "handler";
-    if (inHandler && !/^(SET |CALL |GOTO |THROW ERROR\b|END\b)/i.test(s)) {
+    if (inHandler && !/^(SET |CALL |GOTO |THROW ERROR\b|END\b|ON (BLOCK )?ERROR\b)/i.test(s)) {
       if (/^(IF|LOOP|SWITCH|BLOCK)\b/i.test(s)) E(st, "IF / LOOP / SWITCH inside an error handler drops the whole paste; set a flag here and test it after the block");
       else E(st, "only SET, CALL, GOTO and THROW ERROR are allowed inside ON BLOCK ERROR / ON ERROR (\"The statement isn't allowed inside exception handling\")");
     }
 
-    if (/^END\b/i.test(s)) { stack.pop(); return; }
+    if (/^END\b/i.test(s)) { if (stack.pop() === "handler") group = null; return; }
     if (/^ON BLOCK ERROR\b/i.test(s)) {
       if (/REPEAT/i.test(s)) E(st, "ON BLOCK ERROR has no REPEAT option (REPEAT n TIMES WAIT n belongs to an action's ON ERROR)");
+      else if (/^ON BLOCK ERROR\s+\S/i.test(s) && !/^ON BLOCK ERROR\s+all\s*$/i.test(s) && !/\bIsUserDefinedErrorCode:\s*True\b/i.test(s))
+        E(st, "a named ON BLOCK ERROR case is for custom error codes: write ON BLOCK ERROR MyErr IsUserDefinedErrorCode: True (catches FlowControl.ThrowCustomError CustomErrorCode: MyErr); an action's error name gives an error");
       if (pendingHandler) { stack.push("handler"); pendingHandler = false; }
       return;
     }
     if (/^ON ERROR\b/i.test(s)) {
       if (/^ON ERROR\s+GOTO\b/i.test(s)) { E(st, "ON ERROR GOTO Label drops the whole paste; put GOTO Label inside ON ERROR ... END"); return; }
-      stack.push("handler"); return;
+      // ON ERROR REPEAT ..., ON ERROR <Name> ..., ON ERROR ... follow the action directly and share one END.
+      const cont = inHandler && group;
+      if (!cont) {
+        stack.push("handler");
+        group = { rec: prevAction && prevAction.rec, sawDefault: false };
+        if (!prevAction) E(st, "ON ERROR must come right after the action it handles (or after another ON ERROR case of it); its cases share one END");
+        const eh = group.rec && group.rec.error_handling;
+        if (eh && !eh.on_error) E(st, `${group.rec.actionId} can't raise errors: ON ERROR on it is a paste error ("Exception handling isn't supported for this statement") and makes cloud-triggered runs reject the whole flow; put it in BLOCK ... ON BLOCK ERROR instead`);
+      }
+      if (/^ON ERROR\s+REPEAT\b/i.test(s)) {
+        if (cont) E(st, "ON ERROR REPEAT must be the first ON ERROR line after the action");
+        return;
+      }
+      const name = (s.match(/^ON ERROR\s+([\p{L}_][\p{L}\p{N}_]*)\s*$/iu) || [])[1];
+      if (name) {
+        if (group.sawDefault) E(st, `ON ERROR ${name} after the default ON ERROR: named cases come first, the default ON ERROR last ("An error case statement can't be after an error default case statement")`);
+        const eh = group.rec && group.rec.error_handling;
+        if (eh && eh.on_error && !eh.errors.includes(name))
+          E(st, `${group.rec.actionId} declares no error ${name} (PAD: "Unknown exception '${name}'"; cloud-triggered runs reject the flow); it declares ${eh.errors.join(", ") || "none, so use the plain ON ERROR"}`);
+      } else if (/^ON ERROR\s*$/i.test(s)) {
+        if (group.sawDefault) E(st, "two default ON ERROR cases for one action");
+        group.sawDefault = true;
+      }
+      return;
     }
     if (/^BLOCK\b/i.test(s)) { stack.push("block"); pendingHandler = true; return; }
     pendingHandler = false;
@@ -211,7 +240,8 @@ function checkRobin(text, kb, opts = {}) {
     if ((m = s.match(/^LOOP\s+FOREACH\s+(\w+)\s+IN\b/i))) { stack.push("other"); varName(st, m[1], "loop variable"); reservedIn(st, s, ""); usesIn(st, s.replace(/^LOOP\s+FOREACH\s+\w+\s+IN/i, "")); return; }
     if ((m = s.match(/^LOOP\s+(\w+)\s+FROM\b/i))) { stack.push("other"); varName(st, m[1], "loop variable"); reservedIn(st, s, ""); usesIn(st, s.replace(/^LOOP\s+\w+\s+FROM/i, "").replace(/\b(TO|STEP)\b/gi, " ")); return; }
 
-    const wrapped = s.match(/^(IF|WAIT|LOOP WHILE)\s*\((.*)\)(\s+THEN)?$/i);
+    const wrapped = s.match(/^(IF|WAIT|LOOP WHILE)\s*\((.*)\)(\s+THEN)?$/i) || s.match(/^(WAIT)\s*\((.*)\)\s+FOR\s+(.+)$/i);
+    if (wrapped && /^WAIT$/i.test(wrapped[1]) && wrapped[3] && !/THEN/i.test(wrapped[3])) usesIn(st, wrapped[3]); // WAIT (...) FOR <timeout seconds>
     const isAction = wrapped ? isActionCall(wrapped[2]) : !/^(IF|LOOP)\b/i.test(s);
     if (/^(IF|LOOP)\b/i.test(s)) stack.push("other");
     if (!isAction) { reservedIn(st, s, ""); usesIn(st, s.replace(/^(IF|LOOP WHILE)\b/i, "").replace(/\bTHEN$/i, "")); return; }
@@ -219,6 +249,7 @@ function checkRobin(text, kb, opts = {}) {
     actionLines++;
     const { id, args, argList, outs } = parseAction(s);
     const rec = byId.get(id.toLowerCase());
+    lastAction = { rec };
     if (!rec) { E(st, `unknown action ${id}`); return; }
     const ins = new Set((rec.input_params || []).map(p => p.name.toLowerCase()));
     const os = new Set((rec.output_params || []).map(p => p.name.toLowerCase()));

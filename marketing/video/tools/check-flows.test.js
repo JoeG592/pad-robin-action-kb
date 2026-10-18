@@ -156,3 +156,26 @@ test("enum argument values are checked against the KB enumValues", () => {
     ["line 1: File.Move IfFileExists: AddSequentialSuffix is not a value of File.IfExists (DoNothing, Overwrite)"]);
   assert.match(checkRobin(ok.replace("File.IfExists.Overwrite", "Overwrite"), kb, { knownVars: KNOWN }).errors[0], /needs its module and type/);
 });
+
+test("ON ERROR follows the record's error_handling: on_error, declared names, case order, one END", () => {
+  const ekb = { actions: [
+    { actionId: "Text.ToNumber", input_params: [{ name: "Text" }], output_params: [{ name: "Number" }], error_handling: { on_error: true, errors: ["TextNotValidNumberError"] } },
+    { actionId: "Text.ChangeCase", input_params: [{ name: "Text" }, { name: "NewCase" }], output_params: [{ name: "Result" }], error_handling: { on_error: false, errors: [] } },
+    { actionId: "File.WaitForFile.Created", input_params: [{ name: "File" }], output_params: [], error_handling: { on_error: true, errors: [] } },
+  ] };
+  const e = src => checkRobin(src, ekb, { knownVars: KNOWN }).errors;
+  const num = "Text.ToNumber Text: Raw Number=> N";
+  assert.deepStrictEqual(e([num, "ON ERROR REPEAT 2 TIMES WAIT 1", "ON ERROR TextNotValidNumberError", "    SET N TO 0", "ON ERROR", "    SET A TO 1", "END", "SET S TO N"].join("\n")), []);
+  assert.deepStrictEqual(e(["WAIT (File.WaitForFile.Created File: $'''C:\\x''') FOR 5", "ON ERROR", "    SET A TO 1", "END"].join("\n")), []);
+  assert.ok(e(["Text.ChangeCase Text: S Result=> T", "ON ERROR", "    SET A TO 1", "END"].join("\n")).some(x => /can't raise errors.*BLOCK/.test(x)));
+  assert.ok(e([num, "ON ERROR NoSuchError", "    SET N TO 0", "END"].join("\n")).some(x => /declares no error NoSuchError.*TextNotValidNumberError/.test(x)));
+  assert.ok(e([num, "ON ERROR", "    SET A TO 1", "ON ERROR TextNotValidNumberError", "    SET N TO 0", "END"].join("\n")).some(x => /after the default ON ERROR/.test(x)));
+  assert.ok(e([num, "ON ERROR TextNotValidNumberError", "    SET N TO 0", "END", "ON ERROR", "    SET A TO 1", "END"].join("\n")).some(x => /right after the action/.test(x)));
+  // without error_handling in the KB (older releases) only the structure is checked
+  assert.deepStrictEqual(errs([num, "ON ERROR NoSuchError", "    SET N TO 0", "END"].join("\n")), []);
+});
+
+test("a named ON BLOCK ERROR case needs IsUserDefinedErrorCode: True", () => {
+  flags("BLOCK W\nON BLOCK ERROR TextNotValidNumberError\n    SET A TO 1\nON BLOCK ERROR\n    SET A TO 2\nEND\n    SET N TO 1\nEND", /custom error codes/);
+  ok("BLOCK W\nON BLOCK ERROR MyErr IsUserDefinedErrorCode: True\n    SET A TO 1\nON BLOCK ERROR\n    SET A TO 2\nEND\n    SET N TO 1\nEND");
+});
