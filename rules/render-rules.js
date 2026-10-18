@@ -45,7 +45,9 @@ const fill = (text, r, style) => text.replace("{keywords}", () => (r.keywords ||
 // Markdown for README / SKILL.md. `score` is the checker's result on the corpus.
 function renderDoc(score) {
   const out = [];
-  out.push(`Every rule below was confirmed by pasting into PAD ${rulesFile.pad_build.split(".").slice(0, 2).join(".")} (${rulesFile.pad_build}): ${corpus.probes.length} probe pastes in October 2026, kept with their outcomes in \`rules/probe-corpus.json\`. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.`);
+  const later = corpus.probes.filter(p => p.pad_build);
+  const laterNote = later.length ? `, and ${later.length} on PAD ${later[0].pad_build.split(".").slice(0, 2).join(".")} for the error-handler forms` : "";
+  out.push(`Every rule below was confirmed by pasting into PAD ${rulesFile.pad_build.split(".").slice(0, 2).join(".")} (${rulesFile.pad_build}): ${corpus.probes.length - later.length} probe pastes in October 2026${laterNote}, kept with their outcomes in \`rules/probe-corpus.json\`. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.`);
   let n = 0;
   for (const s of rulesFile.sections) {
     const rules = rulesFile.rules.filter(r => r.section === s.id && r.doc);

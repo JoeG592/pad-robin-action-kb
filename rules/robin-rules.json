@@ -206,18 +206,36 @@
     },
     {
       "id": "error-handlers", "section": "statements", "kind": "error",
-      "doc": "Error handling for a group of actions, and for a single action:\n\n```\nBLOCK ReadFiles\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    ...actions...\nEND\n\nText.ToNumber Text: Raw Number=> Amount\nON ERROR REPEAT 2 TIMES WAIT 5\n    SET Amount TO 0\nEND\n```\n\nA handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other action gives \"The statement isn't allowed inside exception handling\", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `REPEAT` works only on an action's `ON ERROR`. `ERROR => LastError` reads the last error.",
+      "doc": "Error handling for a group of actions, and for a single action:\n\n```\nBLOCK ReadFiles\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    ...actions...\nEND\n\nText.ToNumber Text: Raw Number=> Amount\nON ERROR REPEAT 2 TIMES WAIT 5\nON ERROR TextNotValidNumberError\n    SET Amount TO 0\nON ERROR\n    SET Failed TO True\nEND\n```\n\nAn action's handler goes on the lines right after it (for a condition or a wait, right after `IF (...) THEN` or `WAIT (...)`). The optional `ON ERROR REPEAT n TIMES WAIT n` comes first (it also takes `RetryType: RetryType.Exponential MinInterval: 1 MaxInterval: 10`), then any `ON ERROR <Name>` cases, then the plain `ON ERROR`; one `END` closes them all. A named case after the plain `ON ERROR`, or a second `ON ERROR ... END` after the first, drops the whole paste.\n\nA handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other statement, `NEXT ACTION` included, gives \"The statement isn't allowed inside exception handling\", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `REPEAT` works only on an action's `ON ERROR`. A named `ON BLOCK ERROR` case is for custom error codes: `ON BLOCK ERROR MyErr IsUserDefinedErrorCode: True` catches `FlowControl.ThrowCustomError CustomErrorCode: $'''MyErr'''`. `ERROR => LastError` reads the last error.",
       "prompt": [
-        "- Error handling: BLOCK Name / ON BLOCK ERROR / SET Failed TO True / END / ...actions... / END. For one action: ON ERROR ... END (or ON ERROR REPEAT 2 TIMES WAIT 5 ... END) on the lines after it.",
-        "- An error handler may contain ONLY SET, CALL, GOTO and THROW ERROR, never IF or other actions. Set a flag there and act on it after the block. ERROR => LastError reads the last error."
+        "- Error handling: BLOCK Name / ON BLOCK ERROR / SET Failed TO True / END / ...actions... / END. For one action: ON ERROR ... END on the lines right after it (or ON ERROR REPEAT 2 TIMES WAIT 5 ... END).",
+        "- Named cases: ON ERROR TextNotValidNumberError / SET ... / ON ERROR / SET ... / END. Named cases first, the plain ON ERROR last, ONE END for all of them; never a second ON ERROR ... END after the first.",
+        "- An error handler may contain ONLY SET, CALL, GOTO and THROW ERROR, never IF, NEXT ACTION or other actions. Set a flag there and act on it after the block. ERROR => LastError reads the last error."
       ],
-      "bad": ["BLOCK Work\nON BLOCK ERROR\n    Logging.LogMessage Message: $'''x''' LogLevel: Logging.LogLevel.ErrorLevel\nEND\n    WAIT 1\nEND", "SET A TO 1\nBLOCK Work\nON BLOCK ERROR\n    IF A = 1 THEN\n    END\nEND\nEND"],
-      "good": ["SET Failed TO False\nBLOCK Work\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    WAIT 1\nEND\nIF Failed = True THEN\n    Logging.LogMessage Message: $'''x''' LogLevel: Logging.LogLevel.ErrorLevel\nEND"],
+      "bad": ["BLOCK Work\nON BLOCK ERROR\n    Logging.LogMessage Message: $'''x''' LogLevel: Logging.LogLevel.ErrorLevel\nEND\n    WAIT 1\nEND", "SET A TO 1\nBLOCK Work\nON BLOCK ERROR\n    IF A = 1 THEN\n    END\nEND\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR\n    SET Failed TO True\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nEND\nON ERROR\n    SET Failed TO True\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR\n    NEXT ACTION\nEND"],
+      "good": ["SET Failed TO False\nBLOCK Work\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    WAIT 1\nEND\nIF Failed = True THEN\n    Logging.LogMessage Message: $'''x''' LogLevel: Logging.LogLevel.ErrorLevel\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR REPEAT 2 TIMES WAIT 1\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nON ERROR\n    SET Failed TO True\nEND"],
       "evidence": [
         { "probe": "OB2-log", "outcome": "errors" }, { "probe": "OB1-additem", "outcome": "errors" }, { "probe": "OB9-block-ifinside", "outcome": "rejected" },
         { "probe": "OB4-set", "outcome": "clean" }, { "probe": "ES7-onerror-goto-inside", "outcome": "clean" }, { "probe": "ES8-onerror-throw-set", "outcome": "clean" },
-        { "probe": "D-E05-onerror-repeat", "outcome": "clean" }, { "probe": "E02-block-repeat", "outcome": "errors" }
+        { "probe": "D-E05-onerror-repeat", "outcome": "clean" }, { "probe": "E02-block-repeat", "outcome": "errors" }, { "probe": "EH01-named-default", "outcome": "clean" },
+        { "probe": "EH05-repeat-named-default", "outcome": "clean" }, { "probe": "EH06-repeat-exponential", "outcome": "clean" }, { "probe": "EH08-if-condition", "outcome": "clean" },
+        { "probe": "EH10-block-custom", "outcome": "clean" }, { "probe": "EH03-default-first", "outcome": "rejected" }, { "probe": "EH04-two-groups", "outcome": "rejected" },
+        { "probe": "EH07-nextaction", "outcome": "errors" }, { "probe": "EH13-block-declared-name", "outcome": "errors" }
       ]
+    },
+    {
+      "id": "on-error-allowed", "section": "statements", "kind": "error",
+      "doc": "`ON ERROR` only on an action that can raise errors: its KB record has `error_handling.on_error: true`, and a named case uses a name from its `error_handling.errors`. On any other action the row lands with \"Exception handling isn't supported for this statement\", and a name the action doesn't declare gives \"Unknown exception 'X'\". A flow that has either anyway (written outside the Designer) runs from the Console, but a cloud-triggered run rejects the whole flow when it loads. Put actions that can't raise errors in `BLOCK ... ON BLOCK ERROR` instead. A `WAIT (...)` takes `ON ERROR` even when its action declares no errors, because the wait itself can time out.",
+      "prompt": [
+        "- ON ERROR only after an action whose record has error_handling.on_error true, and ON ERROR <Name> only with a name from its error_handling.errors. Guard any other action with BLOCK / ON BLOCK ERROR; otherwise the paste shows errors and cloud-triggered runs reject the whole flow."
+      ],
+      "bad": ["Text.ChangeCase Text: $'''a''' NewCase: Text.CaseOption.UpperCase Result=> T\nON ERROR\n    SET Failed TO True\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR NoSuchError\n    SET Num TO 0\nEND"],
+      "good": ["SET Failed TO False\nBLOCK Work\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    Text.ChangeCase Text: $'''a''' NewCase: Text.CaseOption.UpperCase Result=> T\nEND", "WAIT (File.WaitForFile.Created File: $'''C:\\temp\\x.txt''') FOR 5\nON ERROR\n    SET Failed TO True\nEND"],
+      "evidence": [
+        { "probe": "EH11-nothrows-onerror", "outcome": "errors" }, { "probe": "EH02-badname", "outcome": "errors" }, { "probe": "EH12-nothrows-block", "outcome": "clean" },
+        { "probe": "EH01-named-default", "outcome": "clean" }, { "probe": "EH09-wait-timeout", "outcome": "clean" }
+      ],
+      "evidence_note": "cloud-triggered load test on PAD 2.73 (2026-10-17), classic and Power Fx flows: every KB record with on_error true loaded with ON ERROR <Name> for each declared error plus a default ON ERROR; each record with on_error false was rejected with a plain ON ERROR; a made-up name was rejected"
     },
     {
       "id": "comments-regions", "section": "statements", "kind": "silent",
