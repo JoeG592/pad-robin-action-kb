@@ -49,7 +49,9 @@ CONTROL FLOW (built into Robin, not in the reference), one statement per line:
 - Records with kind Condition are written IF (Action ...) THEN and need END. kind Wait is WAIT (Action ...). kind While is LOOP WHILE (Action ...) with END. Copy their golden examples.
 - Never write ELSE IF (Action ...) THEN; write ELSE, then IF (Action ...) THEN ... END inside it.
 - Error handling: BLOCK Name / ON BLOCK ERROR / SET Failed TO $fx'=true' / END / ...actions... / END. For one action: ON ERROR ... END on the lines after it.
-- An error handler may contain ONLY SET, CALL, GOTO and THROW ERROR, never IF or other actions. Set a flag there and act on it after the block. ERROR => LastError reads the last error.
+- ON ERROR only after an action whose record has error_handling.on_error true. On any other action a cloud-triggered run rejects the whole flow; guard those with BLOCK / ON BLOCK ERROR instead.
+- To handle one error by name, use a name from the record's error_handling.errors: ON ERROR FileNotFoundError / SET ... / ON ERROR / SET ... / END. Named cases first, the plain ON ERROR last, one END for all of them. An optional ON ERROR REPEAT 2 TIMES WAIT 5 line goes first.
+- An error handler may contain ONLY SET, CALL, GOTO and THROW ERROR, never IF, NEXT ACTION or other actions. Set a flag there and act on it after the block. ERROR => LastError reads the last error.
 - Comments: # text
 - Never write FUNCTION definitions, and no @@ lines in the script body.
 
@@ -67,7 +69,7 @@ OUTPUT: only the Robin script, one action per line, no header lines, no markdown
 - **A clean paste is not enough in a Power Fx flow.** In a classic flow, a script that pastes with zero errors runs. In a Power Fx flow some expressions paste clean and fail only at run time (`L.Count`, `L[0]`), and `ON ERROR` / `ON BLOCK ERROR` do not catch those failures. Run a new flow once with real values in a test flow before you rely on it. `power_fx.run_time_traps` in the KB lists the known cases.
 - **How to tell the editions apart:** a Power Fx flow's text values are written `$fx'...'`; a classic flow's are `$'''...'''`. Classic Robin also pastes into a Power Fx flow and much of it runs, but classic list access (`L.Count`, `L[0]`) fails at run time there, so use the Power Fx edition for Power Fx flows.
 - **"This flow contains an incompatible PowerFx version"** on a cloud-triggered run ("Run a flow built with Power Automate for desktop") is how PAD reports any error it finds while loading a Power Fx flow, even when the versions match. Find the real error in PAD's RobinEngine log (event `robin.project.validate.flowcontainserror`). Power Fx flows without such errors run from the cloud.
-- `ON ERROR` belongs only after actions that can raise errors. On other actions the flow still pastes and runs from the Console, but a cloud-triggered run rejects the flow when it loads.
+- `ON ERROR` belongs only after actions that can raise errors: `error_handling.on_error` in each record says which. On other actions, and with an error name the action doesn't list in `error_handling.errors`, the Designer shows an error after the paste ("Exception handling isn't supported for this statement" or "Unknown exception"), and a cloud-triggered run rejects the whole flow when it loads. Include the `error_handling` field when you give the model the records.
 - The header lines PAD writes into `.robin` files (`@@ConnectionString`, `IMPORT ... AS appmask`, `@SENSITIVE`) must not be pasted into the Designer. Leave them out.
 - If the Designer's error pane shows messages after a paste, send them back to the model together with the same reference records. "Unknown argument" almost always means the wrong selector form was used.
 - `marketing/video/tools/check-flows.js` checks classic Robin only. It does not understand `$fx'...'` values yet and will report false errors on Power Fx scripts.

@@ -46,8 +46,10 @@ CONTROL FLOW (built into Robin, not in the reference), one statement per line:
 - Conditions: = <> > < >= <=, AND, OR, NOT(...), IsEmpty(x), IsNotEmpty(x), Contains(x, $'''y''', False), NotContains, StartsWith, EndsWith
 - CASE takes a comparison only: CASE = x, CASE <> x, CASE > x
 - Never write ELSE IF (Action ...) THEN; write ELSE, then IF (Action ...) THEN ... END inside it.
-- Error handling: BLOCK Name / ON BLOCK ERROR / SET Failed TO True / END / ...actions... / END. For one action: ON ERROR ... END (or ON ERROR REPEAT 2 TIMES WAIT 5 ... END) on the lines after it.
-- An error handler may contain ONLY SET, CALL, GOTO and THROW ERROR, never IF or other actions. Set a flag there and act on it after the block. ERROR => LastError reads the last error.
+- Error handling: BLOCK Name / ON BLOCK ERROR / SET Failed TO True / END / ...actions... / END. For one action: ON ERROR ... END on the lines right after it (or ON ERROR REPEAT 2 TIMES WAIT 5 ... END).
+- Named cases: ON ERROR TextNotValidNumberError / SET ... / ON ERROR / SET ... / END. Named cases first, the plain ON ERROR last, ONE END for all of them; never a second ON ERROR ... END after the first.
+- An error handler may contain ONLY SET, CALL, GOTO and THROW ERROR, never IF, NEXT ACTION or other actions. Set a flag there and act on it after the block. ERROR => LastError reads the last error.
+- ON ERROR only after an action whose record has error_handling.on_error true, and ON ERROR <Name> only with a name from its error_handling.errors. Guard any other action with BLOCK / ON BLOCK ERROR; otherwise the paste shows errors and cloud-triggered runs reject the whole flow.
 - Comments: # text
 - Never write FUNCTION definitions, and no @@ lines in the script body.
 - Records with kind Condition are written IF (...) THEN and need END. kind Wait is WAIT (...). kind While is LOOP WHILE (...) with END.

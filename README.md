@@ -12,20 +12,20 @@ This repo is the missing reference.
 
 | File | Contents |
 |---|---|
-| `PAD_Robin_ActionKB.json` | 1,086 Robin actions across 46 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters (enum inputs list their allowed values), and the other selector forms of the same action. |
+| `PAD_Robin_ActionKB.json` | 1,086 Robin actions across 46 modules. Every record has a template, a golden example that pasted into PAD Designer with zero errors, typed input and output parameters (enum inputs list their allowed values), the other selector forms of the same action, and whether the action takes an `ON ERROR` handler and under which error names (`error_handling`, new in 3.5.0). |
 | `PAD_Robin_TypeReference.json` | 44 parameter types with the exact syntax PAD accepts for each: strings, numbers, file paths, handle variables, lists, UI selectors, and the rule for enums. |
 | `PROMPT.md` | A system prompt that turns a model into a template filler over these two files. This is how the data is meant to be used. |
 | `PAD_Robin_ActionKB_PowerFx.json` | The **Power Fx edition** (new in 3.4.0): the same 1,086 records with their values written for desktop flows created with Power Fx enabled (`$fx'...'`). Every golden example pasted into a Power Fx-enabled flow with zero errors. See [Power Fx flows](#power-fx-flows). |
 | `PAD_Robin_TypeReference_PowerFx.json` | The Type Reference for Power Fx flows. |
 | `PROMPT_PowerFx.md` | The system prompt for Power Fx flows. |
 | `rules/robin-rules.json` | The syntax rules below, each with the probe pastes that prove it. README, PROMPT.md and other copies are rendered from this file. |
-| `rules/probe-corpus.json` | 443 probe pastes into PAD 2.72 with the outcome PAD gave: rejected silently, landed with errors, or clean. Rows include PAD's own description where it was captured. |
+| `rules/probe-corpus.json` | 456 probe pastes (443 into PAD 2.72, 13 into PAD 2.73) with the outcome PAD gave: rejected silently, landed with errors, or clean. Rows include PAD's own description where it was captured. |
 
 **File names stay the same between releases** (since 3.3.1), so a link to the raw file on `main` always gets the latest KB:
 `https://raw.githubusercontent.com/JoeG592/pad-robin-action-kb/main/PAD_Robin_ActionKB.json`.
 The Power Fx edition works the same way: `.../main/PAD_Robin_ActionKB_PowerFx.json`.
 The version is inside each file (`version`, `pad_build`) and in the release tags. To stay on one version, link the file at its tag instead of `main`, for example `.../pad-robin-action-kb/v3.4.0/PAD_Robin_ActionKB.json`.
-The old names `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` are still kept, with the same content as the stable-name files, in 3.4.0; they will be removed in a later release.
+The old names `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` are still kept but frozen at 3.3.0 (no `error_handling`); use the stable names. They will be removed in a later release.
 
 Validated against PAD 2.73 (build 2.73.00155.26278), October 2026: all 987 golden examples carried over from the 2.72 release were re-pasted exactly as published into the 2.73 Designer, with zero errors, and the two records that are new or changed in 2.73 (`ComputerUse.InvokeComputerUse`, `LLM.InvokeLLM`) were paste-validated on the same build. 3.3 adds 97 records that act on a recorded UI element (50 desktop, 47 web), paste-validated on 2.73 against placeholder elements; see `needs_ui_selector` below. The syntax rules below were probed on PAD 2.72 in October 2026 with 563 test pastes, including 19 complex flows of up to 97 rows, and all 443 published probes were re-pasted on 2.73 with the same outcomes.
 
@@ -48,6 +48,7 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
   "constraints": { "DelimiterType": "Standard" },
   "sibling_selectors": [ "Text.JoinText.Join", "Text.JoinText.JoinWithCustomDelimiter" ],
   "needs_ui_selector": false,
+  "error_handling": { "on_error": false, "errors": [] },
   "validation": "paste-validated 2026-09 (PAD 2.72) ..."
 }
 ```
@@ -61,11 +62,23 @@ Do not ask the model to write Robin. Ask it to pick an action from the KB, copy 
 - **needs_ui_selector** marks 114 records whose input is a recorded UI element, web element, or image. Their examples will not run as written; the shape is still correct.
   - 97 refer to placeholder elements: `appmask['Window \'KB Test Window\'']['Button \'OK\'']`, `appmask['Web Page \'KB Test Page\'']['Button \'Submit\'']`. Record your own element in the Designer (UI elements pane) and put its names in the same `appmask['<screen>']['<element>']` form; the apostrophes inside the names are escaped as `\'`. These were validated by pasting into a flow whose UI element repository held the placeholders. The paste checks the reference: an element the flow doesn't have gives "UI element '...' wasn't found".
   - 17 were validated before 3.3: 14 use the text placeholder `Control: $'''body'''` (replace it the same way) and 3 are Windows OCR actions whose screen region is a placeholder.
+- **error_handling** (new in 3.5.0) says whether an action can take an `ON ERROR` handler, and under which error names. 1,016 records have `on_error: true` and list the errors the action declares, for example `File.ReadTextFromFile.ReadText` declares `FileNotFoundError` among others. 70 have `on_error: false`: `Text.JoinText`, `Text.ChangeCase`, `Variables.CreateNewList`, `DateTime.Add`, `File.IfFile` and the other actions that never raise an error. Use a handler only where `on_error` is true:
+
+  ```
+  File.ReadTextFromFile.ReadText File: $'''C:\Reports\in.txt''' Encoding: File.TextFileEncoding.UTF8 Content=> Content
+  ON ERROR FileNotFoundError
+      SET Content TO $'''missing'''
+  ON ERROR
+      SET Failed TO True
+  END
+  ```
+
+  Named cases come first and the plain `ON ERROR` (any other error) last; one `END` closes them all. A condition or wait takes its handler on the line after `IF (...) THEN` or `WAIT (...)`; a `WAIT` takes one even when its action declares no errors, because the wait itself can time out. Why it matters: an `ON ERROR` on an action with `on_error: false` lands in the Designer with "Exception handling isn't supported for this statement", and a name the action doesn't declare gives "Unknown exception". A flow that has either anyway, because it was written outside the Designer, still runs from the Console, but a **cloud-triggered run rejects the whole flow when it loads**. To guard actions that can't raise errors, put them in `BLOCK ... ON BLOCK ERROR`. Every record was load-tested through cloud-triggered runs on PAD 2.73, in both editions; see [How it was validated](#how-it-was-validated).
 
 ## Syntax rules PAD enforces
 
 <!-- robin-rules:begin -->
-Every rule below was confirmed by pasting into PAD 2.72 (2.72.00183.26250): 443 probe pastes in October 2026, kept with their outcomes in `rules/probe-corpus.json`. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.
+Every rule below was confirmed by pasting into PAD 2.72 (2.72.00183.26250): 443 probe pastes in October 2026, and 13 on PAD 2.73 for the error-handler forms, kept with their outcomes in `rules/probe-corpus.json`. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.
 
 **Values**
 
@@ -116,14 +129,20 @@ Every rule below was confirmed by pasting into PAD 2.72 (2.72.00183.26250): 443 
 
     Text.ToNumber Text: Raw Number=> Amount
     ON ERROR REPEAT 2 TIMES WAIT 5
+    ON ERROR TextNotValidNumberError
         SET Amount TO 0
+    ON ERROR
+        SET Failed TO True
     END
     ```
 
-    A handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other action gives "The statement isn't allowed inside exception handling", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `REPEAT` works only on an action's `ON ERROR`. `ERROR => LastError` reads the last error.
-21. Comments are `# text` or `/# ... #/`. Regions are `**REGION Name` / `**ENDREGION`; `REGION` / `END REGION` rejects the whole paste. A `DISABLE ` prefix disables a line.
-22. Don't paste the file header lines (`@@ConnectionString`, `IMPORT`, `@SENSITIVE`) or subflow definitions (`FUNCTION ... END FUNCTION`): both reject the whole paste. Create subflows in the Designer and paste each body into its own subflow. `@@copilotGeneratedAction: 'False'` works only directly before an action; other `@@` lines reject the paste.
-23. Ids removed in PAD 2.72 are rejected as "Unknown action": the bare `Database.Connect` (use `Database.Connect.Connect` or `.ConnectOracle`) and the bare `Scripting.RunPythonScript` (use `.RunPythonScript`, `.RunPythonScript34` or `.RunPythonScriptCPython`).
+    An action's handler goes on the lines right after it (for a condition or a wait, right after `IF (...) THEN` or `WAIT (...)`). The optional `ON ERROR REPEAT n TIMES WAIT n` comes first (it also takes `RetryType: RetryType.Exponential MinInterval: 1 MaxInterval: 10`), then any `ON ERROR <Name>` cases, then the plain `ON ERROR`; one `END` closes them all. A named case after the plain `ON ERROR`, or a second `ON ERROR ... END` after the first, drops the whole paste.
+
+    A handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other statement, `NEXT ACTION` included, gives "The statement isn't allowed inside exception handling", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `REPEAT` works only on an action's `ON ERROR`. A named `ON BLOCK ERROR` case is for custom error codes: `ON BLOCK ERROR MyErr IsUserDefinedErrorCode: True` catches `FlowControl.ThrowCustomError CustomErrorCode: $'''MyErr'''`. `ERROR => LastError` reads the last error.
+21. `ON ERROR` only on an action that can raise errors: its KB record has `error_handling.on_error: true`, and a named case uses a name from its `error_handling.errors`. On any other action the row lands with "Exception handling isn't supported for this statement", and a name the action doesn't declare gives "Unknown exception 'X'". A flow that has either anyway (written outside the Designer) runs from the Console, but a cloud-triggered run rejects the whole flow when it loads. Put actions that can't raise errors in `BLOCK ... ON BLOCK ERROR` instead. A `WAIT (...)` takes `ON ERROR` even when its action declares no errors, because the wait itself can time out.
+22. Comments are `# text` or `/# ... #/`. Regions are `**REGION Name` / `**ENDREGION`; `REGION` / `END REGION` rejects the whole paste. A `DISABLE ` prefix disables a line.
+23. Don't paste the file header lines (`@@ConnectionString`, `IMPORT`, `@SENSITIVE`) or subflow definitions (`FUNCTION ... END FUNCTION`): both reject the whole paste. Create subflows in the Designer and paste each body into its own subflow. `@@copilotGeneratedAction: 'False'` works only directly before an action; other `@@` lines reject the paste.
+24. Ids removed in PAD 2.72 are rejected as "Unknown action": the bare `Database.Connect` (use `Database.Connect.Connect` or `.ConnectOracle`) and the bare `Scripting.RunPythonScript` (use `.RunPythonScript`, `.RunPythonScript34` or `.RunPythonScriptCPython`).
 
 The 3.1.3 documentation said property access in an `IF` condition rejects the paste. That was wrong: it does not reproduce, and the form that fails is `%...%` outside a string.
 
@@ -133,7 +152,7 @@ The 3.1.3 documentation said property access in an `IF` condition rejects the pa
 node marketing/video/tools/check-flows.js PAD_Robin_ActionKB.json flow.robin
 ```
 
-On the probe corpus it flags 105 of 105 silent rejects and 18 of 23 pastes that landed with errors, and passes 313 of 315 clean pastes. The 2 it flags use `\%`, which PAD accepts while silently dropping the percent sign.
+On the probe corpus it flags 107 of 107 silent rejects and 22 of 27 pastes that landed with errors, and passes 320 of 322 clean pastes. The 2 it flags use `\%`, which PAD accepts while silently dropping the percent sign.
 <!-- robin-rules:end -->
 
 ## Troubleshooting
@@ -145,6 +164,8 @@ On the probe corpus it flags 105 of 105 silent rejects and 18 of 23 pastes that 
 Every golden example was pasted into PAD Designer through UI automation and accepted with zero errors in the error pane. The March 2026 set (369 records) was additionally run through producer-to-consumer chains, so that, for example, an Excel action was validated with a real `ExcelInstance` from a launch action before it. The September 2026 sets were validated the same way in batches, with each action's error flag read back from the canvas individually: 578 records on PAD 2.67, and 46 records on PAD 2.72 (the new PowerPoint, PGP, LLM, Triggers and environment actions, plus records whose arguments changed in 2.72).
 
 After each PAD update, the action ids and argument lists of every record are re-extracted from the module DLLs and compared. Records whose arguments changed are re-pasted on the new build, and records that no longer exist are removed (see CHANGELOG). Then every golden example in the release is re-pasted exactly as published on the new build. Each example gets the variables it references, such as an `ExcelInstance` or a `FileList`, from a validated producer action placed before it in the same paste. For PAD 2.72 that full re-paste was 988 examples in 83 batches with zero errors; each record's `validation` field records it.
+
+`error_handling` (3.5.0) was tested on the path that is strictest about it: a cloud-triggered run ("Run a flow built with Power Automate for desktop"), whose agent checks every line of the flow before it starts and rejects the whole flow on any error. The Designer flags the same handlers when you paste them, but a flow written outside the Designer (through the API, or generated and never pasted) still runs from the Console, so this is where they surface. Every published golden example was written into a test flow, behind an `IF` that is never true so nothing actually ran, and the flow was started from the cloud: records with `on_error: true` in batches with `ON ERROR <Name>` for each listed error plus a default `ON ERROR`, which loaded; records with `on_error: false` one at a time with a plain `ON ERROR`, each of which was rejected. Both editions, PAD 2.73, 334 runs. Controls showed the test can tell the two apart: a made-up error name was rejected, the same action with its real name loaded. Real runs confirmed the routing: a named case caught its error ahead of the default, a custom error code reached its `ON BLOCK ERROR MyErr IsUserDefinedErrorCode: True` case, and a `WAIT ... FOR 2` timeout reached `ON ERROR`. 13 paste probes on PAD 2.73 back the syntax rules for these forms. The error names come from the error declarations in PAD's module DLLs; where the loader disagreed with the DLLs (a `WAIT` takes `ON ERROR` even when its action declares no errors, because the wait itself can time out), `on_error` follows the loader.
 
 Pasting proves the golden example, not the metadata around it. So before each release, every record is also checked against the PAD module DLLs: its argument and output names and types, the arguments its template and example use, and its selector, constraints and sibling forms. The Type Reference's producer actions get the same check. A release is not published unless that check has zero errors.
 
@@ -184,8 +205,8 @@ A desktop flow can be created with Power Fx enabled. Its Robin is the same (same
 
 Power Fx flows run from the cloud ("Run a flow built with Power Automate for desktop") as well as from the PAD Console. Two things to know about cloud-triggered runs on PAD 2.73:
 
-- `ON ERROR` on an action that can't raise an error makes a cloud-triggered run reject the flow when it loads, in either edition. The same flow runs from the Console.
-- In a Power Fx flow, PAD reports *any* error it finds while loading the flow as "This flow contains an incompatible PowerFx version", even when the versions match. It is not a version problem: the real error is in PAD's logs (`C:ProgramDataMicrosoftPower AutomateLogs`, the RobinEngine log, event `robin.project.validate.flowcontainserror`), for example a record such as a file or an error placed inside text. 3.4.0 said Power Fx flows don't run from the cloud; that was this message, not a real limit.
+- `ON ERROR` on an action that can't raise an error makes a cloud-triggered run reject the flow when it loads, in either edition. The same flow runs from the Console. Each record's `error_handling.on_error` says which actions take a handler (see [Fields](#fields)).
+- In a Power Fx flow, PAD reports *any* error it finds while loading the flow as "This flow contains an incompatible PowerFx version", even when the versions match. It is not a version problem: the real error is in PAD's logs (`C:\ProgramData\Microsoft\Power Automate\Logs`, the RobinEngine log, event `robin.project.validate.flowcontainserror`), for example a record such as a file or an error placed inside text. 3.4.0 said Power Fx flows don't run from the cloud; that was this message, not a real limit.
 
 The checker, `check-flows.js`, is for classic Robin only. It doesn't understand `$fx'...'` values yet and reports false errors on Power Fx scripts.
 
