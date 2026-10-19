@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.6.1 (2026-10-19)
+
+File cleanup only. The KB data, Type References and prompts are unchanged (classic KB 3.4.0, Power Fx edition 1.1.0).
+
+- **Removed the old file names** `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json`, frozen at 3.3.0 since 3.3.1. Use `PAD_Robin_ActionKB.json` and `PAD_Robin_TypeReference.json`. A link to an old name still works at its tag, for example `.../pad-robin-action-kb/v3.6.0/PAD_Robin_ActionKB_v3_3.json`.
+
 ## 3.6.0 (2026-10-19)
 
 Adds the Deployment KB. The KB data files, Type References and prompts are unchanged.
