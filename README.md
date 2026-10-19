@@ -26,7 +26,7 @@ This repo is the missing reference.
 `https://raw.githubusercontent.com/JoeG592/pad-robin-action-kb/main/PAD_Robin_ActionKB.json`.
 The Power Fx edition works the same way: `.../main/PAD_Robin_ActionKB_PowerFx.json`.
 The version is inside each file (`version`, `pad_build`) and in the release tags. To stay on one version, link the file at its tag instead of `main`, for example `.../pad-robin-action-kb/v3.4.0/PAD_Robin_ActionKB.json`.
-The old names `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` are still kept but frozen at 3.3.0 (no `error_handling`); use the stable names. They will be removed in a later release.
+The old names `PAD_Robin_ActionKB_v3_3.json` and `PAD_Robin_TypeReference_v3_1.json` were removed in 3.6.1; they are still at the `v3.6.0` tag and earlier.
 
 Validated against PAD 2.73 (build 2.73.00155.26278), October 2026: all 987 golden examples carried over from the 2.72 release were re-pasted exactly as published into the 2.73 Designer, with zero errors, and the two records that are new or changed in 2.73 (`ComputerUse.InvokeComputerUse`, `LLM.InvokeLLM`) were paste-validated on the same build. 3.3 adds 97 records that act on a recorded UI element (50 desktop, 47 web), paste-validated on 2.73 against placeholder elements; see `needs_ui_selector` below. The syntax rules below were probed on PAD 2.72 in October 2026 with 563 test pastes, including 19 complex flows of up to 97 rows, and all 443 published probes were re-pasted on 2.73 with the same outcomes.
 
