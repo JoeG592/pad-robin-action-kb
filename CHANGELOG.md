@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.6.0 (2026-10-19)
+
+Adds the Deployment KB. The KB data files, Type References and prompts are unchanged.
+
+- **New: `PAD_Robin_Deployment_KB.md`** (1.0), the companion to the Action KB. The Action KB answers "what Robin will PAD accept?"; this one answers "how do I deliver it and run it?". It covers one sign-in for Graph, the Flow API and Dataverse; discovering the user's real environments, connections and connector operations; creating, starting and running cloud flows through the Flow API and the Dataverse `workflow` table, with the definition rules the API enforces and their exact error messages; validating desktop flows before delivery and delivering them by paste; running desktop flows from a cloud flow or the Console and reading the result from `flowsessions`; and a troubleshooting table. Every claim is marked Re-confirmed, Proven or Measured, checked against PAD 2.73.
+- **Direct Dataverse writes for desktop flows,** documented in full and marked as unsupported by Microsoft: editing and creating desktop flows, UI elements, inputs and outputs, child flows, and cloud connector actions, including operations with dynamic schemas.
+- README links the Deployment KB from the file table and from "Using it with an AI assistant".
+
 ## 3.5.0 (2026-10-17)
 
 Adds `error_handling` to every record, in both editions: can the action take an `ON ERROR` handler, and under which error names. Classic KB 3.4.0, Power Fx edition 1.1.0; the Type References are unchanged. Prompted by a question on Reddit about error handling in the KB.
