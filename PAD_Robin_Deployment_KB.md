@@ -1,6 +1,6 @@
 # PAD Robin Deployment KB
 
-**Version 1.1.** Every status below was checked against PAD 2.73 (2.73.00155.26278).
+**Version 1.1.1.** Every status below was checked against PAD 2.73 (2.73.00155.26278).
 
 How to get a Power Automate flow from generated text to a running flow without clicking through the portal. Every claim is marked with how sure it is.
 
@@ -321,7 +321,7 @@ A flow made this way and never opened in the Designer showed up in the cloud flo
 
 ### Flow inputs and outputs
 
-**Proven for every type** (Text, sensitive Text, Number, Boolean, Custom object, List, Datatable), on flows written through the API, run from a cloud flow and from the Console. The Designer opens them, shows every variable correctly, and keeps them when it publishes. The formats were copied from a flow made in the Designer.
+**Proven for every type** (Text, sensitive Text, Number, Boolean, Custom object, List, Datatable), in classic and Power Fx flows written through the API, run from a cloud flow and from the Console. The Designer opens them, shows every variable correctly, and keeps them when it publishes. The formats were copied from flows made in the Designer.
 
 - **Declare each variable twice, the same way in both places.**
   - **In the Robin header**, after `@SENSITIVE`, one line per variable. Sensitive variables also go in the `@SENSITIVE: [...]` list.
@@ -358,6 +358,11 @@ A flow made this way and never opened in the Designer showed up in the cloud flo
   - `flowsessions.inputs` and `outputs` are file columns: the row holds a file id, and the JSON comes from `flowsessions(<id>)/outputs/$value`.
   - On Console runs, `flowsessions` stores inputs and outputs as text (`"7"`, `"True"`, JSON as a string).
 - **Sensitive values are hidden only in `flowsessions`** (shown as `null`), and only when the column has `"format": "password"`. The cloud flow's run history stores them in plain text unless the action has Secure inputs and Secure outputs turned on.
+- **Power Fx flows declare inputs and outputs exactly the same way.**
+  - The header lines and columns are identical to a classic flow's, defaults included: they're classic literals (`0`, `False`, `{{ }}`), not `$fx`. What makes a flow Power Fx is `"PowerFxEnabled": true` in `flow.manifest` (keep the template's manifest).
+  - The script uses the inputs in Power Fx form: `$fx'=Count + 1'`, `$fx'Total ${Count}'`, `CountRows(Items)`.
+  - Every run and probe above gave the same result. The one difference: a load error, such as a misspelled type or a missing header line, is reported as `PowerFxPackagerValidationError`, "This flow contains an incompatible PowerFx version".
+  - In the Designer, an output assigned straight from an input (`SET Items2 TO $fx'=Items'`) gets a deferred type. It shows the generic `{x}` icon and a "Deferred type provided." warning, but its value still comes back with the right type.
 - Header lines can't be pasted into the Designer (a paste with them is dropped). Inputs and outputs are made in the Designer's variables pane, or written as above.
 
 > **Don't keep secrets in default values.** A default is stored in plain text in the flow's definition, even for an input marked sensitive. A real flow checked during this research had a password there. The Designer's flow checker also warns about input defaults.
