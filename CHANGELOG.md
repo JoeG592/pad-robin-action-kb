@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.7.1 (2026-10-25)
+
+Deployment KB 1.1.1: inputs and outputs in Power Fx flows. The KB data files, Type References and prompts are unchanged (classic KB 3.4.0, Power Fx edition 1.1.0).
+
+- **Power Fx flows declare inputs and outputs exactly like classic flows** (section 7). The same test was repeated on a Power Fx desktop flow written through the API on PAD 2.73: every type, cloud runs, a Console run, the mismatch probes, and a Designer open and Publish. All gave the same results.
+  - The header lines and the `inputs`/`outputs` columns are identical, defaults included (classic literals, not `$fx`). The flow is marked Power Fx only by `"PowerFxEnabled": true` in its manifest.
+  - Load errors (a misspelled type, a missing header line) are reported as "This flow contains an incompatible PowerFx version".
+  - An output assigned straight from an input gets a deferred type in the Designer ("Deferred type provided." warning) but still returns the right type.
+
 ## 3.7.0 (2026-10-25)
 
 Deployment KB 1.1: desktop flow inputs and outputs, tested for every type. The KB data files, Type References and prompts are unchanged (classic KB 3.4.0, Power Fx edition 1.1.0).
