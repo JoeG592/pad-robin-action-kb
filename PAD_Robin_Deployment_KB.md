@@ -1,6 +1,6 @@
 # PAD Robin Deployment KB
 
-**Version 1.0.** Every status below was checked against PAD 2.73 (2.73.00155.26278).
+**Version 1.1.** Every status below was checked against PAD 2.73 (2.73.00155.26278).
 
 How to get a Power Automate flow from generated text to a running flow without clicking through the portal. Every claim is marked with how sure it is.
 
@@ -9,7 +9,7 @@ It sits beside the PAD Robin Action KB in this repo (`PAD_Robin_ActionKB.json`, 
 | Mark | Meaning |
 |---|---|
 | **Re-confirmed** | Proven earlier and re-run on 2026-10-17 with the same result |
-| **Proven** | Done end to end and checked, between 2026-02-01 and 2026-10-17 (from October on PAD 2.73, the current build) |
+| **Proven** | Done end to end and checked, between 2026-02-01 and 2026-10-25 (from October on PAD 2.73, the current build) |
 | **Measured** | A one-off result (success rates) from a single test run on 2026-10-17 |
 | **Superseded** | Was believed or used, later replaced (the replacement is named) |
 | **Failed** | Tried and did not work |
@@ -321,28 +321,46 @@ A flow made this way and never opened in the Designer showed up in the cloud flo
 
 ### Flow inputs and outputs
 
-**Proven** (flows written through the API and run from a cloud flow). The formats were copied from flows made in the Designer.
+**Proven for every type** (Text, sensitive Text, Number, Boolean, Custom object, List, Datatable), on flows written through the API, run from a cloud flow and from the Console. The Designer opens them, shows every variable correctly, and keeps them when it publishes. The formats were copied from a flow made in the Designer.
 
-- **In the Robin header**, after `@SENSITIVE`, one line per variable. Sensitive variables also go in the `@SENSITIVE: [...]` list.
+- **Declare each variable twice, the same way in both places.**
+  - **In the Robin header**, after `@SENSITIVE`, one line per variable. Sensitive variables also go in the `@SENSITIVE: [...]` list.
 
-  ```
-  @SENSITIVE: []
-  @INPUT InText : { 'Description': '', 'FriendlyName': 'InText', 'Type': 'String', 'IsOptional': True, 'DefaultValue': 'hello' }
-  @OUTPUT OutText : { 'Description': '', 'FriendlyName': 'OutText', 'Type': 'String' }
-  ```
+    ```
+    @SENSITIVE: [Secret]
+    @INPUT Count : { 'Description': '', 'FriendlyName': 'Count', 'Type': 'Numeric', 'IsOptional': False, 'DefaultValue': 0 }
+    @INPUT Secret : { 'Description': '', 'FriendlyName': 'Secret', 'Type': 'String', 'IsOptional': False, 'DefaultValue': '' }
+    @OUTPUT Report : { 'Description': '', 'FriendlyName': 'Report', 'Type': 'String' }
+    ```
 
-- **In the `inputs` and `outputs` columns**, a JSON schema:
+  - **In the `inputs` and `outputs` columns**, a JSON schema. Required inputs are listed in `required`, and a sensitive variable has `"format": "password"`. A flow without inputs or outputs has `{"schema": null}`.
 
-  ```
-  {"schema":{"required":[],"properties":{"InText":{"isOptional":true,"default":"hello","description":"","format":null,"title":"InText","type":"string","value":null}},"type":"object"}}
-  ```
+    ```
+    {"schema":{"required":["Count"],"properties":{"Count":{"isOptional":false,"default":"","description":"","format":null,"title":"Count","type":"number","value":"0"}},"type":"object"}}
+    ```
 
-  Required inputs are also listed in `required`. A sensitive input has `"format": "password"`. A data table output has `"type": "array"`. A flow without inputs or outputs has `{"schema": null}`.
-- **Results come back in `flowsessions.outputs`** as JSON, for example `{"OutText":"hello done via parent"}`.
-- **`DefaultValue` doesn't apply on a cloud-triggered run.** An input the cloud flow doesn't pass arrives empty, even with a default in both the header and the column. Have the cloud flow pass every input.
+- **Types.** In the header, `'Type'` is one of: `String`, `Numeric`, `Bool`, `CustomObject`, `List` or `DataTable`. In the column, `type` is `string`, `number`, `boolean`, `object`, or `array` (for both List and Datatable). A misspelled header type (for example `Integer`) fails when the flow loads, with `RobinPackagerValidationError`.
+- **Defaults.**
+  - In the header, `DefaultValue` is a Robin literal: `0`, `False`, `''`, `{{ }}`, `[]`, `{ ^['Name', 'Qty'], ['Bolt', 5] }`.
+  - In the column, the Designer stores the default as text in `value` and leaves `default` empty. The Console's input form fills its fields from `value`.
+  - **A cloud-triggered run ignores defaults**, wherever they're stored. An input the cloud flow doesn't pass arrives empty. Have the cloud flow pass every input.
+- **The two declarations do different jobs.**
+  - The column decides which inputs a run accepts. With header lines but no column schema, the run fails with `FlowArgumentError` "Undefined input argument".
+  - The header defines the variables for the script. With a column schema but no header lines, the flow fails to load.
+  - Keep both identical. A type mismatch between them wasn't rejected, but which one wins wasn't determined.
+- **Calling it from a cloud flow.**
+  - "Run a flow built with Power Automate for desktop" (`RunUIFlow_V2`) takes the inputs as its `item` body. The designer writes each one as `item/<Name>`; passing `item` as one object also works.
+  - Inputs are matched by variable name. `FriendlyName` is only a label.
+  - An input added to the desktop flow is accepted on the next run without changing the cloud flow.
+  - A missing required input fails the run before any action, with `InvalidRobinArgument` "Parameter '<Name>' has invalid value."
+- **Results.**
+  - Outputs come back in the action's body and in `flowsessions.outputs`, with JSON types kept on cloud runs, for example `{"Count":42.0,"Done":false,"Items":["a","b"]}`. Numbers come back as decimals (`42.0`), including inside objects and tables.
+  - `flowsessions.inputs` and `outputs` are file columns: the row holds a file id, and the JSON comes from `flowsessions(<id>)/outputs/$value`.
+  - On Console runs, `flowsessions` stores inputs and outputs as text (`"7"`, `"True"`, JSON as a string).
+- **Sensitive values are hidden only in `flowsessions`** (shown as `null`), and only when the column has `"format": "password"`. The cloud flow's run history stores them in plain text unless the action has Secure inputs and Secure outputs turned on.
 - Header lines can't be pasted into the Designer (a paste with them is dropped). Inputs and outputs are made in the Designer's variables pane, or written as above.
 
-> **Don't keep secrets in default values.** A default is stored in plain text in the flow's definition, even for an input marked sensitive. A real flow checked during this research had a password there.
+> **Don't keep secrets in default values.** A default is stored in plain text in the flow's definition, even for an input marked sensitive. A real flow checked during this research had a password there. The Designer's flow checker also warns about input defaults.
 
 ### Child desktop flows
 
@@ -483,3 +501,5 @@ PAD's logs are in `C:\ProgramData\Microsoft\Power Automate\Logs`: one JSON event
 | **A flow that is On but never runs; trigger history shows `InvalidTemplate` about `splitOn`** | `splitOn` doesn't evaluate to an array; nothing checks it before the trigger fires | Use `splitOn` only on a batch trigger's array (`@triggerOutputs()?['body/value']`), or remove it |
 | **`InvokerConnectionOverrideFailed`** when starting a flow through `/triggers/manual/run` | The flow has a button (`kind: Button`) trigger | Use an HTTP request trigger and POST to its `listCallbackUrl` |
 | **`WorkflowOperationParametersExtraParameter`** | A parameter the operation doesn't define | Keep only parameters from the connector's swagger |
+| **Every Console run of a new or changed flow fails at once: "Load failed.", notification "Error in 'Main', action #0"**; cloud runs work, and flows that ran before still run | A .NET 10 update removed the runtime the open PAD Console had loaded. The Console log shows `MissingNetRuntimeAssembly` and `Could not load file or assembly 'System.IO.Compression, Version=10.0.0.0'` | Exit PAD from the system tray and reopen it |
+| **The Designer won't save a flow: "The flow has already been modified by one of its owners."** | The flow's records were written (for example through the API) after the Designer cached its copy | Close the flow without saving, then open it again |
