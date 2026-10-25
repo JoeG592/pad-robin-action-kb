@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.7.0 (2026-10-25)
+
+Deployment KB 1.1: desktop flow inputs and outputs, tested for every type. The KB data files, Type References and prompts are unchanged (classic KB 3.4.0, Power Fx edition 1.1.0).
+
+- **Inputs and outputs, every type** (section 7). 1.0 was based on one Text input and one Text output. Now proven for Text, sensitive Text, Number, Boolean, Custom object, List and Datatable, on desktop flows written through the API on PAD 2.73. Runs from a cloud flow and from the Console both worked. The Designer showed every variable correctly and kept them when it published. The header type names are `String`, `Numeric`, `Bool`, `CustomObject`, `List` and `DataTable`.
+- **What each declaration does.** The `inputs`/`outputs` column decides which inputs a run accepts: header lines without it fail with `FlowArgumentError`. The header defines the script's variables: the column without them fails to load. A misspelled type fails at load, not silently.
+- **Cloud runs.**
+  - Inputs are matched by variable name, not `FriendlyName`.
+  - An input added to the desktop flow is accepted without changing the cloud flow.
+  - A missing required input fails with `InvalidRobinArgument`.
+  - Numbers come back as decimals (`42.0`).
+  - Defaults are still ignored, wherever they're stored.
+- **Sensitive values** are hidden only in `flowsessions`, and only with `"format": "password"` in the column. The cloud flow's run history stores them in plain text unless the action has Secure inputs and outputs turned on.
+- **Correction:** 1.0's column example kept a Text default in `default`. The Designer keeps defaults in `value`, and the Console's input form reads them from there. The example now uses the Designer's format.
+- `flowsessions.inputs` and `outputs` are file columns, read through `/outputs/$value`. On Console runs they hold text rather than typed JSON.
+- **Two new troubleshooting rows** (section 9):
+  - Every Console run of a new flow fails with "Load failed." after a .NET 10 update. The open Console lost its runtime (`MissingNetRuntimeAssembly`); restart PAD.
+  - The Designer refuses to save with "already been modified by one of its owners" after an API write; reopen the flow.
+
 ## 3.6.1 (2026-10-19)
 
 File cleanup only. The KB data, Type References and prompts are unchanged (classic KB 3.4.0, Power Fx edition 1.1.0).
