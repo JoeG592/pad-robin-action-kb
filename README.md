@@ -20,6 +20,7 @@ This repo is the missing reference.
 | `PROMPT_PowerFx.md` | The system prompt for Power Fx flows. |
 | `rules/robin-rules.json` | The syntax rules below, each with the probe pastes that prove it. README, PROMPT.md and other copies are rendered from this file. |
 | `PAD_Robin_Deployment_KB.md` | The **Deployment KB** (new in 3.6.0): how to get a flow from generated text to a running flow without clicking through the portal. Sign-in, discovery, cloud flows through the Flow API and the Dataverse `workflow` table, validating and delivering desktop flows, running them from the cloud, and a troubleshooting table. Every claim is marked with how sure it is. |
+| `PAD_Robin_Solutions_KB.md` | The **Solutions KB** (new in 3.8.0): how to move a Power Platform solution to another environment or another organization's tenant with code, and keep two copies in sync. Signing in to two tenants, export and import, connection references and turning flows on, desktop flows in solutions, change detection and sync direction, and a troubleshooting table. Every claim is marked with how sure it is. |
 | `rules/probe-corpus.json` | 456 probe pastes (443 into PAD 2.72, 13 into PAD 2.73) with the outcome PAD gave: rejected silently, landed with errors, or clean. Rows include PAD's own description where it was captured. |
 
 **File names stay the same between releases** (since 3.3.1), so a link to the raw file on `main` always gets the latest KB:
@@ -185,7 +186,7 @@ PAD 2.73 exposes 139 further selector variants that are not included here: 103 n
 
 For a flow created with Power Fx enabled, use the Power Fx files and `PROMPT_PowerFx.md` instead (next section).
 
-To deliver the flow and run it from code rather than by pasting, see [`PAD_Robin_Deployment_KB.md`](PAD_Robin_Deployment_KB.md).
+To deliver the flow and run it from code rather than by pasting, see [`PAD_Robin_Deployment_KB.md`](PAD_Robin_Deployment_KB.md). To move a whole solution to another environment or tenant, or keep two copies in sync, see [`PAD_Robin_Solutions_KB.md`](PAD_Robin_Solutions_KB.md).
 
 ## Power Fx flows
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.8.0 (2026-11-02)
+
+Adds the Solutions KB. The KB data files, Type References, prompts and the Deployment KB are unchanged.
+
+- **New: `PAD_Robin_Solutions_KB.md`** (1.0), the third guide beside the Action KB and the Deployment KB. The Deployment KB answers "how do I get one flow into an environment and run it?"; this one answers "how do I move a whole solution, and keep it moving?". It covers:
+  - signing in to two tenants, and the four things a receiving tenant needs before its first import, each with the error you get without it
+  - export and import through the Dataverse Web API, including watching the import job, reading per-component warnings, and the fallback when an org refuses async imports
+  - connection references: the import never creates connections, but it can bind references to existing ones; then turning on the flows that were on in the source
+  - environment variables, desktop flows inside solutions, and keeping two copies in sync (a content hash instead of a ZIP hash, stopping the ping-pong after an import, choosing the direction, conflicts)
+  - where the code runs (PowerShell, a server, a browser extension), measured durations, and a troubleshooting table of 27 errors
+- **How it was tested:** the main paths were re-tested on 2026-10-21 across two tenants. Every claim is marked Re-confirmed, Proven, Measured, Superseded, Failed or Untested. All tests used a user sign-in and unmanaged solutions; managed solutions got one export and import, and nothing was tested with a service principal.
+- README lists the Solutions KB in the file table and links it from "Using it with an AI assistant".
+
 ## 3.7.1 (2026-10-25)
 
 Deployment KB 1.1.1: inputs and outputs in Power Fx flows. The KB data files, Type References and prompts are unchanged (classic KB 3.4.0, Power Fx edition 1.1.0).
