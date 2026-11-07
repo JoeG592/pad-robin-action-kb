@@ -1,7 +1,7 @@
 {
   "name": "PAD Robin syntax rules",
-  "pad_build": "2.72.00183.26250",
-  "date": "2026-10-07",
+  "pad_build": "2.74.00191.26302",
+  "date": "2026-11-07",
   "description": "Single source for the Robin syntax rules. tools render them into README.md, PROMPT.md and other copies such as a skill or an app prompt (rules/render-rules.js), and test the checker against them (rules/rules.test.js). A silent or error rule must cite probes from probe-corpus.json that show both the failure and the fix.",
   "fields": {
     "kind": "silent = PAD drops the whole paste with no error; error = the row lands with an error; value = pastes but PAD reads a different value; works = confirmed to paste; lenient = PAD accepts variations; rule = basic syntax; usage = how to use the KB (prompt only)",
@@ -206,7 +206,7 @@
     },
     {
       "id": "error-handlers", "section": "statements", "kind": "error",
-      "doc": "Error handling for a group of actions, and for a single action:\n\n```\nBLOCK ReadFiles\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    ...actions...\nEND\n\nText.ToNumber Text: Raw Number=> Amount\nON ERROR REPEAT 2 TIMES WAIT 5\nON ERROR TextNotValidNumberError\n    SET Amount TO 0\nON ERROR\n    SET Failed TO True\nEND\n```\n\nAn action's handler goes on the lines right after it (for a condition or a wait, right after `IF (...) THEN` or `WAIT (...)`). The optional `ON ERROR REPEAT n TIMES WAIT n` comes first (it also takes `RetryType: RetryType.Exponential MinInterval: 1 MaxInterval: 10`), then any `ON ERROR <Name>` cases, then the plain `ON ERROR`; one `END` closes them all. A named case after the plain `ON ERROR`, or a second `ON ERROR ... END` after the first, drops the whole paste.\n\nA handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other statement, `NEXT ACTION` included, gives \"The statement isn't allowed inside exception handling\", and an `IF` inside a handler rejects the whole paste. Set a flag in the handler and act on it after the block. `REPEAT` works only on an action's `ON ERROR`. A named `ON BLOCK ERROR` case is for custom error codes: `ON BLOCK ERROR MyErr IsUserDefinedErrorCode: True` catches `FlowControl.ThrowCustomError CustomErrorCode: $'''MyErr'''`. `ERROR => LastError` reads the last error.",
+      "doc": "Error handling for a group of actions, and for a single action:\n\n```\nBLOCK ReadFiles\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    ...actions...\nEND\n\nText.ToNumber Text: Raw Number=> Amount\nON ERROR REPEAT 2 TIMES WAIT 5\nON ERROR TextNotValidNumberError\n    SET Amount TO 0\nON ERROR\n    SET Failed TO True\nEND\n```\n\nAn action's handler goes on the lines right after it (for a condition or a wait, right after `IF (...) THEN` or `WAIT (...)`). The optional `ON ERROR REPEAT n TIMES WAIT n` comes first (it also takes `RetryType: RetryType.Exponential MinInterval: 1 MaxInterval: 10`), then any `ON ERROR <Name>` cases, then the plain `ON ERROR`; one `END` closes them all. A named case after the plain `ON ERROR`, or a second `ON ERROR ... END` after the first, drops the whole paste.\n\nA handler may contain only `SET`, `CALL`, `GOTO` and `THROW ERROR`. Any other statement, `NEXT ACTION` included, gives \"The statement isn't allowed inside exception handling\". An `IF` inside a handler gives the same error (on PAD 2.73 and earlier it rejected the whole paste). Set a flag in the handler and act on it after the block. `REPEAT` works only on an action's `ON ERROR`. A named `ON BLOCK ERROR` case is for custom error codes: `ON BLOCK ERROR MyErr IsUserDefinedErrorCode: True` catches `FlowControl.ThrowCustomError CustomErrorCode: $'''MyErr'''`. `ERROR => LastError` reads the last error.",
       "prompt": [
         "- Error handling: BLOCK Name / ON BLOCK ERROR / SET Failed TO True / END / ...actions... / END. For one action: ON ERROR ... END on the lines right after it (or ON ERROR REPEAT 2 TIMES WAIT 5 ... END).",
         "- Named cases: ON ERROR TextNotValidNumberError / SET ... / ON ERROR / SET ... / END. Named cases first, the plain ON ERROR last, ONE END for all of them; never a second ON ERROR ... END after the first.",
@@ -215,7 +215,7 @@
       "bad": ["BLOCK Work\nON BLOCK ERROR\n    Logging.LogMessage Message: $'''x''' LogLevel: Logging.LogLevel.ErrorLevel\nEND\n    WAIT 1\nEND", "SET A TO 1\nBLOCK Work\nON BLOCK ERROR\n    IF A = 1 THEN\n    END\nEND\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR\n    SET Failed TO True\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nEND\nON ERROR\n    SET Failed TO True\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR\n    NEXT ACTION\nEND"],
       "good": ["SET Failed TO False\nBLOCK Work\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    WAIT 1\nEND\nIF Failed = True THEN\n    Logging.LogMessage Message: $'''x''' LogLevel: Logging.LogLevel.ErrorLevel\nEND", "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR REPEAT 2 TIMES WAIT 1\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nON ERROR\n    SET Failed TO True\nEND"],
       "evidence": [
-        { "probe": "OB2-log", "outcome": "errors" }, { "probe": "OB1-additem", "outcome": "errors" }, { "probe": "OB9-block-ifinside", "outcome": "rejected" },
+        { "probe": "OB2-log", "outcome": "errors" }, { "probe": "OB1-additem", "outcome": "errors" }, { "probe": "OB9-block-ifinside", "outcome": "errors" },
         { "probe": "OB4-set", "outcome": "clean" }, { "probe": "ES7-onerror-goto-inside", "outcome": "clean" }, { "probe": "ES8-onerror-throw-set", "outcome": "clean" },
         { "probe": "D-E05-onerror-repeat", "outcome": "clean" }, { "probe": "E02-block-repeat", "outcome": "errors" }, { "probe": "EH01-named-default", "outcome": "clean" },
         { "probe": "EH05-repeat-named-default", "outcome": "clean" }, { "probe": "EH06-repeat-exponential", "outcome": "clean" }, { "probe": "EH08-if-condition", "outcome": "clean" },
@@ -258,10 +258,10 @@
     },
     {
       "id": "removed-ids", "section": "statements", "kind": "error",
-      "doc": "Ids removed in PAD 2.72 are rejected as \"Unknown action\": the bare `Database.Connect` (use `Database.Connect.Connect` or `.ConnectOracle`) and the bare `Scripting.RunPythonScript` (use `.RunPythonScript`, `.RunPythonScript34` or `.RunPythonScriptCPython`).",
+      "doc": "Ids PAD has removed are rejected as \"Unknown action\". PAD 2.72 removed the bare `Database.Connect` (use `Database.Connect.Connect` or `.ConnectOracle`) and the bare `Scripting.RunPythonScript` (use `.RunPythonScript`, `.RunPythonScript34` or `.RunPythonScriptCPython`). PAD 2.74 removed the bare `ComputerUse.InvokeComputerUse` (use `.AutomationFramework` or `.PureVision`) and 11 bare UI automation ids, which now have a plain form and a `...WithTimeout` form: `UIAutomation.PressButton` (use `UIAutomation.PressButton.PressButton` or `.PressButtonWithTimeout`), and the same for `DragAndDropElement`, `ExpandCollapseTreeNode`, `FocusTextField`, `GetElementDetails`, `GetWindowDetails`, `HoverOnElement`, `SelectMenuOption`, `SelectRadioButton`, `SelectTab` and `SetCheckboxState`.",
       "bad": ["Database.Connect ConnectionString: $'''x''' Connection=> SQLConnection"],
       "good": ["Database.Connect.Connect ConnectionString: $'''x''' Connection=> SQLConnection"],
-      "evidence_note": "Probed on PAD 2.72 on 2026-09-24 (5 single-test batches; see CHANGELOG 3.1.2). Not in this corpus."
+      "evidence_note": "Probed on PAD 2.72 on 2026-09-24 (5 single-test batches; see CHANGELOG 3.1.2), and on PAD 2.74 on 2026-11-07: the bare UIAutomation.PressButton example landed as \"Unknown action\" (\"Module 'UIAutomation' or action 'PressButton' wasn't found.\"), while UIAutomation.PressButton.PressButton with the same arguments was recognized. The other 2.74 removals come from the DLL selector library; every new form was paste-validated. Not in this corpus."
     },
     {
       "id": "record-kinds", "section": "statements", "kind": "usage",
