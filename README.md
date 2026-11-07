@@ -6,7 +6,9 @@ There is no official Robin reference. The original language site went offline in
 
 This repo is the missing reference.
 
-[![Watch the 80-second promo: real pastes into PAD Designer, from 4 to 61 actions](marketing/video/poster.png)](marketing/video/pad-robin-kb-promo.mp4)
+https://github.com/user-attachments/assets/f9a1d40f-50a4-4be1-b33a-50d60a1c71b7
+
+The 80-second promo: real pastes into PAD Designer, from 4 to 61 actions. Full quality: [16:9](https://github.com/JoeG592/pad-robin-action-kb/releases/download/v3.9.2/pad-robin-kb-promo.mp4) · [4:5, for feeds](https://github.com/JoeG592/pad-robin-action-kb/releases/download/v3.9.2/pad-robin-kb-promo-4x5.mp4). The videos are not stored in the repo, so a clone stays small.
 
 ## What is in it
 
@@ -22,6 +24,7 @@ This repo is the missing reference.
 | `PAD_Robin_Deployment_KB.md` | The **Deployment KB** (new in 3.6.0): how to get a flow from generated text to a running flow without clicking through the portal. Sign-in, discovery, cloud flows through the Flow API and the Dataverse `workflow` table, validating and delivering desktop flows, running them from the cloud, and a troubleshooting table. Every claim is marked with how sure it is. |
 | `PAD_Robin_Solutions_KB.md` | The **Solutions KB** (new in 3.8.0): how to move a Power Platform solution to another environment or another organization's tenant with code, and keep two copies in sync. Signing in to two tenants, export and import, connection references and turning flows on, desktop flows in solutions, change detection and sync direction, and a troubleshooting table. Every claim is marked with how sure it is. |
 | `rules/probe-corpus.json` | 456 probe pastes (written on PAD 2.72 and 2.73, all re-pasted on PAD 2.74) with the outcome PAD gave: rejected silently, landed with errors, or clean. Rows include PAD's own description where it was captured. |
+| `examples/` | Six complete flows built only from golden examples (4 to 61 rows), the ones pasted in the promo video, plus one deliberately wrong flow written from memory for comparison. |
 
 **File names stay the same between releases** (since 3.3.1), so a link to the raw file on `main` always gets the latest KB:
 `https://raw.githubusercontent.com/JoeG592/pad-robin-action-kb/main/PAD_Robin_ActionKB.json`.
