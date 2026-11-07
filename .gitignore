@@ -1,0 +1,10 @@
+# Videos are hosted outside the repo (README player and release files), so clones stay small.
+*.mp4
+
+# The promo video's build lives locally only. The public repo keeps the poster and the checker.
+marketing/video/*
+!marketing/video/poster.png
+!marketing/video/tools/
+marketing/video/tools/*
+!marketing/video/tools/check-flows.js
+!marketing/video/tools/check-flows.test.js

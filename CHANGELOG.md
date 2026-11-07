@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.9.2 (2026-11-07)
+
+Smaller clones. The KB data files, Type References, prompts and guides are unchanged. Suggested by a user on Reddit.
+
+- **The promo videos are no longer stored in the repo.** The README plays the video from GitHub's video hosting, and the full-quality 16:9 and 4:5 MP4s are attached to this release. `*.mp4` is in `.gitignore`.
+- **New `examples/` folder** with the six flows from the video: five complete flows of 4 to 61 rows built only from golden examples, and the deliberately wrong "written from memory" flow they're compared against, with a README. All six still give the same result against the 2.74 KB with `check-flows.js`.
+- The rest of the video's build (scenes, capture and render scripts, screen captures) is no longer in the repo. The checker stays at `marketing/video/tools/check-flows.js`, and the README's poster image stays at `marketing/video/poster.png`.
+- Earlier versions of the videos are still in the git history, so a full clone is not smaller yet. A clone with `git clone --filter=blob:none` skips them.
+
 ## 3.9.1 (2026-11-07)
 
 Deployment KB 1.2: re-checked on PAD 2.74. The KB data files, Type References, prompts and the Solutions KB are unchanged.
