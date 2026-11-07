@@ -47,7 +47,8 @@ function renderDoc(score) {
   const out = [];
   const later = corpus.probes.filter(p => p.pad_build);
   const laterNote = later.length ? `, and ${later.length} on PAD ${later[0].pad_build.split(".").slice(0, 2).join(".")} for the error-handler forms` : "";
-  out.push(`Every rule below was confirmed by pasting into PAD ${rulesFile.pad_build.split(".").slice(0, 2).join(".")} (${rulesFile.pad_build}): ${corpus.probes.length - later.length} probe pastes in October 2026${laterNote}, kept with their outcomes in \`rules/probe-corpus.json\`. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.`);
+  const when = later.length ? "in October 2026" : `(written in October 2026, all re-pasted on ${corpus.date})`;
+  out.push(`Every rule below was confirmed by pasting into PAD ${rulesFile.pad_build.split(".").slice(0, 2).join(".")} (${rulesFile.pad_build}): ${corpus.probes.length - later.length} probe pastes ${when}${laterNote}, kept with their outcomes in \`rules/probe-corpus.json\`. Most failures are silent. PAD drops the whole paste, the canvas stays empty and no error is shown, so one bad line costs the whole script.`);
   let n = 0;
   for (const s of rulesFile.sections) {
     const rules = rulesFile.rules.filter(r => r.section === s.id && r.doc);

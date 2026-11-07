@@ -1,12 +1,12 @@
 {
  "name": "PAD Robin syntax probe corpus",
- "pad_build": "2.72.00183.26250",
- "date": "2026-10-06",
- "description": "Probe pastes into PAD Designer (paste only, nothing run; round 7 on the pad_build it names) with the outcome PAD gave. rejected = PAD dropped the whole paste silently (empty canvas, no error); errors = rows landed with errors; clean = zero errors. details are PAD's own description of each canvas row, where captured. Robin lines here are test inputs, not recommendations: many are deliberately wrong.",
+ "pad_build": "2.74.00191.26302",
+ "date": "2026-11-07",
+ "description": "Probe pastes into PAD Designer (paste only, nothing run; written in October 2026, every probe re-pasted on PAD 2.74.00191.26302 on 2026-11-07) with the outcome PAD gave. rejected = PAD dropped the whole paste silently (empty canvas, no error); errors = rows landed with errors; clean = zero errors. details are PAD's own description of each canvas row, where captured. Robin lines here are test inputs, not recommendations: many are deliberately wrong.",
  "counts": {
   "clean": 322,
-  "rejected": 107,
-  "errors": 27
+  "rejected": 106,
+  "errors": 28
  },
  "probes": [
   {
@@ -2422,8 +2422,19 @@
    "round": 2,
    "desc": "ON BLOCK ERROR with an IF inside",
    "robin": "SET Failed TO False\nVariables.CreateNewList List=> Failures\nBLOCK Work\nON BLOCK ERROR\n    IF Failed = False THEN\n        SET Failed TO True\n    END\nEND\n    Clipboard.SetText Text: $'''x'''\nEND\n",
-   "outcome": "rejected",
-   "rows": 0
+   "outcome": "errors",
+   "rows": 6,
+   "details": [
+    "Set variable ~ Assign to variable   the value False ~ Failed",
+    "Create new list ~ Create a new list and store it to   ~ Failures",
+    "On block error ~ Work",
+    "End",
+    "Set clipboard text ~ Store the text 'x' into the clipboard",
+    "End"
+   ],
+   "errors": [
+    "The statement isn't allowed inside exception handling."
+   ]
   },
   {
    "id": "D-X01",
@@ -5158,7 +5169,6 @@
   {
    "id": "EH01-named-default",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nON ERROR\n    SET Failed TO True\nEND\n",
    "outcome": "clean",
@@ -5170,7 +5180,6 @@
   {
    "id": "EH02-badname",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR NoSuchError\n    SET Num TO 0\nEND\n",
    "outcome": "errors",
@@ -5185,7 +5194,6 @@
   {
    "id": "EH03-default-first",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR\n    SET Failed TO True\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nEND\n",
    "outcome": "rejected",
@@ -5194,7 +5202,6 @@
   {
    "id": "EH04-two-groups",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nEND\nON ERROR\n    SET Failed TO True\nEND\n",
    "outcome": "rejected",
@@ -5203,7 +5210,6 @@
   {
    "id": "EH05-repeat-named-default",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR REPEAT 2 TIMES WAIT 1\nON ERROR TextNotValidNumberError\n    SET Num TO 0\nON ERROR\n    SET Failed TO True\nEND\n",
    "outcome": "clean",
@@ -5215,7 +5221,6 @@
   {
    "id": "EH06-repeat-exponential",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR REPEAT 3 TIMES WAIT 2 RetryType: RetryType.Exponential MinInterval: 1 MaxInterval: 10\nEND\n",
    "outcome": "clean",
@@ -5227,7 +5232,6 @@
   {
    "id": "EH07-nextaction",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "Text.ToNumber Text: $'''abc''' Number=> Num\nON ERROR\n    NEXT ACTION\nEND\nSET Done TO True\n",
    "outcome": "errors",
@@ -5243,7 +5247,6 @@
   {
    "id": "EH08-if-condition",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "IF (OCR.IfTextOnScreen.TextOnScreenExistsWithWindowsOcr TextToFind: $'''example''' IsRegex: False WindowsOcrLanguage: OCR.WindowsOcrLanguage.English SearchForTextOn: OCR.SearchTarget.EntireScreen ImageWidthMultiplier: 1 ImageHeightMultiplier: 1 TextLocationX=> LocationOfTextFoundX TextLocationY=> LocationOfTextFoundY) THEN\nON ERROR FailedToAnalyzeTextWithOCRError\n    SET Failed TO True\nON ERROR\n    SET Failed TO True\nEND\n    SET Found TO True\nEND\n",
    "outcome": "clean",
@@ -5257,7 +5260,6 @@
   {
    "id": "EH09-wait-timeout",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "WAIT (File.WaitForFile.Created File: $'''C:\\temp\\x.txt''') FOR 5\nON ERROR\n    SET Failed TO True\nEND\n",
    "outcome": "clean",
@@ -5269,7 +5271,6 @@
   {
    "id": "EH10-block-custom",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "BLOCK Work\nON BLOCK ERROR MyErr IsUserDefinedErrorCode: True\n    SET Failed TO True\nON BLOCK ERROR\n    SET Other TO True\nEND\n    FlowControl.ThrowCustomError CustomErrorCode: $'''MyErr''' CustomErrorMessage: $'''x'''\nEND\n",
    "outcome": "clean",
@@ -5283,7 +5284,6 @@
   {
    "id": "EH11-nothrows-onerror",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "Text.ChangeCase Text: $'''a''' NewCase: Text.CaseOption.UpperCase Result=> T\nON ERROR\n    SET Failed TO True\nEND\n",
    "outcome": "errors",
@@ -5298,7 +5298,6 @@
   {
    "id": "EH13-block-declared-name",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "BLOCK Work\nON BLOCK ERROR TextNotValidNumberError\n    SET Failed TO True\nON BLOCK ERROR\n    SET Other TO True\nEND\n    Text.ToNumber Text: $'''abc''' Number=> Num\nEND\n",
    "outcome": "errors",
@@ -5315,7 +5314,6 @@
   {
    "id": "EH12-nothrows-block",
    "round": 7,
-   "pad_build": "2.73.00155.26278",
    "desc": "error handler forms (2026-10-17)",
    "robin": "BLOCK Work\nON BLOCK ERROR\n    SET Failed TO True\nEND\n    Text.ChangeCase Text: $'''a''' NewCase: Text.CaseOption.UpperCase Result=> T\nEND\n",
    "outcome": "clean",

@@ -1,5 +1,29 @@
 # Changelog
 
+## 3.9.0 (2026-11-07)
+
+Updated for PAD 2.74 (2.74.00191.26302). Classic KB 3.5.0 and Power Fx edition 1.2.0, 1,135 records each across 46 modules (1,086 in 3.8.0); the Type References are unchanged (3.1.1 and Power Fx 1.0.0).
+
+- **Removed in PAD 2.74: 12 bare action ids, which now paste as "Unknown action".** They were split into named forms:
+  - `ComputerUse.InvokeComputerUse` → `.AutomationFramework` and `.PureVision`
+  - 11 UI automation actions → a plain form and a `...WithTimeout` form each: `PressButton` (use `UIAutomation.PressButton.PressButton` or `.PressButtonWithTimeout`), `DragAndDropElement`, `ExpandCollapseTreeNode`, `FocusTextField`, `GetElementDetails`, `GetWindowDetails`, `HoverOnElement`, `SelectMenuOption`, `SelectRadioButton`, `SelectTab`, `SetCheckboxState`
+
+  The KB publishes the new forms instead. **A script that uses the old bare ids no longer pastes on 2.74**: switch it to the new forms. Rule 24 lists them.
+- **New in PAD 2.74:**
+  - `...WithTimeout` forms (`Timeout`, `UseTimeout`) on the UI automation window actions. Those actions now also declare `ActionTimeoutError`, so `ON ERROR ActionTimeoutError` is a valid case for them (25 actions; in `error_handling.errors`).
+  - `LLM.InvokeLLM` takes an optional `Provider` (`LLM.LLMProvider.Local` or `.AzureAIFoundry`). The example now includes `Provider: LLM.LLMProvider.Local`; the example without it still pastes clean.
+  - `PowerAutomateEnvironment.GetFlowMetadata` has a new `RunId` output.
+  - Enum values added (none removed): `DatabaseType` gained `SqlServer`, and the time-zone list gained Alberta, British Columbia and Manitoba.
+  - `ComputerUse` defaults changed to interaction mode `PureVision` and reasoning effort `high`.
+- **Syntax rule changed (rule 20):** an `IF` inside an `ON ERROR` / `ON BLOCK ERROR` handler no longer drops the whole paste. It lands, and the handler row shows "The statement isn't allowed inside exception handling", the same as other statements that aren't allowed there. It is still not allowed.
+- **How 2.74 was tested:**
+  - **Full regression, both editions:** all 1,135 golden examples re-pasted exactly as published, 93 batches each, zero errors.
+  - **New and changed records:** 98 paste-validated on 2.74 (68 UI automation forms against placeholder elements, 29 others, and `LLM.InvokeLLM` with both `Provider` values).
+  - **Syntax regression:** all 456 probes in `rules/probe-corpus.json` re-pasted. 455 gave the same outcome, and probe `OB9-block-ifinside` moved from rejected to errors (rule 20). The corpus now records the 2.74 outcomes.
+  - **`error_handling` load test** for the 61 records new in 2.74, through cloud-triggered runs in both editions: 26 runs, all as expected, including the controls.
+  - DLL consistency check against the 2.74 modules: zero errors, the same 14 warnings as on 2.73.
+- **The Designer also changed** (not affecting Robin): a redesigned toolbar, and UI automation rows offer "Self-healing", a new error-handling option.
+
 ## 3.8.0 (2026-11-02)
 
 Adds the Solutions KB. The KB data files, Type References, prompts and the Deployment KB are unchanged.
