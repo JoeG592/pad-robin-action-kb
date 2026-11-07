@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.9.1 (2026-11-07)
+
+Deployment KB 1.2: re-checked on PAD 2.74. The KB data files, Type References, prompts and the Solutions KB are unchanged.
+
+- **The Deployment KB's PAD-dependent claims were re-run on PAD 2.74 (2.74.00191.26302), with the same results as on 2.73:**
+  - a desktop flow created from scratch through the API, with all seven input and output types, run from a cloud flow (including a missing required input failing with `InvalidRobinArgument`, and defaults ignored on cloud runs)
+  - a child flow through `External.RunFlow`
+  - a cloud connector action (Office 365 Users) inside a desktop flow
+  - a Console run by link
+  - from the 3.9.0 work: the paste and syntax checks, definition writes started from the cloud in both editions, and UI elements written through the API
+- The header now lists what was re-run on 2.74. The 17-probe parity test and the Designer-side details were not re-run.
+- The Solutions KB needs no re-check for a PAD update: everything in it goes through Dataverse's solution APIs, which don't depend on the PAD build.
+
 ## 3.9.0 (2026-11-07)
 
 Updated for PAD 2.74 (2.74.00191.26302). Classic KB 3.5.0 and Power Fx edition 1.2.0, 1,135 records each across 46 modules (1,086 in 3.8.0); the Type References are unchanged (3.1.1 and Power Fx 1.0.0).

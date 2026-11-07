@@ -1,6 +1,6 @@
 # PAD Robin Deployment KB
 
-**Version 1.1.1.** Every status below was checked against PAD 2.73 (2.73.00155.26278).
+**Version 1.2.** Every status below was checked against PAD 2.73 (2.73.00155.26278). The parts that depend on the PAD build were re-run on PAD 2.74 (2.74.00191.26302) on 2026-11-07 with the same results: the paste and syntax checks (all 456 probes), definition writes started from the cloud in both editions, a flow created from scratch, flow inputs and outputs, a child flow, a cloud connector action, UI elements written through the API, and a Console run by link. The 17-probe parity test (section 5) and the Designer-side details (section 7) were not re-run on 2.74. Sign-in, discovery and cloud flows don't depend on the PAD build.
 
 How to get a Power Automate flow from generated text to a running flow without clicking through the portal. Every claim is marked with how sure it is.
 
@@ -9,7 +9,7 @@ It sits beside the PAD Robin Action KB in this repo (`PAD_Robin_ActionKB.json`, 
 | Mark | Meaning |
 |---|---|
 | **Re-confirmed** | Proven earlier and re-run on 2026-10-17 with the same result |
-| **Proven** | Done end to end and checked, between 2026-02-01 and 2026-10-25 (from October on PAD 2.73, the current build) |
+| **Proven** | Done end to end and checked, between 2026-02-01 and 2026-11-07 (from October on PAD 2.73; what was re-run on PAD 2.74 is listed above) |
 | **Measured** | A one-off result (success rates) from a single test run on 2026-10-17 |
 | **Superseded** | Was believed or used, later replaced (the replacement is named) |
 | **Failed** | Tried and did not work |
@@ -269,7 +269,7 @@ Remove PAD's file header lines before handing the script over: `@@ConnectionStri
 
 > **Unsupported by Microsoft.** This writes a desktop flow's Dataverse rows directly. A PAD update could change any of it, and a wrong write can leave a flow that won't open or run. Everything here was proven on one environment, with attended runs only. Try it in a test environment first, and keep a copy of the flow's `workflow` row and binaries before you write.
 
-A desktop flow is a `workflow` row with `category = 6` plus four `desktopflowbinaries` rows. All of the following was **proven on PAD 2.72 and 2.73, and re-confirmed** (definition writes, a flow created from scratch, and runs from the cloud). The Designer-side details (what Publish and Save draft write) were not re-run.
+A desktop flow is a `workflow` row with `category = 6` plus four `desktopflowbinaries` rows. All of the following was **proven on PAD 2.72 and 2.73, and re-confirmed** (definition writes, a flow created from scratch, and runs from the cloud). On PAD 2.74 a flow created from scratch, its inputs and outputs, a child flow and a cloud connector action were run again from the cloud, with the same results. The Designer-side details (what Publish and Save draft write) were not re-run.
 
 ### Editing an existing flow
 
